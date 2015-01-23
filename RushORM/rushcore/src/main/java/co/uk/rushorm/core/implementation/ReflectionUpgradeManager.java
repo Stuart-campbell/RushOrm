@@ -177,6 +177,7 @@ public class ReflectionUpgradeManager implements RushUpgradeManager {
             List<Field> fields = new ArrayList<>();
             ReflectionUtils.getAllFields(fields, clazz);
             for (Field field : fields) {
+                field.setAccessible(true);
                 if (!field.isAnnotationPresent(RushIgnore.class)) {
                     if(RushTable.class.isAssignableFrom(field.getType())){
                         addJoinMappingIfRequired(joinMapping, clazz, field.getType(), field);

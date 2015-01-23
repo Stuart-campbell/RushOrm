@@ -87,14 +87,12 @@ public class ReflectionStatementGenerator implements RushStatementGenerator {
         ReflectionUtils.getAllFields(fields, rushTable.getClass());
         for (Field field : fields) {
             if(!field.isAnnotationPresent(RushIgnore.class)) {
-
+                field.setAccessible(true);
                 String joinTableName = joinFromField(joins, rushTable, field);
                 if(joinTableName == null) {
                     if(rushColumns.supportsField(field)) {
                         try {
-                            field.setAccessible(true);
                             String value = rushColumns.valueFormField(rushTable, field, rushStringSanitizer);
-                            field.setAccessible(false);
                             columns.add(field.getName());
                             values.add(value);
                         } catch (IllegalAccessException e) {
@@ -214,6 +212,7 @@ public class ReflectionStatementGenerator implements RushStatementGenerator {
 
         ReflectionUtils.getAllFields(fields, rushTable.getClass());
         for (Field field : fields) {
+            field.setAccessible(true);
             if(!field.isAnnotationPresent(RushIgnore.class)) {
                 if(RushTable.class.isAssignableFrom(field.getType())){
                     try {

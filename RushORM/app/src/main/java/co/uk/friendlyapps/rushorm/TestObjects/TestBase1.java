@@ -18,6 +18,7 @@ public class TestBase1 extends RushTable {
 
     public TestBase2 testBase2;
 
+
     @RushList(classname = "co.uk.friendlyapps.rushorm.TestObjects.TestBase2")
     public List<TestBase2> testBase2List;
 }

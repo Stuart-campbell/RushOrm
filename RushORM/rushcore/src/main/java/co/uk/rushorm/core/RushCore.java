@@ -55,6 +55,8 @@ public class RushCore {
             rushCore.createTables(rushClassFinder, que);
         } else if(rushConfig.inDebug() || rushConfig.upgrade()){
             rushCore.upgrade(rushClassFinder, rushUpgradeManager, que);
+        } else {
+            queProvider.queComplete(que);
         }
     }
 

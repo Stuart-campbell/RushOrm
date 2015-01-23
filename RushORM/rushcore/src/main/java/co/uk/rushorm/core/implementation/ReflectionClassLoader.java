@@ -51,15 +51,13 @@ public class ReflectionClassLoader implements RushClassLoader {
         ReflectionUtils.getAllFields(fields, clazz);
         int counter = 1;
         for (Field field : fields) {
-
+            field.setAccessible(true);
             if (!field.isAnnotationPresent(RushIgnore.class)) {
                 if (!hasJoin(field)) {
                     if(rushColumns.supportsField(field)) {
                         String value = values.get(counter);
                         if(value != null && !value.equals("null")) {
-                            field.setAccessible(true);
                             rushColumns.setField(object, field, value);
-                            field.setAccessible(false);
                         }
                     }
                     counter++;
