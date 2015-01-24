@@ -2,10 +2,8 @@ package co.uk.friendlyapps.rushorm;
 
 import android.app.Application;
 import android.content.Context;
-import android.provider.SyncStateContract;
 import android.test.ApplicationTestCase;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,7 +31,6 @@ import co.uk.rushorm.android.AndroidRushConfig;
 import co.uk.rushorm.android.AndroidRushQueProvider;
 import co.uk.rushorm.android.AndroidRushStatementRunner;
 import co.uk.rushorm.android.AndroidRushStringSanitizer;
-import co.uk.rushorm.core.RushTable;
 
 /**
  * Created by Stuart on 17/12/14.
@@ -500,28 +497,22 @@ public class UpgradeTests extends ApplicationTestCase<Application> {
         assertTrue(loadedObject.myClass.name.equalsIgnoreCase("Hello"));
     }
 
-    private class MyColumn implements RushColumn {
+    private class MyColumn implements RushColumn<MyClass> {
         @Override
         public String sqlColumnType() {
             return "varchar(255)";
         }
 
         @Override
-        public String valueFormField(RushTable rushTable, Field field, RushStringSanitizer stringSanitizer) throws IllegalAccessException {
-            MyClass myClass = (MyClass)field.get(rushTable);
-            String serializedString = null;
-            if(myClass != null) {
-                serializedString = myClass.name;
-            }
-            return stringSanitizer.sanitize(serializedString);
-
+        public String serialize(MyClass object, RushStringSanitizer stringSanitizer) {
+            return stringSanitizer.sanitize(object.name);
         }
 
         @Override
-        public <T> void setField(T rush, Field field, String value) throws IllegalAccessException {
+        public MyClass deserialize(String value) {
             MyClass myClass = new MyClass();
             myClass.name = value;
-            field.set(rush, myClass);
+            return myClass;
         }
 
         @Override

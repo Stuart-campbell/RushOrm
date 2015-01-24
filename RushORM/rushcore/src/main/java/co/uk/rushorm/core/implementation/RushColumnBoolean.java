@@ -1,28 +1,25 @@
 package co.uk.rushorm.core.implementation;
 
-import java.lang.reflect.Field;
-
-import co.uk.rushorm.core.RushTable;
 import co.uk.rushorm.core.RushColumn;
 import co.uk.rushorm.core.RushStringSanitizer;
 
 /**
  * Created by Stuart on 06/01/15.
  */
-public class RushColumnBoolean implements RushColumn {
+public class RushColumnBoolean implements RushColumn<Boolean> {
     @Override
     public String sqlColumnType() {
         return "boolean";
     }
 
     @Override
-    public String valueFormField(RushTable rushTable, Field field, RushStringSanitizer stringSanitizer) throws IllegalAccessException {
-        return "'" + Boolean.toString(field.getBoolean(rushTable)) + "'";
+    public String serialize(Boolean object, RushStringSanitizer stringSanitizer) {
+        return "'" + Boolean.toString(object) + "'";
     }
 
     @Override
-    public <T> void setField(T rush, Field field, String value) throws IllegalAccessException {
-        field.setBoolean(rush, Boolean.parseBoolean(value));
+    public Boolean deserialize(String value) {
+        return Boolean.parseBoolean(value);
     }
 
     @Override

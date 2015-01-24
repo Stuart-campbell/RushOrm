@@ -1,28 +1,25 @@
 package co.uk.rushorm.core.implementation;
 
-import java.lang.reflect.Field;
-
-import co.uk.rushorm.core.RushTable;
 import co.uk.rushorm.core.RushColumn;
 import co.uk.rushorm.core.RushStringSanitizer;
 
 /**
  * Created by Stuart on 06/01/15.
  */
-public class RushColumnInt implements RushColumn {
+public class RushColumnInt implements RushColumn<Integer> {
     @Override
     public String sqlColumnType() {
         return "integer";
     }
 
     @Override
-    public String valueFormField(RushTable rushTable, Field field, RushStringSanitizer stringSanitizer) throws IllegalAccessException {
-        return Integer.toString(field.getInt(rushTable));
+    public String serialize(Integer object, RushStringSanitizer stringSanitizer) {
+        return Integer.toString(object);
     }
 
     @Override
-    public <T> void setField(T rush, Field field, String value) throws IllegalAccessException {
-        field.setInt(rush, Integer.parseInt(value));
+    public Integer deserialize(String value) {
+        return Integer.parseInt(value);
     }
 
     @Override

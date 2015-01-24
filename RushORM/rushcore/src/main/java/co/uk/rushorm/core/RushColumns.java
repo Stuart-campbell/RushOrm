@@ -9,7 +9,7 @@ public interface RushColumns {
 
     public boolean supportsField(Field field);
     public String sqlColumnType(Field field);
-    public String valueFormField(RushTable rushTable, Field field, RushStringSanitizer stringSanitizer) throws IllegalAccessException;
+    public String valueFromField(Rush rush, Field field, RushStringSanitizer stringSanitizer) throws IllegalAccessException;
     public <T> void setField(T rush, Field field, String value) throws IllegalAccessException;
 
 }

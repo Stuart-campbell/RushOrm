@@ -1,6 +1,6 @@
 package co.uk.rushorm.android;
 
-import co.uk.rushorm.core.RushTable;
+import co.uk.rushorm.core.Rush;
 import co.uk.rushorm.core.RushClassFinder;
 import co.uk.rushorm.core.RushConfig;
 import co.uk.rushorm.core.annotations.RushTableAnnotation;
@@ -61,8 +61,8 @@ public class AndroidRushClassFinder implements RushClassFinder {
 
 
         if (discoveredClass != null
-             && RushTable.class.isAssignableFrom(discoveredClass)
-             && !RushTable.class.equals(discoveredClass)
+             && Rush.class.isAssignableFrom(discoveredClass)
+             && !Rush.class.equals(discoveredClass)
              && (discoveredClass.isAnnotationPresent(RushTableAnnotation.class) || !rushConfig.requireTableAnnotation())
              && !Modifier.isAbstract(discoveredClass.getModifiers())) {
 

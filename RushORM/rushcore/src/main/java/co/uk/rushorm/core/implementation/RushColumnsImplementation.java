@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import co.uk.rushorm.core.RushTable;
+import co.uk.rushorm.core.Rush;
 import co.uk.rushorm.core.RushColumn;
 import co.uk.rushorm.core.RushColumns;
 import co.uk.rushorm.core.RushStringSanitizer;
@@ -36,12 +36,17 @@ public class RushColumnsImplementation implements RushColumns {
     }
 
     @Override
-    public String valueFormField(RushTable rushTable, Field field, RushStringSanitizer stringSanitizer) throws IllegalAccessException {
-        return columnMap.get(field.getType()).valueFormField(rushTable, field, stringSanitizer);
+    public String valueFromField(Rush rush, Field field, RushStringSanitizer stringSanitizer) throws IllegalAccessException {
+        Object value = field.get(rush);
+        String string = null;
+        if(value != null) {
+            string = columnMap.get(field.getType()).serialize(value, stringSanitizer);
+        }
+        return string;
     }
 
     @Override
     public <T> void setField(T rush, Field field, String value) throws IllegalAccessException {
-        columnMap.get(field.getType()).setField(rush, field, value);
+        field.set(rush, columnMap.get(field.getType()).deserialize(value));
     }
 }

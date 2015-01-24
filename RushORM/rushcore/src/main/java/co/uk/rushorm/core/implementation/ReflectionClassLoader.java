@@ -4,7 +4,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
-import co.uk.rushorm.core.RushTable;
+import co.uk.rushorm.core.Rush;
 import co.uk.rushorm.core.RushClassLoader;
 import co.uk.rushorm.core.RushColumns;
 import co.uk.rushorm.core.RushStatementRunner;
@@ -45,7 +45,7 @@ public class ReflectionClassLoader implements RushClassLoader {
 
         long id = Long.parseLong(values.get(0));
         T object = clazz.newInstance();
-        callback.didLoadObject((RushTable) object, id);
+        callback.didLoadObject((Rush) object, id);
 
         List<Field> fields = new ArrayList<>();
         ReflectionUtils.getAllFields(fields, clazz);
@@ -62,18 +62,18 @@ public class ReflectionClassLoader implements RushClassLoader {
                     }
                     counter++;
                 }else{
-                    loadJoinField((RushTable) object, field, callback);
+                    loadJoinField((Rush) object, field, callback);
                 }
             }
         }
         return object;
     }
 
-    private void loadJoinField(RushTable object, Field field, LoadCallback callback) throws IllegalAccessException, InstantiationException, ClassNotFoundException {
+    private void loadJoinField(Rush object, Field field, LoadCallback callback) throws IllegalAccessException, InstantiationException, ClassNotFoundException {
         String sql = SearchUtils.findChildren(object, field);
         RushStatementRunner.ValuesCallback valuesCallback = callback.runStatement(sql);
         if (valuesCallback.hasNext()) {
-            if (RushTable.class.isAssignableFrom(field.getType())) {
+            if (Rush.class.isAssignableFrom(field.getType())) {
                 field.set(object, loadClass(field.getType(), valuesCallback.next(), callback));
                 valuesCallback.close();
             } else {
@@ -86,6 +86,6 @@ public class ReflectionClassLoader implements RushClassLoader {
     }
 
     private boolean hasJoin(Field field) {
-        return RushTable.class.isAssignableFrom(field.getType()) || field.isAnnotationPresent(RushList.class);
+        return Rush.class.isAssignableFrom(field.getType()) || field.isAnnotationPresent(RushList.class);
     }
 }

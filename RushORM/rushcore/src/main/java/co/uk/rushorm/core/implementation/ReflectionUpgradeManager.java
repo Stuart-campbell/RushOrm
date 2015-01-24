@@ -4,7 +4,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
-import co.uk.rushorm.core.RushTable;
+import co.uk.rushorm.core.Rush;
 import co.uk.rushorm.core.RushStatementRunner;
 import co.uk.rushorm.core.RushUpgradeManager;
 import co.uk.rushorm.core.annotations.RushIgnore;
@@ -179,7 +179,7 @@ public class ReflectionUpgradeManager implements RushUpgradeManager {
             for (Field field : fields) {
                 field.setAccessible(true);
                 if (!field.isAnnotationPresent(RushIgnore.class)) {
-                    if(RushTable.class.isAssignableFrom(field.getType())){
+                    if(Rush.class.isAssignableFrom(field.getType())){
                         addJoinMappingIfRequired(joinMapping, clazz, field.getType(), field);
                     }else if(field.isAnnotationPresent(RushList.class)) {
                         RushList rushList = field.getAnnotation(RushList.class);

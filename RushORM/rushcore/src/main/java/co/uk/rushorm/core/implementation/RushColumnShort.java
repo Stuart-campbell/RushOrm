@@ -1,28 +1,25 @@
 package co.uk.rushorm.core.implementation;
 
-import java.lang.reflect.Field;
-
-import co.uk.rushorm.core.RushTable;
 import co.uk.rushorm.core.RushColumn;
 import co.uk.rushorm.core.RushStringSanitizer;
 
 /**
  * Created by Stuart on 06/01/15.
  */
-public class RushColumnShort implements RushColumn {
+public class RushColumnShort implements RushColumn<Short> {
     @Override
     public String sqlColumnType() {
         return "short";
     }
 
     @Override
-    public String valueFormField(RushTable rushTable, Field field, RushStringSanitizer stringSanitizer) throws IllegalAccessException {
-        return Short.toString(field.getShort(rushTable));
+    public String serialize(Short object, RushStringSanitizer stringSanitizer) {
+        return Short.toString(object);
     }
 
     @Override
-    public <T> void setField(T rush, Field field, String value) throws IllegalAccessException {
-        field.setShort(rush, Short.parseShort(value));
+    public Short deserialize(String value) {
+        return Short.parseShort(value);
     }
 
     @Override

@@ -6,18 +6,18 @@ package co.uk.rushorm.core;
 public interface RushStatementGenerator {
 
     public interface SaveCallback {
-        public void statementCreatedForRush(String sql, RushTable rushTable);
+        public void statementCreatedForRush(String sql, Rush rush);
         public void deleteJoinStatementCreated(String sql);
         public void joinStatementCreated(String sql);
     }
 
     public interface DeleteCallback {
         public void deleteJoinStatementCreated(String sql);
-        public void statementCreatedForRush(String sql, RushTable rushTable);
-        public void deleteChild(RushTable rushTable);
+        public void statementCreatedForRush(String sql, Rush rush);
+        public void deleteChild(Rush rush);
     }
 
-    public void generateSaveOrUpdate(RushTable rushTable, SaveCallback saveCallback);
-    public void generateDelete(RushTable rushTable, DeleteCallback deleteCallback);
+    public void generateSaveOrUpdate(Rush rush, SaveCallback saveCallback);
+    public void generateDelete(Rush rush, DeleteCallback deleteCallback);
 
 }

@@ -4,7 +4,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
-import co.uk.rushorm.core.RushTable;
+import co.uk.rushorm.core.Rush;
 import co.uk.rushorm.core.RushColumns;
 import co.uk.rushorm.core.annotations.RushIgnore;
 import co.uk.rushorm.core.annotations.RushList;
@@ -92,7 +92,7 @@ public class ReflectionTableStatementGenerator implements RushTableStatementGene
 
     private Column columnFromField(Class clazz, Field field) {
 
-        if(RushTable.class.isAssignableFrom(field.getType())){
+        if(Rush.class.isAssignableFrom(field.getType())){
 
             // One to one join table
             Join join = new Join();
@@ -114,7 +114,7 @@ public class ReflectionTableStatementGenerator implements RushTableStatementGene
                 throw new RushListAnnotationDoesNotMatchClassException();
             }
 
-            if (RushTable.class.isAssignableFrom(listClass)) {
+            if (Rush.class.isAssignableFrom(listClass)) {
 
                 Join join = new Join();
                 join.key = clazz;

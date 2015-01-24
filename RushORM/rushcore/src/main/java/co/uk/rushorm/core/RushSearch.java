@@ -223,12 +223,12 @@ public class RushSearch {
     }
 
 
-    public RushSearch whereEqual(String field, RushTable value) {
+    public RushSearch whereEqual(String field, Rush value) {
         whereStatements.add(new WhereHasChild(field, value.getId(), value.getClass(), "="));
         return this;
     }
 
-    public RushSearch whereNotEqual(String field, RushTable value) {
+    public RushSearch whereNotEqual(String field, Rush value) {
         whereStatements.add(new WhereHasChild(field, value.getId(), value.getClass(), "<>"));
         return this;
     }

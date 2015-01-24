@@ -1,7 +1,8 @@
 package co.uk.rushorm.core.implementation;
 
 import java.lang.reflect.Field;
-import co.uk.rushorm.core.RushTable;
+
+import co.uk.rushorm.core.Rush;
 import co.uk.rushorm.core.annotations.RushList;
 import co.uk.rushorm.core.exceptions.RushListAnnotationDoesNotMatchClassException;
 
@@ -23,10 +24,10 @@ public class SearchUtils {
         return String.format(BASIC_WHERE_TEMPLATE, ReflectionUtils.tableNameForClass(rush), "id=" + Long.toString(id));
     }
 
-    public static String findChildren(RushTable parent, Field field) {
+    public static String findChildren(Rush parent, Field field) {
 
         Class childClass;
-        if(RushTable.class.isAssignableFrom(field.getType())){
+        if(Rush.class.isAssignableFrom(field.getType())){
             childClass = field.getType();
         }else {
             // One to many join table

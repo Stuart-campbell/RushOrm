@@ -1,5 +1,6 @@
 package co.uk.friendlyapps.rushorm.TestObjects;
 
+import co.uk.rushorm.core.Rush;
 import co.uk.rushorm.core.RushTable;
 
 /**
