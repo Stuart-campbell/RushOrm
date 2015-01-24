@@ -6,7 +6,7 @@ RushOrm replaces the need for SQL by mapping java classes to SQL tables.
 
 Core features
 <ul>
-    <li>Custom fields - easily implement custom fields so that any object can be serialization to the database</li>
+    <li>Custom fields - easily implement custom fields so that any object can be serialized to the database</li>
     <li>Relationships</li>
     <ul>
 			<li>One to one</li>
