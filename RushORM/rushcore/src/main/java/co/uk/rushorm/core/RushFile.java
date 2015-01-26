@@ -9,7 +9,7 @@ import java.io.InputStream;
 /**
  * Created by Stuart on 19/01/15.
  */
-public abstract class RushFile extends RushTable {
+public abstract class RushFile extends RushObject {
 
     public abstract String fileExtension();
 

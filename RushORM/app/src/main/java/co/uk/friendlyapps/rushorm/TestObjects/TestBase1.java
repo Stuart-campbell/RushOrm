@@ -2,13 +2,13 @@ package co.uk.friendlyapps.rushorm.TestObjects;
 
 import java.util.List;
 
-import co.uk.rushorm.core.RushTable;
+import co.uk.rushorm.core.RushObject;
 import co.uk.rushorm.core.annotations.RushList;
 
 /**
  * Created by Stuart on 17/12/14.
  */
-public class TestBase1 extends RushTable {
+public class TestBase1 extends RushObject {
     public String stringField;
     public double doubleField;
     public int intField;

@@ -10,7 +10,7 @@ Core features
     <li>Relationships</li>
     <ul>
 			<li>One to one</li>
-			<li>One to many</li>
+			<li>One to many, save lists of children</li>
 			<li>Saving a parent object automatically saves it children</li>
 		</ul>
 		<li>Files - easily store long text, JSON and bitmaps</li>
