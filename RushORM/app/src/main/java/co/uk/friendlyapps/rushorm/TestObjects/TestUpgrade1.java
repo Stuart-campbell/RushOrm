@@ -2,8 +2,7 @@ package co.uk.friendlyapps.rushorm.TestObjects;
 
 import java.util.List;
 
-import co.uk.rushorm.core.Rush;
-import co.uk.rushorm.core.RushTable;
+import co.uk.rushorm.core.RushObject;
 import co.uk.rushorm.core.annotations.RushList;
 import co.uk.rushorm.core.annotations.RushRenamed;
 
@@ -11,7 +10,7 @@ import co.uk.rushorm.core.annotations.RushRenamed;
  * Created by Stuart on 17/12/14.
  */
 @RushRenamed(names = {"co.uk.friendlyapps.rushorm.TestObjects.TestBase1"})
-public class TestUpgrade1 extends RushTable {
+public class TestUpgrade1 extends RushObject {
     public String stringField;
     public double doubleField;
     public int intField;

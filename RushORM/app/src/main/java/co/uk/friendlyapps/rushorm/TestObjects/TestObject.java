@@ -2,8 +2,7 @@ package co.uk.friendlyapps.rushorm.TestObjects;
 
 import java.util.List;
 
-import co.uk.rushorm.core.Rush;
-import co.uk.rushorm.core.RushTable;
+import co.uk.rushorm.core.RushObject;
 import co.uk.rushorm.core.annotations.RushDisableAutodelete;
 import co.uk.rushorm.core.annotations.RushIgnore;
 import co.uk.rushorm.core.annotations.RushList;
@@ -13,7 +12,7 @@ import co.uk.rushorm.core.annotations.RushTableAnnotation;
  * Created by Stuart on 15/12/14.
  */
 @RushTableAnnotation
-public class TestObject extends RushTable {
+public class TestObject extends RushObject {
 
     public String stringField;
     public double doubleField;

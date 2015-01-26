@@ -3,7 +3,7 @@ package co.uk.rushorm.core;
 /**
  * Created by Stuart on 24/01/15.
  */
-public abstract class RushTable implements Rush {
+public abstract class RushObject implements Rush {
 
     @Override
     public void save() {
