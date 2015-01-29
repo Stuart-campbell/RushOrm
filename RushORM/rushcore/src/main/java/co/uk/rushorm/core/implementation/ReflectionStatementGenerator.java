@@ -2,7 +2,9 @@ package co.uk.rushorm.core.implementation;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import co.uk.rushorm.core.Rush;
 import co.uk.rushorm.core.RushColumns;
@@ -38,17 +40,18 @@ public class ReflectionStatementGenerator implements RushStatementGenerator {
 
     private static final String DELETE_TEMPLATE = "DELETE FROM %s \n" +
             "WHERE id=%d;";
-
+/*
     private class Join {
         private final Rush parent;
         private final Rush child;
         private final String name;
-        private Join(Rush parent, Rush child,String name){
+
+        private Join(Rush parent, Rush child, String name) {
             this.parent = parent;
             this.child = child;
             this.name = name;
         }
-    }
+    }*/
 
     private final RushStringSanitizer rushStringSanitizer;
     private final RushColumns rushColumns;
@@ -58,22 +61,71 @@ public class ReflectionStatementGenerator implements RushStatementGenerator {
         this.rushColumns = rushColumns;
     }
 
-    @Override
-    public void generateSaveOrUpdate(Rush rush, SaveCallback saveCallback) {
+    private class BasicJoin {
+        private final Rush parent;
+        private final Rush child;
 
-        List<Join> joins = new ArrayList<>();
-        List<Rush> rushObjects = new ArrayList<>();
-
-        generateSaveOrUpdate(rush, saveCallback, rushObjects, joins);
-
-        for(Join join : joins) {
-            saveCallback.joinStatementCreated(statementForJoin(join));
+        private BasicJoin(Rush parent, Rush child) {
+            this.parent = parent;
+            this.child = child;
         }
     }
 
-    private void generateSaveOrUpdate(Rush rush, SaveCallback saveCallback, List<Rush> rushObjects, List<Join> joins) {
+    private class BasicUpdate {
+        private final List<String> values;
+        private final long id;
 
-        if(rushObjects.contains(rush)) {
+        private BasicUpdate(List<String> values, long id) {
+            this.values = values;
+            this.id = id;
+        }
+    }
+
+    private class BasicCreate {
+        private final List<String> values;
+        private final Rush rush;
+
+        private BasicCreate(List<String> values, Rush rush) {
+            this.values = values;
+            this.rush = rush;
+        }
+    }
+
+    @Override
+    public void generateSaveOrUpdate(Rush rush, SaveCallback saveCallback) {
+
+        List<Rush> rushObjects = new ArrayList<>();
+
+        Map<Class, List<BasicCreate>> createValues = new HashMap<>();
+        Map<Class, List<BasicUpdate>> updateValues = new HashMap<>();
+        Map<Class, List<String>> columns = new HashMap<>();
+
+        Map<String, List<Long>> joinDeletes = new HashMap<>();
+        Map<String, List<BasicJoin>> joinValues = new HashMap<>();
+
+        generateSaveOrUpdate(rush, saveCallback, rushObjects, createValues, updateValues, columns, joinDeletes, joinValues);
+
+
+        deleteManyJoins(joinDeletes, saveCallback);
+        createObjects(createValues, columns, saveCallback);
+        updateObjects(updateValues, columns, saveCallback);
+        createManyJoins(joinValues, saveCallback);
+
+/*
+        for (Join join : joins) {
+            saveCallback.joinStatementCreated(statementForJoin(join));
+        }*/
+    }
+
+    private void generateSaveOrUpdate(Rush rush, SaveCallback saveCallback,
+                                      List<Rush> rushObjects,
+                                      Map<Class, List<BasicCreate>> createValuesMap,
+                                      Map<Class, List<BasicUpdate>> updateValuesMap,
+                                      Map<Class, List<String>> columnsMap,
+                                      Map<String, List<Long>> joinDeletesMap,
+                                      Map<String, List<BasicJoin>> joinValuesMap) {
+
+        if (rushObjects.contains(rush)) {
             // Exit if object is referenced by child
             return;
         }
@@ -86,11 +138,11 @@ public class ReflectionStatementGenerator implements RushStatementGenerator {
 
         ReflectionUtils.getAllFields(fields, rush.getClass());
         for (Field field : fields) {
-            if(!field.isAnnotationPresent(RushIgnore.class)) {
+            if (!field.isAnnotationPresent(RushIgnore.class)) {
                 field.setAccessible(true);
-                String joinTableName = joinFromField(joins, rush, field);
-                if(joinTableName == null) {
-                    if(rushColumns.supportsField(field)) {
+                String joinTableName = joinFromField(joinValuesMap, rush, field);
+                if (joinTableName == null) {
+                    if (rushColumns.supportsField(field)) {
                         try {
                             String value = rushColumns.valueFromField(rush, field, rushStringSanitizer);
                             columns.add(field.getName());
@@ -99,37 +151,57 @@ public class ReflectionStatementGenerator implements RushStatementGenerator {
                             e.printStackTrace();
                         }
                     }
-                }else {
-                    if(rush.getId() > 0) {
+                } else {
+                    if (rush.getId() > 0) {
                         // Clear join tables and re save rows to catch any deleted or changed children
-                        saveCallback.deleteJoinStatementCreated(String.format(DELETE_JOIN_TEMPLATE, joinTableName, rush.getId()));
+                        //saveCallback.deleteJoinStatementCreated(String.format(DELETE_JOIN_TEMPLATE, joinTableName, rush.getId()));
+                        if (!joinDeletesMap.containsKey(joinTableName)) {
+                            joinDeletesMap.put(joinTableName, new ArrayList<Long>());
+                        }
+                        joinDeletesMap.get(joinTableName).add(rush.getId());
                     }
-                    for (Join join : joins) {
-                        // Recourse through all children and save
-                        generateSaveOrUpdate(join.child, saveCallback, rushObjects, joins);
+                    for (Map.Entry<String, List<BasicJoin>> entry : joinValuesMap.entrySet())
+                    {
+                        for (BasicJoin join : entry.getValue()) {
+                            // Recourse through all children and save
+                            generateSaveOrUpdate(join.child, saveCallback, rushObjects, createValuesMap, updateValuesMap, columnsMap, joinDeletesMap, joinValuesMap);
+                        }
                     }
+
                 }
             }
         }
 
+        if (!columnsMap.containsKey(rush.getClass())) {
+            columnsMap.put(rush.getClass(), columns);
+        }
+
         // Save self
-        if(rush.getId() < 0) {
-            saveCallback.statementCreatedForRush(createStatement(rush, columns, values), rush);
-        }else if(columns.size() > 0) {
-            saveCallback.statementCreatedForRush(updateStatement(rush, columns, values), rush);
+        if (rush.getId() < 0) {
+            if (!createValuesMap.containsKey(rush.getClass())) {
+                createValuesMap.put(rush.getClass(), new ArrayList<BasicCreate>());
+            }
+            createValuesMap.get(rush.getClass()).add(new BasicCreate(values, rush));
+            //saveCallback.statementCreatedForRush(createStatement(rush, columns, values), rush);
+        } else if (columns.size() > 0) {
+            if (!updateValuesMap.containsKey(rush.getClass())) {
+                updateValuesMap.put(rush.getClass(), new ArrayList<BasicUpdate>());
+            }
+            updateValuesMap.get(rush.getClass()).add(new BasicUpdate(values, rush.getId()));
+            //saveCallback.statementCreatedForRush(updateStatement(rush, columns, values), rush);
         }
     }
-
+/*
     private String createStatement(Rush rush, List<String> columns, List<String> values) {
-        if(columns.size() < 1){
+        if (columns.size() < 1) {
             return String.format(INSERT_BLANK_TEMPLATE, ReflectionUtils.tableNameForClass(rush.getClass()));
         }
         StringBuilder columnString = new StringBuilder();
         StringBuilder valueString = new StringBuilder();
-        for(int i = 0; i < columns.size(); i ++) {
+        for (int i = 0; i < columns.size(); i++) {
             columnString.append(columns.get(i));
             valueString.append(values.get(i));
-            if(i < columns.size() - 1) {
+            if (i < columns.size() - 1) {
                 columnString.append(",");
                 valueString.append(",");
             }
@@ -139,11 +211,11 @@ public class ReflectionStatementGenerator implements RushStatementGenerator {
 
     private String updateStatement(Rush rush, List<String> columns, List<String> values) {
         StringBuilder string = new StringBuilder();
-        for(int i = 0; i < columns.size(); i ++) {
+        for (int i = 0; i < columns.size(); i++) {
             string.append(columns.get(i))
                     .append("=")
                     .append(values.get(i));
-            if(i < columns.size() - 1) {
+            if (i < columns.size() - 1) {
                 string.append(",");
             }
         }
@@ -153,21 +225,21 @@ public class ReflectionStatementGenerator implements RushStatementGenerator {
     private String statementForJoin(Join join) {
         return String.format(JOIN_TEMPLATE, ReflectionUtils.tableNameForClass(join.parent.getClass()), ReflectionUtils.tableNameForClass(join.child.getClass()), join.name, join.parent.getId(), join.child.getId());
     }
+*/
+    private String joinFromField(Map<String, List<BasicJoin>> joins, Rush rush, Field field) {
 
-    private String joinFromField(List<Join> joins, Rush rush, Field field) {
-
-        if(Rush.class.isAssignableFrom(field.getType())){
+        if (Rush.class.isAssignableFrom(field.getType())) {
+            String tableName = ReflectionUtils.joinTableNameForClass(rush.getClass(), field.getType(), field);
             try {
-                Rush child = (Rush)field.get(rush);
-                if(child != null) {
-                    Join join = new Join(rush, child, field.getName());
-                    joins.add(join);
+                Rush child = (Rush) field.get(rush);
+                if (child != null) {
+                    addJoin(joins, tableName, new BasicJoin(rush, child));
                 }
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
             }
-            return ReflectionUtils.joinTableNameForClass(rush.getClass(), field.getType(), field);
-        }else if(field.isAnnotationPresent(RushList.class)) {
+            return tableName;
+        } else if (field.isAnnotationPresent(RushList.class)) {
 
             // One to many join table
             RushList rushList = field.getAnnotation(RushList.class);
@@ -179,15 +251,13 @@ public class ReflectionStatementGenerator implements RushStatementGenerator {
                 throw new RushListAnnotationDoesNotMatchClassException();
             }
 
+            String tableName = ReflectionUtils.joinTableNameForClass(rush.getClass(), listClass, field);
             if (Rush.class.isAssignableFrom(listClass)) {
-
                 try {
-
-                    List<Rush> children = (List<Rush>)field.get(rush);
-                    if(children != null) {
+                    List<Rush> children = (List<Rush>) field.get(rush);
+                    if (children != null) {
                         for (Rush child : children) {
-                            Join join = new Join(rush, child, field.getName());
-                            joins.add(join);
+                            addJoin(joins, tableName, new BasicJoin(rush, child));
                         }
                     }
                 } catch (IllegalAccessException e) {
@@ -195,15 +265,22 @@ public class ReflectionStatementGenerator implements RushStatementGenerator {
                 }
             }
 
-            return ReflectionUtils.joinTableNameForClass(rush.getClass(), listClass, field);
+            return tableName;
         }
         return null;
+    }
+
+    private void addJoin(Map<String, List<BasicJoin>> joins, String table, BasicJoin basicJoin) {
+        if(!joins.containsKey(table)) {
+            joins.put(table, new ArrayList<BasicJoin>());
+        }
+        joins.get(table).add(basicJoin);
     }
 
     @Override
     public void generateDelete(Rush rush, DeleteCallback deleteCallback) {
 
-        if(rush.getId() < 0) {
+        if (rush.getId() < 0) {
             return;
         }
 
@@ -213,27 +290,27 @@ public class ReflectionStatementGenerator implements RushStatementGenerator {
         ReflectionUtils.getAllFields(fields, rush.getClass());
         for (Field field : fields) {
             field.setAccessible(true);
-            if(!field.isAnnotationPresent(RushIgnore.class)) {
-                if(Rush.class.isAssignableFrom(field.getType())){
+            if (!field.isAnnotationPresent(RushIgnore.class)) {
+                if (Rush.class.isAssignableFrom(field.getType())) {
                     try {
-                        Rush child = (Rush)field.get(rush);
-                        if(child != null) {
+                        Rush child = (Rush) field.get(rush);
+                        if (child != null) {
                             deleteCallback.deleteJoinStatementCreated(deleteJoin(rush, child, field));
-                            if(!field.isAnnotationPresent(RushDisableAutodelete.class)) {
+                            if (!field.isAnnotationPresent(RushDisableAutodelete.class)) {
                                 children.add(child);
                             }
                         }
                     } catch (IllegalAccessException e) {
                         e.printStackTrace();
                     }
-                }else if(field.isAnnotationPresent(RushList.class)) {
+                } else if (field.isAnnotationPresent(RushList.class)) {
                     try {
 
                         List<Rush> fieldChildren = (List<Rush>) field.get(rush);
                         if (fieldChildren != null && fieldChildren.size() > 0) {
                             Rush child = fieldChildren.get(0);
                             deleteCallback.deleteJoinStatementCreated(deleteJoin(rush, child, field));
-                            if(!field.isAnnotationPresent(RushDisableAutodelete.class)) {
+                            if (!field.isAnnotationPresent(RushDisableAutodelete.class)) {
                                 children.addAll(fieldChildren);
                             }
                         }
@@ -244,16 +321,183 @@ public class ReflectionStatementGenerator implements RushStatementGenerator {
             }
         }
         deleteCallback.statementCreatedForRush(deleteStatement(rush), rush);
-        for(Rush child : children) {
+        for (Rush child : children) {
             deleteCallback.deleteChild(child);
         }
     }
 
-    private String deleteJoin(Rush parent, Rush child, Field field){
+    private String deleteJoin(Rush parent, Rush child, Field field) {
         return String.format(DELETE_JOIN_TEMPLATE, ReflectionUtils.joinTableNameForClass(parent.getClass(), child.getClass(), field), parent.getId());
     }
 
     private String deleteStatement(Rush rush) {
         return String.format(DELETE_TEMPLATE, ReflectionUtils.tableNameForClass(rush.getClass()), rush.getId());
     }
+
+
+    /**
+     * **** Test *******
+     */
+    private static final String MULTIPLE_INSERT_TEMPLATE = "INSERT INTO %s " +
+            "(%s)\n" +
+            "VALUES %s;";
+
+    private static final String MULTIPLE_UPDATE_TEMPLATE = "UPDATE %s " +
+            "%s;";
+
+    private void createObjects(Map<Class, List<BasicCreate>> valuesMap, Map<Class, List<String>> columnsMap, SaveCallback saveCallback) {
+
+        for (Map.Entry<Class, List<BasicCreate>> entry : valuesMap.entrySet()) {
+            columnsMap.get(entry.getKey()).add(0, "id");
+            long lastId = saveCallback.lastTableId(ReflectionUtils.tableNameForClass(entry.getKey()));
+
+            StringBuilder columnsString = new StringBuilder();
+            List<BasicCreate> creates = entry.getValue();
+            for (int i = 0; i < creates.size(); i++) {
+                lastId++;
+
+                saveCallback.addRush(creates.get(i).rush, lastId);
+                creates.get(i).values.add(0, Long.toString(lastId));
+                columnsString.append("(")
+                        .append(commaSeparated(creates.get(i).values))
+                        .append(")");
+
+                if(i % 500 == 0) {
+                    create(columnsString.toString(), entry.getKey(), columnsMap.get(entry.getKey()), saveCallback);
+                    columnsString = new StringBuilder();
+                }else if(i < creates.size() - 1) {
+                    columnsString.append(", ");
+                }
+            }
+            if(columnsString.length() > 0) {
+                create(columnsString.toString(), entry.getKey(), columnsMap.get(entry.getKey()), saveCallback);
+            }
+        }
+    }
+
+    private void create(String middleBit, Class clazz, List<String> columns, SaveCallback saveCallback) {
+        String sql = String.format(MULTIPLE_INSERT_TEMPLATE,
+                ReflectionUtils.tableNameForClass(clazz),
+                commaSeparated(columns),
+                middleBit);
+
+        saveCallback.statementCreatedForRush(sql);
+    }
+
+    private String commaSeparated(List<String> values) {
+        StringBuilder string = new StringBuilder();
+        for (int i = 0; i < values.size(); i++) {
+            string.append(values.get(i));
+            if (i < values.size() - 1) {
+                string.append(",");
+            }
+        }
+        return string.toString();
+    }
+
+    private void updateObjects(Map<Class, List<BasicUpdate>> valuesMap, Map<Class, List<String>> columnsMap, SaveCallback saveCallback) {
+
+        for (Map.Entry<Class, List<BasicUpdate>> entry : valuesMap.entrySet()) {
+            StringBuilder columnsString = new StringBuilder();
+
+            List<BasicUpdate> values = entry.getValue();
+            for (int i = 0; i < values.size(); i ++) {
+                columnsString.append("\nSet ")
+                        .append(updateSection(columnsMap.get(entry.getKey()), values.get(i).values))
+                        .append(" Where id=")
+                        .append(values.get(i).id);
+                if(i % 500 == 0) {
+                    update(ReflectionUtils.tableNameForClass(entry.getKey()), columnsString.toString(), saveCallback);
+                    columnsString = new StringBuilder();
+                } else if(i < values.size() - 1) {
+                    columnsString.append(", ");
+                }
+            }
+            if(columnsString.length() > 0) {
+                update(ReflectionUtils.tableNameForClass(entry.getKey()), columnsString.toString(), saveCallback);
+            }
+        }
+    }
+
+    private void update(String table, String columns, SaveCallback saveCallback) {
+        String sql = String.format(MULTIPLE_UPDATE_TEMPLATE,table,columns);
+        saveCallback.statementCreatedForRush(sql);
+    }
+
+    private String updateSection(List<String> columns, List<String> values) {
+        StringBuilder string = new StringBuilder();
+        for (int i = 0; i < columns.size(); i++) {
+            string.append(columns.get(i))
+                    .append("=")
+                    .append(values.get(i));
+            if (i < columns.size() - 1) {
+                string.append(",");
+            }
+        }
+        return string.toString();
+    }
+
+    private static final String MULTIPLE_DELETE_JOIN_TEMPLATE = "DELETE FROM %s \n" +
+            "WHERE %s;";
+
+    private void deleteManyJoins(Map<String, List<Long>> joinDeletes, SaveCallback saveCallback) {
+
+        for (Map.Entry<String, List<Long>> entry : joinDeletes.entrySet()) {
+            StringBuilder columnsString = new StringBuilder();
+
+            List<Long> ids = entry.getValue();
+            for (int i = 0; i < ids.size(); i ++) {
+                columnsString.append("parent=")
+                        .append(ids.get(i));
+
+                if(i < ids.size() - 1) {
+                     columnsString.append(" OR ");
+                 }
+            }
+
+            String sql = String.format(MULTIPLE_DELETE_JOIN_TEMPLATE, entry.getKey(),
+                    columnsString.toString());
+
+            saveCallback.deleteJoinStatementCreated(sql);
+
+        }
+    }
+
+    private static final String MULTIPLE_INSERT_JOIN_TEMPLATE = "INSERT INTO %s " +
+            "(parent, child)\n" +
+            "VALUES %s;";
+
+    private void createManyJoins(Map<String, List<BasicJoin>> joinValues, SaveCallback saveCallback) {
+
+        for (Map.Entry<String, List<BasicJoin>> entry : joinValues.entrySet()) {
+            StringBuilder columnsString = new StringBuilder();
+            List<BasicJoin> values = entry.getValue();
+            for (int i = 0; i < values.size(); i ++) {
+                columnsString.append("(")
+                        .append(values.get(i).parent.getId())
+                        .append(",")
+                        .append(values.get(i).child.getId())
+                        .append(")");
+
+                if(i % 500 == 0) {
+                    createJoins(entry.getKey(), columnsString.toString(), saveCallback);
+                    columnsString = new StringBuilder();
+                } else if(i < values.size() - 1) {
+                    columnsString.append(", ");
+                }
+            }
+
+            if(columnsString.length() > 0) {
+                createJoins(entry.getKey(), columnsString.toString(), saveCallback);
+            }
+        }
+    }
+
+    private void createJoins(String table, String columns, SaveCallback saveCallback) {
+        String sql = String.format(MULTIPLE_INSERT_JOIN_TEMPLATE, table,
+                columns);
+
+        saveCallback.statementCreatedForRush(sql);
+    }
+
 }

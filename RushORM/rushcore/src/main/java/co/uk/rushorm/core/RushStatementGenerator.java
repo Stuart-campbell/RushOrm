@@ -6,9 +6,10 @@ package co.uk.rushorm.core;
 public interface RushStatementGenerator {
 
     public interface SaveCallback {
-        public void statementCreatedForRush(String sql, Rush rush);
+        public void addRush(Rush rush, long id);
+        public long lastTableId(String sql);
+        public void statementCreatedForRush(String sql);
         public void deleteJoinStatementCreated(String sql);
-        public void joinStatementCreated(String sql);
     }
 
     public interface DeleteCallback {

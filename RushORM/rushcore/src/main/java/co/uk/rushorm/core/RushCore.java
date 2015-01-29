@@ -186,23 +186,27 @@ public class RushCore {
         statementRunner.startTransition(que);
         statementGenerator.generateSaveOrUpdate(rush, new RushStatementGenerator.SaveCallback() {
             @Override
-            public void statementCreatedForRush(String sql, Rush rush) {
-                logger.logSql(sql);
-                long id = statementRunner.runPut(sql, que);
-                if(rush.getId() < 0) {
-                    idTable.put(rush, id);
-                }
+            public void addRush(Rush rush, long id) {
+                idTable.put(rush, id);
             }
+
             @Override
-            public void deleteJoinStatementCreated(String sql) {
+            public long lastTableId(String sql) {
+                long id = statementRunner.runGetLastId(sql, que);
+                return id;
+            }
+
+            @Override
+            public void statementCreatedForRush(String sql) {
                 logger.logSql(sql);
                 statementRunner.runRaw(sql, que);
             }
 
+
             @Override
-            public void joinStatementCreated(String sql) {
+            public void deleteJoinStatementCreated(String sql) {
                 logger.logSql(sql);
-                statementRunner.runPut(sql, que);
+                statementRunner.runRaw(sql, que);
             }
         });
         statementRunner.endTransition(que);
