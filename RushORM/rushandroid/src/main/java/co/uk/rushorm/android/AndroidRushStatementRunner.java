@@ -43,10 +43,14 @@ public class AndroidRushStatementRunner extends SQLiteOpenHelper implements Rush
     @Override
     public long runGetLastId(String table, RushQue que) {
         Cursor c = getWritableDatabase().rawQuery(String.format(LAST_ID, table), null);
-        if (c != null && c.moveToFirst()) {
-            return c.getLong(0); //The 0 is the column index, we only have 1 column, so the index is 0
+        long id = 0;
+        if (c != null ) {
+            if(c.moveToFirst()){
+                id = c.getLong(0); //The 0 is the column index, we only have 1 column, so the index is 0
+            }
+            c.close();
         }
-        return 0;
+        return id;
     }
 
     @Override

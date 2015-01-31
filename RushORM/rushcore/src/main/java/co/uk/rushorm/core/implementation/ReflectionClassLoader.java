@@ -75,7 +75,6 @@ public class ReflectionClassLoader implements RushClassLoader {
         if (valuesCallback.hasNext()) {
             if (Rush.class.isAssignableFrom(field.getType())) {
                 field.set(object, loadClass(field.getType(), valuesCallback.next(), callback));
-                valuesCallback.close();
             } else {
                 RushList rushList = field.getAnnotation(RushList.class);
                 Class listClass;
@@ -83,6 +82,7 @@ public class ReflectionClassLoader implements RushClassLoader {
                 field.set(object, loadClasses(listClass, valuesCallback, callback));
             }
         }
+        valuesCallback.close();
     }
 
     private boolean hasJoin(Field field) {

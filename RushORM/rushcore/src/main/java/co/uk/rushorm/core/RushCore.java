@@ -295,6 +295,7 @@ public class RushCore {
                 idTable.put(rush, id);
             }
         });
+        values.close();
         queProvider.queComplete(que);
         return objects;
     }

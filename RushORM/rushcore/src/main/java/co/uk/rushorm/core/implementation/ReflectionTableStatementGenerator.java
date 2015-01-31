@@ -22,7 +22,7 @@ public class ReflectionTableStatementGenerator implements RushTableStatementGene
             "\n);";
 
     private static final String JOIN_TEMPLATE = "CREATE TABLE %s (" +
-            "\nid integer primary key autoincrement" +
+            "\nid integer primary key" +
             ",\nparent integer NOT NULL" +
             ",\nchild integer NOT NULL" +
             ",\nFOREIGN KEY (parent) REFERENCES %s(id)" +

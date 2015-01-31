@@ -66,7 +66,6 @@ public class AndroidRushClassFinder implements RushClassFinder {
              && (discoveredClass.isAnnotationPresent(RushTableAnnotation.class) || !rushConfig.requireTableAnnotation())
              && !Modifier.isAbstract(discoveredClass.getModifiers())) {
 
-            Log.i("Rush", "domain class : " + discoveredClass.getSimpleName());
             return discoveredClass;
 
         } else {

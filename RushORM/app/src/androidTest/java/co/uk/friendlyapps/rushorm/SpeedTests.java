@@ -67,7 +67,7 @@ public class SpeedTests extends ApplicationTestCase<Application> {
 
         Log.i("SPEED_TEST", "Save 1000 children - " + Double.toString(time));
 
-        assertTrue("Save Children time of 100 rows : " + Double.toString(time), time < 10);
+        assertTrue("Save Children time of 1000 rows : " + Double.toString(time), time < 20);
     }
 
     public void testSave1000ChildrenInTransitionRows() throws Exception {
