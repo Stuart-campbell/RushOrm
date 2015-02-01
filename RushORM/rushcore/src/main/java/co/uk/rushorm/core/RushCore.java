@@ -1,6 +1,7 @@
 package co.uk.rushorm.core;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -41,9 +42,12 @@ public class RushCore {
 
         RushColumns rushColumns = new RushColumnsImplementation(columns);
         RushUpgradeManager rushUpgradeManager = new ReflectionUpgradeManager();
-        RushStatementGenerator statementGenerator = new ReflectionStatementGenerator(rushStringSanitizer, rushColumns);
+
+        Map<Class, AnnotationCache> annotationCache = new HashMap<>();
+
+        RushStatementGenerator statementGenerator = new ReflectionStatementGenerator(rushStringSanitizer, rushColumns, annotationCache);
         RushTableStatementGenerator rushTableStatementGenerator = new ReflectionTableStatementGenerator(rushColumns);
-        RushClassLoader rushClassLoader = new ReflectionClassLoader(rushColumns);
+        RushClassLoader rushClassLoader = new ReflectionClassLoader(rushColumns, annotationCache);
 
         initialize(rushUpgradeManager, statementGenerator, rushClassFinder, rushTableStatementGenerator, statementRunner, queProvider, rushConfig, rushClassLoader, rushStringSanitizer, logger);
     }
@@ -52,6 +56,8 @@ public class RushCore {
         rushCore = new RushCore(statementGenerator, statementRunner, queProvider, rushConfig, rushTableStatementGenerator, rushClassLoader, rushStringSanitizer, logger);
         RushQue que = queProvider.blockForNextQue();
         if (rushConfig.firstRun()) {
+            /* Turn off automatic_index to stop logging in Android L */
+            //statementRunner.runRaw("PRAGMA automatic_index=off;", que);
             rushCore.createTables(rushClassFinder, que);
         } else if(rushConfig.inDebug() || rushConfig.upgrade()){
             rushCore.upgrade(rushClassFinder, rushUpgradeManager, que);
@@ -247,12 +253,12 @@ public class RushCore {
         queProvider.queComplete(que);
     }
 
-    protected <T> List<T> load(Class<T> clazz, String sql) {
+    protected <T extends Rush> List<T> load(Class<T> clazz, String sql) {
         RushQue que = queProvider.blockForNextQue();
         return load(clazz, sql, que);
     }
 
-    private <T> List<T> load(Class<T> clazz, String sql, final RushQue que) {
+    private <T extends Rush> List<T> load(Class<T> clazz, String sql, final RushQue que) {
         logger.logSql(sql);
         RushStatementRunner.ValuesCallback values = statementRunner.runGet(sql, que);
         List<T> objects = rushClassLoader.loadClasses(clazz, values, new RushClassLoader.LoadCallback() {

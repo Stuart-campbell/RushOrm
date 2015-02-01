@@ -17,17 +17,19 @@ import co.uk.rushorm.core.RushTableStatementGenerator;
 public class ReflectionTableStatementGenerator implements RushTableStatementGenerator {
 
     private static final String TABLE_TEMPLATE = "CREATE TABLE %s (" +
-            "\nid integer primary key autoincrement" +
+            "\nid integer primary key" +
             "%s" +
             "\n);";
 
     private static final String JOIN_TEMPLATE = "CREATE TABLE %s (" +
-            "\nid integer primary key" +
+            "\nid integer primary key autoincrement" +
             ",\nparent integer NOT NULL" +
             ",\nchild integer NOT NULL" +
             ",\nFOREIGN KEY (parent) REFERENCES %s(id)" +
             ",\nFOREIGN KEY (child) REFERENCES %s(id)" +
             "\n);";
+
+    private static final String CREATE_INDEX = "CREATE INDEX %s_idx ON %s(child);";
 
     private List<Join> joins = new ArrayList<>();
 
@@ -57,8 +59,10 @@ public class ReflectionTableStatementGenerator implements RushTableStatementGene
         }
 
         for(Join join : joins){
-            String sql = joinToStatement(join);
+            String joinTableName = ReflectionUtils.joinTableNameForClass(join.key, join.child, join.keyField);
+            String sql = joinToStatement(join, joinTableName);
             statementCallback.StatementCreated(sql);
+            statementCallback.StatementCreated(String.format(CREATE_INDEX, joinTableName, joinTableName));
         }
     }
 
@@ -83,9 +87,8 @@ public class ReflectionTableStatementGenerator implements RushTableStatementGene
         return String.format(TABLE_TEMPLATE, ReflectionUtils.tableNameForClass(clazz), columnsStatement.toString());
     }
 
-    private String joinToStatement(Join join) {
-        return String.format(JOIN_TEMPLATE,
-                ReflectionUtils.joinTableNameForClass(join.key, join.child, join.keyField),
+    private String joinToStatement(Join join, String joinTableName) {
+        return String.format(JOIN_TEMPLATE, joinTableName,
                 ReflectionUtils.tableNameForClass(join.key),
                 ReflectionUtils.tableNameForClass(join.child));
     }
@@ -133,8 +136,5 @@ public class ReflectionTableStatementGenerator implements RushTableStatementGene
         }
 
         return null;
-
     }
-
-
 }

@@ -68,12 +68,12 @@ public class RushSearch {
         }
     }
 
-    public <T> T findSingle(Class<T> clazz) {
+    public <T extends Rush> T findSingle(Class<T> clazz) {
         List<T> results = find(clazz);
         return results.size() > 0 ? results.get(0) : null;
     }
 
-    public <T> List<T> find(Class<T> clazz) {
+    public <T extends Rush> List<T> find(Class<T> clazz) {
         joinString = new StringBuilder();
         StringBuilder whereString = new StringBuilder();
         for(int i = 0; i < whereStatements.size(); i ++) {

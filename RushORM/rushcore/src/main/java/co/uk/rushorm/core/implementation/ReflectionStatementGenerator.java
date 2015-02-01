@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import co.uk.rushorm.core.AnnotationCache;
 import co.uk.rushorm.core.Rush;
 import co.uk.rushorm.core.RushColumns;
 import co.uk.rushorm.core.RushStringSanitizer;
@@ -39,25 +40,15 @@ public class ReflectionStatementGenerator implements RushStatementGenerator {
     private static final String MULTIPLE_DELETE_TEMPLATE = "DELETE FROM %s \n" +
             "WHERE %s;";
 
-    private static final Map<Class, Cache> annotationCache = new HashMap<>();
-
-    private class Cache {
-        private final List<String> fieldToIgnore;
-        private final List<String> disableAutoDelete;
-        private final Map<String, Class> listsFields;
-        private Cache(List<String> fieldToIgnore, List<String> disableAutoDelete, Map<String, Class> listsFields) {
-            this.fieldToIgnore = fieldToIgnore;
-            this.disableAutoDelete = disableAutoDelete;
-            this.listsFields = listsFields;
-        }
-    }
+    private final Map<Class, AnnotationCache> annotationCache;
 
     private final RushStringSanitizer rushStringSanitizer;
     private final RushColumns rushColumns;
 
-    public ReflectionStatementGenerator(RushStringSanitizer rushStringSanitizer, RushColumns rushColumns) {
+    public ReflectionStatementGenerator(RushStringSanitizer rushStringSanitizer, RushColumns rushColumns, Map<Class, AnnotationCache> annotationCache) {
         this.rushStringSanitizer = rushStringSanitizer;
         this.rushColumns = rushColumns;
+        this.annotationCache = annotationCache;
     }
 
     private interface LoopCallBack {
@@ -81,33 +72,6 @@ public class ReflectionStatementGenerator implements RushStatementGenerator {
         if(max == 1 || (max - 1) % interval != 0) {
             callBack.doAction();
         }
-    }
-
-    private void cacheClassAnnotations(Class clazz, List<Field> fields) {
-        Map<String, Class> listMap = new HashMap<>();
-        List<String> ignoreFields = new ArrayList<>();
-        List<String> disableAutoDeleteFields = new ArrayList<>();
-
-        for(Field field : fields) {
-            if(field.isAnnotationPresent(RushIgnore.class)) {
-                ignoreFields.add(field.getName());
-            } else {
-                if (field.isAnnotationPresent(RushList.class)) {
-                    try {
-                        Class listClass = Class.forName(field.getAnnotation(RushList.class).classname());
-                        listMap.put(field.getName(), listClass);
-                    } catch (ClassNotFoundException e) {
-                        e.printStackTrace();
-                        throw new RushListAnnotationDoesNotMatchClassException();
-                    }
-                }
-
-                if (field.isAnnotationPresent(RushDisableAutodelete.class)) {
-                    disableAutoDeleteFields.add(field.getName());
-                }
-            }
-        }
-        annotationCache.put(clazz, new Cache(ignoreFields, disableAutoDeleteFields, listMap));
     }
 
     private void deleteManyJoins(Map<String, List<Long>> joinDeletes, final Callback saveCallback) {
@@ -229,11 +193,11 @@ public class ReflectionStatementGenerator implements RushStatementGenerator {
         ReflectionUtils.getAllFields(fields, rush.getClass());
 
         if(!annotationCache.containsKey(rush.getClass())) {
-            cacheClassAnnotations(rush.getClass(), fields);
+            annotationCache.put(rush.getClass(), new AnnotationCache(rush.getClass(), fields));
         }
 
         for (Field field : fields) {
-            if (!annotationCache.get(rush.getClass()).fieldToIgnore.contains(field.getName())) {
+            if (!annotationCache.get(rush.getClass()).getFieldToIgnore().contains(field.getName())) {
                 field.setAccessible(true);
                 List<BasicJoin> joins = new ArrayList<>();
                 String joinTableName = joinFromField(joins, rush, field);
@@ -295,8 +259,8 @@ public class ReflectionStatementGenerator implements RushStatementGenerator {
             return tableName;
         }
 
-        if(annotationCache.get(rush.getClass()).listsFields.containsKey(field.getName())) {
-            Class listClass = annotationCache.get(rush.getClass()).listsFields.get(field.getName());
+        if(annotationCache.get(rush.getClass()).getListsFields().containsKey(field.getName())) {
+            Class listClass = annotationCache.get(rush.getClass()).getListsFields().get(field.getName());
             String tableName = ReflectionUtils.joinTableNameForClass(rush.getClass(), listClass, field);
             if (Rush.class.isAssignableFrom(listClass)) {
                 try {
@@ -482,31 +446,31 @@ public class ReflectionStatementGenerator implements RushStatementGenerator {
         ReflectionUtils.getAllFields(fields, rush.getClass());
 
         if(!annotationCache.containsKey(rush.getClass())) {
-            cacheClassAnnotations(rush.getClass(), fields);
+            annotationCache.put(rush.getClass(), new AnnotationCache(rush.getClass(), fields));
         }
 
         for (Field field : fields) {
             field.setAccessible(true);
-            if (!annotationCache.get(rush.getClass()).fieldToIgnore.contains(field.getName())) {
+            if (!annotationCache.get(rush.getClass()).getFieldToIgnore().contains(field.getName())) {
                 String joinTableName = null;
                 if (Rush.class.isAssignableFrom(field.getType())) {
                     try {
                         Rush child = (Rush) field.get(rush);
                         if (child != null) {
                             joinTableName = ReflectionUtils.joinTableNameForClass(rush.getClass(), child.getClass(), field);
-                            if (!annotationCache.get(rush.getClass()).disableAutoDelete.contains(field.getName())) {
+                            if (!annotationCache.get(rush.getClass()).getDisableAutoDelete().contains(field.getName())) {
                                 generateDelete(child, deletes, joinDeletes, rushObjects, callback);
                             }
                         }
                     } catch (IllegalAccessException e) {
                         e.printStackTrace();
                     }
-                } else if (annotationCache.get(rush.getClass()).listsFields.containsKey(field.getName())) {
+                } else if (annotationCache.get(rush.getClass()).getListsFields().containsKey(field.getName())) {
                     try {
                         List<Rush> fieldChildren = (List<Rush>) field.get(rush);
                         if (fieldChildren != null && fieldChildren.size() > 0) {
-                            joinTableName = ReflectionUtils.joinTableNameForClass(rush.getClass(), annotationCache.get(rush.getClass()).listsFields.get(field.getName()), field);
-                            if (!annotationCache.get(rush.getClass()).disableAutoDelete.contains(field.getName())) {
+                            joinTableName = ReflectionUtils.joinTableNameForClass(rush.getClass(), annotationCache.get(rush.getClass()).getListsFields().get(field.getName()), field);
+                            if (!annotationCache.get(rush.getClass()).getDisableAutoDelete().contains(field.getName())) {
                                 for(Rush child : fieldChildren) {
                                     generateDelete(child, deletes, joinDeletes, rushObjects, callback);
                                 }
