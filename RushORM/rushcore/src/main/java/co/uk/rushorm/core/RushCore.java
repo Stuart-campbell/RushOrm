@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.WeakHashMap;
 
 import co.uk.rushorm.core.exceptions.RushCoreNotInitializedException;
+import co.uk.rushorm.core.exceptions.RushTableMissingEmptyConstructor;
 import co.uk.rushorm.core.implementation.ReflectionClassLoader;
 import co.uk.rushorm.core.implementation.ReflectionStatementGenerator;
 import co.uk.rushorm.core.implementation.ReflectionTableStatementGenerator;
@@ -110,6 +111,20 @@ public class RushCore {
         });
     }
 
+    public <T extends Rush> List<T> load(Class<T> clazz, String sql) {
+        RushQue que = queProvider.blockForNextQue();
+        return load(clazz, sql, que);
+    }
+
+    public <T extends Rush> void load(final Class<T> clazz, final String sql, final RushSearchCallback<T> callback) {
+        queProvider.waitForNextQue(new RushQueProvider.RushQueCallback() {
+            @Override
+            public void callback(RushQue rushQue) {
+                callback.complete(load(clazz, sql, rushQue));
+            }
+        });
+    }
+
     public void delete(Rush rush) {
         List<Rush> objects = new ArrayList<>();
         objects.add(rush);
@@ -172,7 +187,7 @@ public class RushCore {
     private void createTables(List<Class> classes, final RushQue que) {
         rushTableStatementGenerator.generateStatements(classes, new RushTableStatementGenerator.StatementCallback() {
             @Override
-            public void StatementCreated(String statement) {
+            public void statementCreated(String statement) {
                 logger.logSql(statement);
                 statementRunner.runRaw(statement, que);
             }
@@ -253,11 +268,6 @@ public class RushCore {
         queProvider.queComplete(que);
     }
 
-    protected <T extends Rush> List<T> load(Class<T> clazz, String sql) {
-        RushQue que = queProvider.blockForNextQue();
-        return load(clazz, sql, que);
-    }
-
     private <T extends Rush> List<T> load(Class<T> clazz, String sql, final RushQue que) {
         logger.logSql(sql);
         RushStatementRunner.ValuesCallback values = statementRunner.runGet(sql, que);
@@ -275,6 +285,9 @@ public class RushCore {
         });
         values.close();
         queProvider.queComplete(que);
+        if(objects == null) {
+            throw new RushTableMissingEmptyConstructor(clazz);
+        }
         return objects;
     }
 

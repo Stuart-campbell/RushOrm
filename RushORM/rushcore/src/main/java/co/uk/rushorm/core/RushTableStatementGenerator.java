@@ -8,7 +8,7 @@ import java.util.List;
 public interface RushTableStatementGenerator {
 
     public interface StatementCallback {
-        public void StatementCreated(String statement);
+        public void statementCreated(String statement);
     }
 
     public void generateStatements(List<Class> classes, StatementCallback statementCallback);

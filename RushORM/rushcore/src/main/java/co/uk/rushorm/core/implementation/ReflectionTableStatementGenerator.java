@@ -55,14 +55,14 @@ public class ReflectionTableStatementGenerator implements RushTableStatementGene
 
         for(Class clazz : classes) {
             String sql = classToStatement(clazz);
-            statementCallback.StatementCreated(sql);
+            statementCallback.statementCreated(sql);
         }
 
         for(Join join : joins){
             String joinTableName = ReflectionUtils.joinTableNameForClass(join.key, join.child, join.keyField);
             String sql = joinToStatement(join, joinTableName);
-            statementCallback.StatementCreated(sql);
-            statementCallback.StatementCreated(String.format(CREATE_INDEX, joinTableName, joinTableName));
+            statementCallback.statementCreated(sql);
+            statementCallback.statementCreated(String.format(CREATE_INDEX, joinTableName, joinTableName));
         }
     }
 
