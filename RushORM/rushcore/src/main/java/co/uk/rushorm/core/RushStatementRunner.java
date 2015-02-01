@@ -14,7 +14,6 @@ public interface RushStatementRunner {
     }
 
     public void runRaw(String statement, RushQue que);
-    public long runPut(String sql, RushQue que);
     public long runGetLastId(String sql, RushQue que);
     public ValuesCallback runGet(String sql, RushQue que);
     public void startTransition(RushQue que);

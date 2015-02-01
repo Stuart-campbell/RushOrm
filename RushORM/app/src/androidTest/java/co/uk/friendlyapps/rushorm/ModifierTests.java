@@ -3,7 +3,7 @@ package co.uk.friendlyapps.rushorm;
 import android.app.Application;
 import android.test.ApplicationTestCase;
 
-import co.uk.friendlyapps.rushorm.TestObjects.TestModifiers;
+import co.uk.friendlyapps.rushorm.testobjects.TestModifiers;
 import co.uk.rushorm.android.RushAndroid;
 import co.uk.rushorm.core.RushSearch;
 

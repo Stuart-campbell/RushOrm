@@ -15,7 +15,6 @@ import java.util.List;
 
 import co.uk.friendlyapps.rushorm.demo.Car;
 import co.uk.friendlyapps.rushorm.demo.Engine;
-import co.uk.friendlyapps.rushorm.demo.PlaceHolder;
 import co.uk.friendlyapps.rushorm.demo.Wheel;
 import co.uk.rushorm.core.RushCallback;
 import co.uk.rushorm.core.RushCore;
@@ -62,19 +61,19 @@ public class RushOrmFragment extends Fragment {
                 imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
 
                 final long startTime = System.currentTimeMillis();
-                final int cars = Integer.parseInt(carsRaw);
+                final int numberToSave = Integer.parseInt(carsRaw);
 
-                PlaceHolder placeHolder = new PlaceHolder();
-                placeHolder.cars = new ArrayList<>();
-                for(int i = 0; i < cars; i ++) {
+                List<Car> cars = new ArrayList<>(numberToSave);
+                for(int i = 0; i < numberToSave; i ++) {
                     Car car = new Car("Red", new Engine());
-                   /* car.wheels = new ArrayList<>();
+                    car.wheels = new ArrayList<>();
                     for (int j = 0; j < 4; j ++) {
                         car.wheels.add(new Wheel("Michelin"));
-                    }*/
-                    placeHolder.cars.add(car);
+                    }
+                    cars.add(car);
                 }
-                placeHolder.save(new RushCallback() {
+
+                RushCore.getInstance().save(cars, new RushCallback() {
                     @Override
                     public void complete() {
                         long endTime = System.currentTimeMillis();
@@ -94,8 +93,8 @@ public class RushOrmFragment extends Fragment {
         }
     };
 
-    private List<PlaceHolder> getCars() {
-        return new RushSearch().find(PlaceHolder.class);
+    private List<Car> getCars() {
+        return new RushSearch().find(Car.class);
     }
 
     private View.OnClickListener loadListener = new View.OnClickListener() {
@@ -109,12 +108,7 @@ public class RushOrmFragment extends Fragment {
                 @Override
                 public void run() {
 
-                    int count = 0;
-                    for(PlaceHolder placeHolder : getCars()) {
-                        if(placeHolder.cars != null) {
-                            count += placeHolder.cars.size();
-                        }
-                    }
+                    int count = getCars().size();
 
                     final int loading = count;
                     getActivity().runOnUiThread(new Runnable() {

@@ -1,4 +1,4 @@
-package co.uk.friendlyapps.rushorm.TestObjects;
+package co.uk.friendlyapps.rushorm.testobjects;
 
 import co.uk.rushorm.core.RushObject;
 

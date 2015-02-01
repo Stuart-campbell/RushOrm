@@ -1,4 +1,4 @@
-package co.uk.friendlyapps.rushorm.TestObjects;
+package co.uk.friendlyapps.rushorm.testobjects;
 
 import java.util.List;
 
@@ -28,7 +28,7 @@ public class TestObject extends RushObject {
     @RushIgnore
     public String ignoredField;
 
-    @RushList(classname = "co.uk.friendlyapps.rushorm.TestObjects.TestChildObject")
+    @RushList(classname = "co.uk.friendlyapps.rushorm.testobjects.TestChildObject")
     public List<TestChildObject> children;
 
 }

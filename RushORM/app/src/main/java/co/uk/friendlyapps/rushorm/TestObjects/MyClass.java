@@ -1,4 +1,4 @@
-package co.uk.friendlyapps.rushorm.TestObjects;
+package co.uk.friendlyapps.rushorm.testobjects;
 
 /**
  * Created by Stuart on 21/01/15.

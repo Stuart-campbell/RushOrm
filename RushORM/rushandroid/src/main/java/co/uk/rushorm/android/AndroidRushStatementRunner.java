@@ -31,16 +31,6 @@ public class AndroidRushStatementRunner extends SQLiteOpenHelper implements Rush
     }
 
     @Override
-    public long runPut(String sql, RushQue que) {
-        getWritableDatabase().execSQL(sql);
-        Cursor cursor = getWritableDatabase().rawQuery("SELECT last_insert_rowid()", null);
-        cursor.moveToFirst();
-        long id = cursor.getLong(0);
-        cursor.close();
-        return id;
-    }
-
-    @Override
     public long runGetLastId(String table, RushQue que) {
         Cursor c = getWritableDatabase().rawQuery(String.format(LAST_ID, table), null);
         long id = 0;
@@ -65,7 +55,7 @@ public class AndroidRushStatementRunner extends SQLiteOpenHelper implements Rush
             @Override
             public List<String> next() {
 
-                List<String> row = new ArrayList();
+                List<String> row = new ArrayList<>();
                 for(int i = 0; i < cursor.getColumnCount(); i++){
                     row.add(cursor.getString(i));
                 }

@@ -15,8 +15,8 @@ public class SearchUtils {
             "WHERE %s;";
 
 
-    private static final String SELECT_CHILDREN = "SELECT * from %s \n" +
-            "JOIN %s using (id) \n" +
+    private static final String SELECT_CHILDREN = "SELECT %s.* from %s \n" +
+            "JOIN %s ON %s.id = %s.child \n" +
             "WHERE parent=%d;";
 
 
@@ -41,6 +41,7 @@ public class SearchUtils {
         }
 
         String table = ReflectionUtils.joinTableNameForClass(parent.getClass(), childClass, field);
-        return String.format(SELECT_CHILDREN, ReflectionUtils.tableNameForClass(childClass), table, parent.getId());
+        String childTable = ReflectionUtils.tableNameForClass(childClass);
+        return String.format(SELECT_CHILDREN, childTable, childTable, table, childTable, table, parent.getId());
     }
 }

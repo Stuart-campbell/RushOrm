@@ -1,4 +1,4 @@
-package co.uk.friendlyapps.rushorm.TestObjects;
+package co.uk.friendlyapps.rushorm.testobjects;
 
 import java.util.List;
 
@@ -12,7 +12,7 @@ import co.uk.rushorm.core.annotations.RushTableAnnotation;
 @RushTableAnnotation
 public class TestRootObject extends RushObject {
 
-    @RushList(classname = "co.uk.friendlyapps.rushorm.TestObjects.TestObject")
+    @RushList(classname = "co.uk.friendlyapps.rushorm.testobjects.TestObject")
     public List<TestObject> objects;
 
 }
