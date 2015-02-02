@@ -1,4 +1,4 @@
-package co.uk.friendlyapps.rushorm.TestObjects;
+package co.uk.friendlyapps.rushorm.testobjects;
 
 import java.util.List;
 
@@ -9,7 +9,7 @@ import co.uk.rushorm.core.annotations.RushRenamed;
 /**
  * Created by Stuart on 18/12/14.
  */
-@RushRenamed(names = {"co.uk.friendlyapps.rushorm.TestObjects.TestBase1"})
+@RushRenamed(names = {"co.uk.friendlyapps.rushorm.testobjects.TestBase1"})
 public class TestUpgrade2 extends RushObject {
     @RushRenamed(names = {"stringField"})
     public String stringFieldNamed;
@@ -26,6 +26,6 @@ public class TestUpgrade2 extends RushObject {
     @RushRenamed(names = {"testBase2"})
     public TestBase2 testBase2Names;
     @RushRenamed(names = {"testBase2List"})
-    @RushList(classname = "co.uk.friendlyapps.rushorm.TestObjects.TestBase2")
+    @RushList(classname = "co.uk.friendlyapps.rushorm.testobjects.TestBase2")
     public List<TestBase2> testBase2ListNamed;
 }

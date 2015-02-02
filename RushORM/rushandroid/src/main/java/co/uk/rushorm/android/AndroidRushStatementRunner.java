@@ -16,6 +16,8 @@ import co.uk.rushorm.core.RushStatementRunner;
  */
 public class AndroidRushStatementRunner extends SQLiteOpenHelper implements RushStatementRunner {
 
+    private static final String LAST_ID = "SELECT id FROM %s ORDER BY id DESC LIMIT 1";
+
     private int lastRunVersion = -1;
 
     public AndroidRushStatementRunner(Context context, String name, int version) {
@@ -29,12 +31,15 @@ public class AndroidRushStatementRunner extends SQLiteOpenHelper implements Rush
     }
 
     @Override
-    public long runPut(String sql, RushQue que) {
-        getWritableDatabase().execSQL(sql);
-        Cursor cursor = getWritableDatabase().rawQuery("SELECT last_insert_rowid()", null);
-        cursor.moveToFirst();
-        long id = cursor.getLong(0);
-        cursor.close();
+    public long runGetLastId(String table, RushQue que) {
+        Cursor c = getWritableDatabase().rawQuery(String.format(LAST_ID, table), null);
+        long id = 0;
+        if (c != null ) {
+            if(c.moveToFirst()){
+                id = c.getLong(0); //The 0 is the column index, we only have 1 column, so the index is 0
+            }
+            c.close();
+        }
         return id;
     }
 
@@ -50,7 +55,7 @@ public class AndroidRushStatementRunner extends SQLiteOpenHelper implements Rush
             @Override
             public List<String> next() {
 
-                List row = new ArrayList();
+                List<String> row = new ArrayList<>();
                 for(int i = 0; i < cursor.getColumnCount(); i++){
                     row.add(cursor.getString(i));
                 }

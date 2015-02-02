@@ -28,6 +28,7 @@ public class ReflectionUpgradeManager implements RushUpgradeManager {
     private class TableMapping {
         private Mapping name;
         private List<Mapping> fields = new ArrayList<>();
+        private List<String> indexes = new ArrayList<>();
     }
 
     private class PotentialTableMapping {
@@ -51,6 +52,8 @@ public class ReflectionUpgradeManager implements RushUpgradeManager {
     private static final String MOVE_ROWS = "INSERT INTO %s(id%s)\n" +
             "SELECT id%s\n" +
             "FROM %s;";
+
+    private static final String DELETE_INDEX = "DROP INDEX %s;";
 
     @Override
     public void upgrade(List<Class> classList, UpgradeCallback callback) {
@@ -90,6 +93,7 @@ public class ReflectionUpgradeManager implements RushUpgradeManager {
                     joinMapping.name = new Mapping(tableName, potentialJoinMapping.newName);
                     joinMapping.fields.add(new Mapping("parent", "parent"));
                     joinMapping.fields.add(new Mapping("child", "child"));
+                    joinMapping.indexes.add(tableName + "_idx");
                     tableMappings.add(joinMapping);
 
                 }
@@ -97,9 +101,11 @@ public class ReflectionUpgradeManager implements RushUpgradeManager {
 
             for (TableMapping tableMapping : tableMappings) {
                 if(tableMapping.name.oldName.equals(tableMapping.name.newName)) {
-
                     tableMapping.name.oldName = tableMapping.name.oldName + "_temp";
                     renameTable(tableMapping.name.oldName, tableMapping.name.newName, callback);
+                }
+                for(String index : tableMapping.indexes) {
+                    callback.runRaw(String.format(DELETE_INDEX, index));
                 }
             }
 

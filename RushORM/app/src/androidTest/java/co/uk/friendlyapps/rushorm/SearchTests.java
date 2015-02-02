@@ -6,12 +6,10 @@ import android.test.ApplicationTestCase;
 import java.util.ArrayList;
 import java.util.List;
 
-import co.uk.rushorm.core.RushCallback;
-import co.uk.rushorm.core.RushColumn;
 import co.uk.rushorm.core.RushCore;
 import co.uk.rushorm.core.RushSearch;
-import co.uk.friendlyapps.rushorm.TestObjects.TestChildObject;
-import co.uk.friendlyapps.rushorm.TestObjects.TestObject;
+import co.uk.friendlyapps.rushorm.testobjects.TestChildObject;
+import co.uk.friendlyapps.rushorm.testobjects.TestObject;
 import co.uk.rushorm.android.RushAndroid;
 
 /**

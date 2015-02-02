@@ -68,12 +68,20 @@ public class RushSearch {
         }
     }
 
-    public <T> T findSingle(Class<T> clazz) {
+    public <T extends Rush> T findSingle(Class<T> clazz) {
         List<T> results = find(clazz);
         return results.size() > 0 ? results.get(0) : null;
     }
 
-    public <T> List<T> find(Class<T> clazz) {
+    public <T extends Rush> void find(Class<T> clazz, RushSearchCallback<T> callback) {
+        RushCore.getInstance().load(clazz, buildSql(clazz), callback);
+    }
+
+    public <T extends Rush> List<T> find(Class<T> clazz) {
+        return RushCore.getInstance().load(clazz, buildSql(clazz));
+    }
+
+    private String buildSql(Class clazz) {
         joinString = new StringBuilder();
         StringBuilder whereString = new StringBuilder();
         for(int i = 0; i < whereStatements.size(); i ++) {
@@ -94,13 +102,9 @@ public class RushSearch {
             order.append(orderStatements.get(i).getStatement());
         }
 
-        String sql = String.format(WHERE_TEMPLATE, ReflectionUtils.tableNameForClass(clazz), joinString.toString(), whereString.toString(), order.toString());
-        List<T> results = RushCore.getInstance().load(clazz, sql);
-        if(results == null) {
-            throw new RushTableMissingEmptyConstructor(clazz);
-        }
-        return results;
+        return String.format(WHERE_TEMPLATE, ReflectionUtils.tableNameForClass(clazz), joinString.toString(), whereString.toString(), order.toString());
     }
+
 
     public RushSearch whereId(long id) {
         return where("id", "=", Long.toString(id));

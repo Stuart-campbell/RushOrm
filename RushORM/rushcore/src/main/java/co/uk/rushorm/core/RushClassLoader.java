@@ -12,6 +12,6 @@ public interface RushClassLoader {
         public void didLoadObject(Rush rush, long id);
     }
 
-    public <T> List<T> loadClasses(Class<T> clazz, RushStatementRunner.ValuesCallback valuesCallback, LoadCallback callback);
+    public <T extends Rush> List<T> loadClasses(Class<T> clazz, RushStatementRunner.ValuesCallback valuesCallback, LoadCallback callback);
 
 }

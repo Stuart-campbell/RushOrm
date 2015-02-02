@@ -28,8 +28,6 @@ public class RushTextFile extends RushFile {
         writeToFile(text.getBytes());
     }
 
-
-
     public String getText() throws IOException {
         InputStream inputStream = readFormFile();
 

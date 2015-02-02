@@ -1,4 +1,4 @@
-package co.uk.friendlyapps.rushorm.TestObjects;
+package co.uk.friendlyapps.rushorm.testobjects;
 
 import java.util.List;
 
@@ -19,6 +19,6 @@ public class TestBase1 extends RushObject {
     public TestBase2 testBase2;
 
 
-    @RushList(classname = "co.uk.friendlyapps.rushorm.TestObjects.TestBase2")
+    @RushList(classname = "co.uk.friendlyapps.rushorm.testobjects.TestBase2")
     public List<TestBase2> testBase2List;
 }
