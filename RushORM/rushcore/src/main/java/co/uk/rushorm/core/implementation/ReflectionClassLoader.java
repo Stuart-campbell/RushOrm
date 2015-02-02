@@ -44,10 +44,10 @@ public class ReflectionClassLoader implements RushClassLoader {
 
     @Override
     public <T extends Rush> List<T> loadClasses(Class<T> clazz, RushStatementRunner.ValuesCallback valuesCallback, LoadCallback callback) {
-        return loadClasses(clazz, valuesCallback, callback, null);
+        return loadClasses(clazz, valuesCallback, callback, new HashMap<Class, Map<Long, T>>(), null);
     }
 
-    public <T extends Rush> List<T> loadClasses(Class<T> clazz, RushStatementRunner.ValuesCallback valuesCallback, LoadCallback callback, AttachChild<T> attachChild) {
+    public <T extends Rush> List<T> loadClasses(Class<T> clazz, RushStatementRunner.ValuesCallback valuesCallback, LoadCallback callback, Map<Class, Map<Long, T>> loadedClasses, AttachChild<T> attachChild) {
         try {
 
             Map<Class, List<Join>> joins = new HashMap<>();
@@ -56,7 +56,7 @@ public class ReflectionClassLoader implements RushClassLoader {
             List<T> results = new ArrayList<>();
             while(valuesCallback.hasNext()) {
                 List<String> valuesList = valuesCallback.next();
-                T object = loadClass(clazz, valuesList, joins, joinTables, callback);
+                T object = loadClass(clazz, valuesList, joins, joinTables, loadedClasses, callback);
                 results.add(object);
                 if(attachChild != null) {
                     attachChild.attach(object, valuesList);
@@ -65,7 +65,7 @@ public class ReflectionClassLoader implements RushClassLoader {
             valuesCallback.close();
 
             for (Map.Entry<Class, List<Join>> entry : joins.entrySet()) {
-                addChildrenToList(entry.getKey(), entry.getValue(), joinTables.get(entry.getKey()), callback);
+                addChildrenToList(entry.getKey(), entry.getValue(), joinTables.get(entry.getKey()), loadedClasses, callback);
             }
 
             return results;
@@ -75,10 +75,19 @@ public class ReflectionClassLoader implements RushClassLoader {
         return null;
     }
 
-    private <T extends Rush> T loadClass(Class<T> clazz, List<String> values, Map<Class, List<Join>> joins, Map<Class, List<String>> joinTables, LoadCallback callback) throws IllegalAccessException, InstantiationException, ClassNotFoundException {
+    private <T extends Rush> T loadClass(Class<T> clazz, List<String> values, Map<Class, List<Join>> joins, Map<Class, List<String>> joinTables, Map<Class, Map<Long, T>> loadedClasses, LoadCallback callback) throws IllegalAccessException, InstantiationException, ClassNotFoundException {
 
         long id = Long.parseLong(values.get(0));
+
+        if(!loadedClasses.containsKey(clazz)) {
+            loadedClasses.put(clazz, new HashMap<Long, T>());
+        }
+        if(loadedClasses.get(clazz).containsKey(id)) {
+            return loadedClasses.get(clazz).get(id);
+        }
         T object = clazz.newInstance();
+
+        loadedClasses.get(clazz).put(id, object);
         callback.didLoadObject(object, id);
 
         List<Field> fields = new ArrayList<>();
@@ -132,26 +141,12 @@ public class ReflectionClassLoader implements RushClassLoader {
             "%s" +
             "WHERE %s;";
 
-    private <T extends Rush> void addChildrenToList(final Class<T> clazz, final List<Join> joins, final List<String> tableNames, final LoadCallback callback) {
+    private <T extends Rush> void addChildrenToList(final Class<T> clazz, final List<Join> joins, final List<String> tableNames, final Map<Class, Map<Long, T>> loadedClasses, final LoadCallback callback) {
 
-        StringBuilder statementBuilder = new StringBuilder();
         final String tableName = ReflectionUtils.tableNameForClass(clazz);
         final Map<Integer, String> tableMap = new HashMap<>();
         final Map<String, Map<Long, Join>> parentMap = new HashMap<>();
-        int counter = (tableNames.size() * 3) - 2;
-        for(String joinTableName : tableNames) {
-            tableMap.put(counter, joinTableName);
-            statementBuilder.append("LEFT JOIN ")
-                    .append(joinTableName)
-                    .append(" ON ")
-                    .append(tableName)
-                    .append(".id = ")
-                    .append(joinTableName)
-                    .append(".child \n");
-            counter -= 3;
-            parentMap.put(joinTableName, new HashMap<Long, Join>());
-        }
-        final String joinsString = statementBuilder.toString();
+        final String joinsString = joinSection(tableName, tableNames, tableMap, parentMap);
         final StringBuilder columnsString = new StringBuilder();
 
         doLoop(joins.size(), 250, new LoopCallBack() {
@@ -178,7 +173,7 @@ public class ReflectionClassLoader implements RushClassLoader {
             public void doAction(int at) {
                 String sql = String.format(SELECT_CHILDREN, tableName, joinsString, columnsString.toString());
                 RushStatementRunner.ValuesCallback values = callback.runStatement(sql);
-                loadClasses(clazz, values, callback, new AttachChild<T>() {
+                loadClasses(clazz, values, callback, loadedClasses, new AttachChild<T>() {
                     @Override
                     public void attach(T object, List<String> values) throws IllegalAccessException {
                         int i = values.size() - 2;
@@ -205,6 +200,24 @@ public class ReflectionClassLoader implements RushClassLoader {
                 });
             }
         });
+    }
+
+    private String joinSection(String tableName, List<String> tableNames, Map<Integer, String> tableMap, Map<String, Map<Long, Join>> parentMap) {
+        StringBuilder stringBuilder = new StringBuilder();
+        int counter = (tableNames.size() * 3) - 2;
+        for(String joinTableName : tableNames) {
+            tableMap.put(counter, joinTableName);
+            stringBuilder.append("LEFT JOIN ")
+                    .append(joinTableName)
+                    .append(" ON ")
+                    .append(tableName)
+                    .append(".id = ")
+                    .append(joinTableName)
+                    .append(".child \n");
+            counter -= 3;
+            parentMap.put(joinTableName, new HashMap<Long, Join>());
+        }
+        return stringBuilder.toString();
     }
 
     private interface LoopCallBack {

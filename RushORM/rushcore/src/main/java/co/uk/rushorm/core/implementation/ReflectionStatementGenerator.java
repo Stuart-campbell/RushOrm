@@ -419,7 +419,6 @@ public class ReflectionStatementGenerator implements RushStatementGenerator {
     }
 
     /*** Delete ***/
-
     @Override
     public void generateDelete(List<? extends Rush> objects, Callback callback) {
         Map<String, List<Long>> joinDeletes = new HashMap<>();
