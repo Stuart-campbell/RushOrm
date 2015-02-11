@@ -18,7 +18,7 @@ public class RushJSONFile extends RushTextFile {
         super(directory);
     }
 
-    public RushJSONFile(){};
+    public RushJSONFile(){}
 
     @Override
     public String fileExtension() {

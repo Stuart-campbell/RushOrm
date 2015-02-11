@@ -36,7 +36,7 @@ public class SpeedTests extends ApplicationTestCase<Application> {
         super.tearDown();
     }
 
-    public void testSave1000Rows() throws Exception {
+    public void testSave1000ChildRows() throws Exception {
 
         Date date = new Date();
 
@@ -54,11 +54,11 @@ public class SpeedTests extends ApplicationTestCase<Application> {
         assertTrue("Save time of 1001 rows : " + Double.toString(time), time < 10);
     }
 
-    public void testSave1000ChildrenRows() throws Exception {
+    public void testSave100RowsIndividually() throws Exception {
 
         Date date = new Date();
 
-        for (int i = 0; i < 1000; i++) {
+        for (int i = 0; i < 100; i++) {
             TestChildObject testObject = new TestChildObject();
             testObject.save();
         }
