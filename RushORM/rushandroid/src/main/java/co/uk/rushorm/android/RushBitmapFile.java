@@ -21,7 +21,7 @@ public class RushBitmapFile extends RushFile {
         super(directory);
     }
 
-    public RushBitmapFile(){};
+    public RushBitmapFile(){}
 
     @Override
     public String fileExtension() {

@@ -4,18 +4,24 @@
 
 RushOrm replaces the need for SQL by mapping java classes to SQL tables.
 
-Core features
+###What is the aim?
+<p>The aim is to abstract away all SQLite interaction under a very simple interface to make object storage incredibly quick to implement.</p> 
+<h3>What projects is it right for?</h3>
 <ul>
-    <li>Custom fields - easily implement custom fields so that any object can be serialized to the database</li>
-    <li>Relationships</li>
-    <ul>
-			<li>One to one</li>
-			<li>One to many, save lists of children</li>
-			<li>Saving a parent object automatically saves it children</li>
-		</ul>
-		<li>Files - easily store long text, JSON and bitmaps</li>
-		<li>Upgrading - database upgrading is supported through annotations removing the need for upgrade scripts</li>
+    <li>Projects with complex data structures</li>
+    <li>Projects that want to implement database storage in the minimum amount of time</li>
+</ul>          	
+###Why was RushOrm written?
+<ul>
+    <li>Complex relationships - RushObjects support Lists of other RushObjects</li>
+    <li>SQL free migration</li>
+    <li>Easily extendable</li>
+    <li>No dependencies</li>
+    <li>Support asynchronous call</li>
+    <li>Be fast</li>
 </ul>
+While there are a number of other ORMs the areas many seems to fall short is the support of 'one to many' relationships, migration and extensions. While claiming all the same basic feature of most other ORMs RushOrm supports 'List' properties without having to add the parent object to its children. It also handles migrating the class structure without any SQL scripts being required by the developer. Finally it is designed with the understanding that not every situation can be anticipated so instead it can be easily customized.
+
 
 For getting started see http://www.rushorm.com/
 
