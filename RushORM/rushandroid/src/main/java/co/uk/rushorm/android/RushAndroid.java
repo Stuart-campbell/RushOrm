@@ -25,12 +25,12 @@ public class RushAndroid {
         Context applicationContext = context.getApplicationContext();
 
         AndroidRushConfig rushConfig = new AndroidRushConfig(applicationContext);
+        Logger logger = new AndroidLogger(rushConfig);
         RushStringSanitizer rushStringSanitizer = new AndroidRushStringSanitizer();
-        RushClassFinder rushClassFinder = new AndroidRushClassFinder(applicationContext);
+        RushClassFinder rushClassFinder = new AndroidRushClassFinder(applicationContext, logger);
         AndroidRushStatementRunner statementRunner = new AndroidRushStatementRunner(applicationContext, rushConfig.dbName(), rushConfig.dbVersion());
         rushConfig.setLastRunVersion(statementRunner.getLastRunVersion());
         RushQueProvider queProvider = new AndroidRushQueProvider();
-        Logger logger = new AndroidLogger();
 
         RushCore.initialize(rushClassFinder, statementRunner, queProvider, rushConfig, rushStringSanitizer, logger, columns);
     }

@@ -423,23 +423,23 @@ public class ReflectionStatementGenerator implements RushStatementGenerator {
     public void generateDelete(List<? extends Rush> objects, Callback callback) {
         Map<String, List<Long>> joinDeletes = new HashMap<>();
         Map<String, List<Long>> deletes = new HashMap<>();
-        List<Rush> rushObjects = new ArrayList<>();
 
         for (Rush object : objects) {
-            generateDelete(object, deletes, joinDeletes, rushObjects, callback);
+            generateDelete(object, deletes, joinDeletes, callback);
         }
 
         deleteManyJoins(joinDeletes, callback);
         deleteMany(deletes, callback);
     }
 
-    public void generateDelete(Rush rush, Map<String, List<Long>> deletes, Map<String, List<Long>> joinDeletes, List<Rush> rushObjects, Callback callback) {
+    public void generateDelete(Rush rush, Map<String, List<Long>> deletes, Map<String, List<Long>> joinDeletes, Callback callback) {
 
-        if (rush.getId() < 0 && !rushObjects.contains(rush)) {
+        if (rush.getId() < 0) {
             return;
         }
 
-        rushObjects.add(rush);
+        long id = rush.getId();
+        callback.removeRush(rush);
 
         List<Field> fields = new ArrayList<>();
         ReflectionUtils.getAllFields(fields, rush.getClass());
@@ -458,7 +458,7 @@ public class ReflectionStatementGenerator implements RushStatementGenerator {
                         if (child != null) {
                             joinTableName = ReflectionUtils.joinTableNameForClass(rush.getClass(), child.getClass(), field);
                             if (!annotationCache.get(rush.getClass()).getDisableAutoDelete().contains(field.getName())) {
-                                generateDelete(child, deletes, joinDeletes, rushObjects, callback);
+                                generateDelete(child, deletes, joinDeletes, callback);
                             }
                         }
                     } catch (IllegalAccessException e) {
@@ -471,7 +471,7 @@ public class ReflectionStatementGenerator implements RushStatementGenerator {
                             joinTableName = ReflectionUtils.joinTableNameForClass(rush.getClass(), annotationCache.get(rush.getClass()).getListsFields().get(field.getName()), field);
                             if (!annotationCache.get(rush.getClass()).getDisableAutoDelete().contains(field.getName())) {
                                 for(Rush child : fieldChildren) {
-                                    generateDelete(child, deletes, joinDeletes, rushObjects, callback);
+                                    generateDelete(child, deletes, joinDeletes, callback);
                                 }
                             }
                         }
@@ -483,7 +483,7 @@ public class ReflectionStatementGenerator implements RushStatementGenerator {
                     if (!joinDeletes.containsKey(joinTableName)) {
                         joinDeletes.put(joinTableName, new ArrayList<Long>());
                     }
-                    joinDeletes.get(joinTableName).add(rush.getId());
+                    joinDeletes.get(joinTableName).add(id);
                 }
             }
         }
@@ -492,8 +492,8 @@ public class ReflectionStatementGenerator implements RushStatementGenerator {
         if(!deletes.containsKey(table)) {
             deletes.put(table, new ArrayList<Long>());
         }
-        deletes.get(table).add(rush.getId());
-        callback.removeRush(rush);
+        deletes.get(table).add(id);
+
     }
 
     private void deleteMany(Map<String, List<Long>> deletes, final Callback saveCallback) {

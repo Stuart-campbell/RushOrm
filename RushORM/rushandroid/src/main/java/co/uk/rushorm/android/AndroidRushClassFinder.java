@@ -1,5 +1,6 @@
 package co.uk.rushorm.android;
 
+import co.uk.rushorm.core.Logger;
 import co.uk.rushorm.core.Rush;
 import co.uk.rushorm.core.RushClassFinder;
 import co.uk.rushorm.core.RushConfig;
@@ -8,7 +9,6 @@ import dalvik.system.DexFile;
 
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.util.Log;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,9 +24,11 @@ import java.util.List;
 public class AndroidRushClassFinder implements RushClassFinder {
 
     private final Context content;
+    private final Logger logger;
 
-    public AndroidRushClassFinder(Context content) {
+    public AndroidRushClassFinder(Context content, Logger logger) {
         this.content = content;
+        this.logger = logger;
     }
 
     @Override
@@ -36,7 +38,7 @@ public class AndroidRushClassFinder implements RushClassFinder {
 
     /* Loading classes code */
 
-    private static List<Class> getDomainClasses(Context context, RushConfig rushConfig) {
+    private List<Class> getDomainClasses(Context context, RushConfig rushConfig) {
         List<Class> domainClasses = new ArrayList<Class>();
         try {
             for (String className : getAllClasses(context)) {
@@ -45,20 +47,18 @@ public class AndroidRushClassFinder implements RushClassFinder {
 
             }
         } catch (IOException | PackageManager.NameNotFoundException e) {
-            Log.e("Rush", e.getMessage());
+            logger.logError(e.getMessage());
         }
         return domainClasses;
     }
 
-    private static Class getRushClass(String className, Context context, RushConfig rushConfig) {
+    private Class getRushClass(String className, Context context, RushConfig rushConfig) {
         Class<?> discoveredClass = null;
         try {
             discoveredClass = Class.forName(className, true, context.getClass().getClassLoader());
-        } catch (ClassNotFoundException e) {
-            Log.e("Rush", e.getMessage());
+        } catch (Exception e) {
+            logger.logError(e.getMessage());
         }
-
-
 
         if (discoveredClass != null
              && Rush.class.isAssignableFrom(discoveredClass)
