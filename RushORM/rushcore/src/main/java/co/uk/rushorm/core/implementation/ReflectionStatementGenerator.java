@@ -166,8 +166,8 @@ public class ReflectionStatementGenerator implements RushStatementGenerator {
         }
 
         deleteManyJoins(joinDeletes, saveCallback);
-        createObjects(createValues, columns, saveCallback);
         updateObjects(updateValues, columns, saveCallback);
+        createObjects(createValues, columns, saveCallback);
         createManyJoins(joinValues, saveCallback);
 
     }

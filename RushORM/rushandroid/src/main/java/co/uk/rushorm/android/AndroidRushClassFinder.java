@@ -56,7 +56,7 @@ public class AndroidRushClassFinder implements RushClassFinder {
         Class<?> discoveredClass = null;
         try {
             discoveredClass = Class.forName(className, true, context.getClass().getClassLoader());
-        } catch (Exception e) {
+        } catch (Throwable e) {
             logger.logError(e.getMessage());
         }
 
