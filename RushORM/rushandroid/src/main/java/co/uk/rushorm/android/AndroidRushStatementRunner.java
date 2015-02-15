@@ -12,13 +12,14 @@ import java.util.List;
 import co.uk.rushorm.core.RushQue;
 import co.uk.rushorm.core.RushStatementRunner;
 import co.uk.rushorm.core.exceptions.RushSqlException;
+import co.uk.rushorm.core.implementation.ReflectionUtils;
 
 /**
  * Created by stuartc on 11/12/14.
  */
 public class AndroidRushStatementRunner extends SQLiteOpenHelper implements RushStatementRunner {
 
-    private static final String LAST_ID = "SELECT id FROM %s ORDER BY id DESC LIMIT 1";
+    private static final String LAST_ID = "SELECT " + ReflectionUtils.RUSH_ID + " FROM %s ORDER BY " + ReflectionUtils.RUSH_ID + " DESC LIMIT 1";
 
     private int lastRunVersion = -1;
 

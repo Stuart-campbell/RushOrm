@@ -14,7 +14,7 @@ public class RushSearch {
 
     private static final String WHERE_TEMPLATE = "SELECT * from %s %s %s %s;";
 
-    private static final String JOIN = "JOIN %s using (id)";
+    private static final String JOIN = "JOIN %s using (" + ReflectionUtils.RUSH_ID + ")";
 
     private final List<Where> whereStatements = new ArrayList<>();
     private final List<OrderBy> orderStatements = new ArrayList<>();
@@ -107,7 +107,7 @@ public class RushSearch {
 
 
     public RushSearch whereId(long id) {
-        return where("id", "=", Long.toString(id));
+        return where(ReflectionUtils.RUSH_ID, "=", Long.toString(id));
     }
 
     public RushSearch and(){

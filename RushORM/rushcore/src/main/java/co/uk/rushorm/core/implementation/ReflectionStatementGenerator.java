@@ -282,7 +282,7 @@ public class ReflectionStatementGenerator implements RushStatementGenerator {
     private void createObjects(Map<Class, List<BasicCreate>> valuesMap, final Map<Class, List<String>> columnsMap, final Callback saveCallback) {
 
         for (final Map.Entry<Class, List<BasicCreate>> entry : valuesMap.entrySet()) {
-            columnsMap.get(entry.getKey()).add(0, "id");
+            columnsMap.get(entry.getKey()).add(0, ReflectionUtils.RUSH_ID);
             final long nextId = saveCallback.lastIdInTable(ReflectionUtils.tableNameForClass(entry.getKey())) + 1;
 
             final StringBuilder columnsString = new StringBuilder();
@@ -349,7 +349,9 @@ public class ReflectionStatementGenerator implements RushStatementGenerator {
                 public void actionAtIndex(int index) {
                     columnsString.append("\nSet ")
                             .append(updateSection(columnsMap.get(entry.getKey()), values.get(index).values))
-                            .append(" Where id=")
+                            .append(" Where ")
+                            .append(ReflectionUtils.RUSH_ID)
+                            .append("=")
                             .append(values.get(index).id);
                 }
 
@@ -510,7 +512,8 @@ public class ReflectionStatementGenerator implements RushStatementGenerator {
 
                 @Override
                 public void actionAtIndex(int index) {
-                    columnsString.append("id=")
+                    columnsString.append(ReflectionUtils.RUSH_ID)
+                            .append("=")
                             .append(values.get(index));
                 }
 

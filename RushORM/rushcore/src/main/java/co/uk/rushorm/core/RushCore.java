@@ -222,7 +222,7 @@ public class RushCore {
         statementGenerator.generateSaveOrUpdate(objects, new RushStatementGenerator.Callback() {
             @Override
             public void addRush(Rush rush, long id) {
-                idTable.put(rush, id);
+                RushCore.this.addRush(rush, id);
             }
             @Override
             public void removeRush(Rush rush) {}
@@ -252,7 +252,7 @@ public class RushCore {
             public void addRush(Rush rush, long id) {}
             @Override
             public void removeRush(Rush rush) {
-                removeId(rush.getClass(), rush.getId());
+                RushCore.this.removeRush(rush);
             }
             @Override
             public long lastIdInTable(String sql) { return 0; }
@@ -280,7 +280,7 @@ public class RushCore {
 
             @Override
             public void didLoadObject(Rush rush, long id) {
-                idTable.put(rush, id);
+                addRush(rush, id);
             }
         });
         values.close();
@@ -291,7 +291,14 @@ public class RushCore {
         return objects;
     }
 
-    private void removeId(Class clazz, long id) {
+    private void addRush(Rush rush, long id) {
+        idTable.put(rush, id);
+    }
+
+    private void removeRush(Rush rush) {
+        Class clazz = rush.getClass();
+        long id = rush.getId();
+
         Iterator<Map.Entry<Rush, Long>> iterator = idTable.entrySet().iterator();
         while (iterator.hasNext()) {
             Map.Entry<Rush, Long> entry = iterator.next();

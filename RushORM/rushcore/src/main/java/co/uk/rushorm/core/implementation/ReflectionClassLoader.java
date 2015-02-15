@@ -211,7 +211,8 @@ public class ReflectionClassLoader implements RushClassLoader {
                     .append(joinTableName)
                     .append(" ON ")
                     .append(tableName)
-                    .append(".id = ")
+                    .append(".").append(ReflectionUtils.RUSH_ID)
+                    .append(" = ")
                     .append(joinTableName)
                     .append(".child \n");
             counter -= 3;

@@ -16,12 +16,12 @@ public class SearchUtils {
 
 
     private static final String SELECT_CHILDREN = "SELECT %s.* from %s \n" +
-            "JOIN %s ON %s.id = %s.child \n" +
+            "JOIN %s ON %s." + ReflectionUtils.RUSH_ID + " = %s.child \n" +
             "WHERE parent=%d;";
 
 
     public static <T> String find(Class<T> rush, long id) {
-        return String.format(BASIC_WHERE_TEMPLATE, ReflectionUtils.tableNameForClass(rush), "id=" + Long.toString(id));
+        return String.format(BASIC_WHERE_TEMPLATE, ReflectionUtils.tableNameForClass(rush), ReflectionUtils.RUSH_ID + "=" + Long.toString(id));
     }
 
     public static String findChildren(Rush parent, Field field) {

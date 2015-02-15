@@ -49,8 +49,8 @@ public class ReflectionUpgradeManager implements RushUpgradeManager {
     private static final String RENAME_TABLE = "ALTER TABLE %s RENAME TO %s";
     private static final String TABLE_INFO = "SELECT name FROM sqlite_master WHERE type='table';";
     private static final String DROP = "DROP TABLE %s";
-    private static final String MOVE_ROWS = "INSERT INTO %s(id%s)\n" +
-            "SELECT id%s\n" +
+    private static final String MOVE_ROWS = "INSERT INTO %s(" + ReflectionUtils.RUSH_ID + "%s)\n" +
+            "SELECT " + ReflectionUtils.RUSH_ID + "%s\n" +
             "FROM %s;";
 
     private static final String DELETE_INDEX = "DROP INDEX %s;";
@@ -156,7 +156,7 @@ public class ReflectionUpgradeManager implements RushUpgradeManager {
         while(values.hasNext()) {
             List<String> columnsInfo = values.next();
             String column = columnsInfo.get(1);
-            if(!column.equals("id")) {
+            if(!column.equals(ReflectionUtils.RUSH_ID)) {
                 columns.add(columnsInfo.get(1));
             }
         }

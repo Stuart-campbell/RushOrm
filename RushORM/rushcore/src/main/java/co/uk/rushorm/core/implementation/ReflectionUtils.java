@@ -12,6 +12,8 @@ public class ReflectionUtils {
 
     public static final String RUSH_TABLE_PREFIX = "rush_";
 
+    public static final String RUSH_ID = "id";
+
     public static String tableNameForClass(Class clazz) {
         return tableNameForClass(clazz.getName());
     }
