@@ -1,5 +1,6 @@
 package co.uk.rushorm.core;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -28,8 +29,8 @@ import co.uk.rushorm.core.implementation.RushColumnsImplementation;
 public class RushCore {
 
     private static RushCore rushCore;
-    private static Map<Rush, Long> idTable = new WeakHashMap<>();
-
+    private final Map<Rush, String> idTable = new WeakHashMap<>();
+    private final List<String> deletedIds = new ArrayList<>();
     /* Public */
     public static void initialize(RushClassFinder rushClassFinder, RushStatementRunner statementRunner, RushQueProvider queProvider, RushConfig rushConfig, RushStringSanitizer rushStringSanitizer, Logger logger, List<RushColumn> columns) {
 
@@ -74,10 +75,10 @@ public class RushCore {
         return rushCore;
     }
 
-    public long getId(Rush rush) {
-        Long id = idTable.get(rush);
-        if (id == null) {
-            return -1;
+    public String getId(Rush rush) {
+        String id = idTable.get(rush);
+        if (id == null || deletedIds.contains(id)) {
+            return null;
         }
         return id;
     }
@@ -221,15 +222,11 @@ public class RushCore {
         statementRunner.startTransition(que);
         statementGenerator.generateSaveOrUpdate(objects, new RushStatementGenerator.Callback() {
             @Override
-            public void addRush(Rush rush, long id) {
+            public void addRush(Rush rush, String id) {
                 RushCore.this.addRush(rush, id);
             }
             @Override
             public void removeRush(Rush rush) {}
-            @Override
-            public long lastIdInTable(String sql) {
-                return statementRunner.runGetLastId(sql, que);
-            }
             @Override
             public void createdOrUpdateStatement(String sql) {
                 logger.logSql(sql);
@@ -249,15 +246,18 @@ public class RushCore {
         statementRunner.startTransition(que);
         statementGenerator.generateDelete(objects, new RushStatementGenerator.Callback() {
             @Override
-            public void addRush(Rush rush, long id) {}
+            public void addRush(Rush rush, String id) {
+            }
+
             @Override
             public void removeRush(Rush rush) {
                 RushCore.this.removeRush(rush);
             }
+
             @Override
-            public long lastIdInTable(String sql) { return 0; }
-            @Override
-            public void createdOrUpdateStatement(String sql) {}
+            public void createdOrUpdateStatement(String sql) {
+            }
+
             @Override
             public void deleteStatement(String sql) {
                 logger.logSql(sql);
@@ -265,6 +265,7 @@ public class RushCore {
             }
         });
         statementRunner.endTransition(que);
+        cleanIdMap();
         queProvider.queComplete(que);
     }
 
@@ -279,7 +280,7 @@ public class RushCore {
             }
 
             @Override
-            public void didLoadObject(Rush rush, long id) {
+            public void didLoadObject(Rush rush, String id) {
                 addRush(rush, id);
             }
         });
@@ -291,20 +292,22 @@ public class RushCore {
         return objects;
     }
 
-    private void addRush(Rush rush, long id) {
+    private void addRush(Rush rush, String id) {
         idTable.put(rush, id);
     }
 
     private void removeRush(Rush rush) {
-        Class clazz = rush.getClass();
-        long id = rush.getId();
+        deletedIds.add(idTable.remove(rush));
+    }
 
-        Iterator<Map.Entry<Rush, Long>> iterator = idTable.entrySet().iterator();
+    private void cleanIdMap() {
+        Iterator<Map.Entry<Rush, String>> iterator = idTable.entrySet().iterator();
         while (iterator.hasNext()) {
-            Map.Entry<Rush, Long> entry = iterator.next();
-            if (id == entry.getValue() && clazz.isInstance(entry.getKey())) {
+            Map.Entry<Rush, String> entry = iterator.next();
+            if (deletedIds.contains(entry.getValue())) {
                 iterator.remove();
             }
         }
+        deletedIds.clear();
     }
 }

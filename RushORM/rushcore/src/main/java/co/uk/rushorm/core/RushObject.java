@@ -26,7 +26,7 @@ public abstract class RushObject implements Rush {
     }
 
     @Override
-    public long getId() {
+    public String getId() {
         return RushCore.getInstance().getId(this);
     }
 

@@ -62,7 +62,7 @@ public class UpgradeTests extends ApplicationTestCase<Application> {
         TestBase1 test1 = new TestBase1();
         test1.stringField = "Test1";
         test1.save();
-        long id = test1.getId();
+        String id = test1.getId();
 
         List<Class> classes2 = new ArrayList<>();
         classes2.add(TestUpgrade1.class);
@@ -82,7 +82,7 @@ public class UpgradeTests extends ApplicationTestCase<Application> {
         TestBase1 test1 = new TestBase1();
         test1.doubleField = 10.05;
         test1.save();
-        long id = test1.getId();
+        String id = test1.getId();
 
         List<Class> classes2 = new ArrayList<>();
         classes2.add(TestUpgrade1.class);
@@ -102,7 +102,7 @@ public class UpgradeTests extends ApplicationTestCase<Application> {
         TestBase1 test1 = new TestBase1();
         test1.intField = 5;
         test1.save();
-        long id = test1.getId();
+        String id = test1.getId();
 
         List<Class> classes2 = new ArrayList<>();
         classes2.add(TestUpgrade1.class);
@@ -122,7 +122,7 @@ public class UpgradeTests extends ApplicationTestCase<Application> {
         TestBase1 test1 = new TestBase1();
         test1.longField = 1000000000;
         test1.save();
-        long id = test1.getId();
+        String id = test1.getId();
 
         List<Class> classes2 = new ArrayList<>();
         classes2.add(TestUpgrade1.class);
@@ -142,7 +142,7 @@ public class UpgradeTests extends ApplicationTestCase<Application> {
         TestBase1 test1 = new TestBase1();
         test1.shortField = 1;
         test1.save();
-        long id = test1.getId();
+        String id = test1.getId();
 
         List<Class> classes2 = new ArrayList<>();
         classes2.add(TestUpgrade1.class);
@@ -162,7 +162,7 @@ public class UpgradeTests extends ApplicationTestCase<Application> {
         TestBase1 test1 = new TestBase1();
         test1.booleanField = true;
         test1.save();
-        long id = test1.getId();
+        String id = test1.getId();
 
         List<Class> classes2 = new ArrayList<>();
         classes2.add(TestUpgrade1.class);
@@ -182,8 +182,8 @@ public class UpgradeTests extends ApplicationTestCase<Application> {
         TestBase1 test1 = new TestBase1();
         test1.testBase2 = new TestBase2();
         test1.save();
-        long id = test1.getId();
-        long testBase2Id = test1.testBase2.getId();
+        String id = test1.getId();
+        String testBase2Id = test1.testBase2.getId();
 
         List<Class> classes2 = new ArrayList<>();
         classes2.add(TestUpgrade1.class);
@@ -205,7 +205,7 @@ public class UpgradeTests extends ApplicationTestCase<Application> {
         test1.testBase2List.add(new TestBase2());
         test1.testBase2List.add(new TestBase2());
         test1.save();
-        long id = test1.getId();
+        String id = test1.getId();
 
         List<Class> classes2 = new ArrayList<>();
         classes2.add(TestUpgrade1.class);
@@ -225,7 +225,7 @@ public class UpgradeTests extends ApplicationTestCase<Application> {
         TestBase1 test1 = new TestBase1();
         test1.stringField = "Test1";
         test1.save();
-        long id = test1.getId();
+        String id = test1.getId();
 
         List<Class> classes2 = new ArrayList<>();
         classes2.add(TestUpgrade2.class);
@@ -245,7 +245,7 @@ public class UpgradeTests extends ApplicationTestCase<Application> {
         TestBase1 test1 = new TestBase1();
         test1.doubleField = 10.05;
         test1.save();
-        long id = test1.getId();
+        String id = test1.getId();
 
         List<Class> classes2 = new ArrayList<>();
         classes2.add(TestUpgrade2.class);
@@ -265,7 +265,7 @@ public class UpgradeTests extends ApplicationTestCase<Application> {
         TestBase1 test1 = new TestBase1();
         test1.intField = 5;
         test1.save();
-        long id = test1.getId();
+        String id = test1.getId();
 
         List<Class> classes2 = new ArrayList<>();
         classes2.add(TestUpgrade2.class);
@@ -285,7 +285,7 @@ public class UpgradeTests extends ApplicationTestCase<Application> {
         TestBase1 test1 = new TestBase1();
         test1.longField = 1000000000;
         test1.save();
-        long id = test1.getId();
+        String id = test1.getId();
 
         List<Class> classes2 = new ArrayList<>();
         classes2.add(TestUpgrade2.class);
@@ -305,7 +305,7 @@ public class UpgradeTests extends ApplicationTestCase<Application> {
         TestBase1 test1 = new TestBase1();
         test1.shortField = 1;
         test1.save();
-        long id = test1.getId();
+        String id = test1.getId();
 
         List<Class> classes2 = new ArrayList<>();
         classes2.add(TestUpgrade2.class);
@@ -325,7 +325,7 @@ public class UpgradeTests extends ApplicationTestCase<Application> {
         TestBase1 test1 = new TestBase1();
         test1.booleanField = true;
         test1.save();
-        long id = test1.getId();
+        String id = test1.getId();
 
         List<Class> classes2 = new ArrayList<>();
         classes2.add(TestUpgrade2.class);
@@ -345,8 +345,8 @@ public class UpgradeTests extends ApplicationTestCase<Application> {
         TestBase1 test1 = new TestBase1();
         test1.testBase2 = new TestBase2();
         test1.save();
-        long id = test1.getId();
-        long testBase2Id = test1.testBase2.getId();
+        String id = test1.getId();
+        String testBase2Id = test1.testBase2.getId();
 
         List<Class> classes2 = new ArrayList<>();
         classes2.add(TestUpgrade2.class);
@@ -368,7 +368,7 @@ public class UpgradeTests extends ApplicationTestCase<Application> {
         test1.testBase2List.add(new TestBase2());
         test1.testBase2List.add(new TestBase2());
         test1.save();
-        long id = test1.getId();
+        String id = test1.getId();
 
         List<Class> classes2 = new ArrayList<>();
         classes2.add(TestUpgrade2.class);
@@ -388,8 +388,8 @@ public class UpgradeTests extends ApplicationTestCase<Application> {
         TestBase1 test1 = new TestBase1();
         test1.testBase2 = new TestBase2();
         test1.save();
-        long id = test1.getId();
-        long testBase2Id = test1.testBase2.getId();
+        String id = test1.getId();
+        String testBase2Id = test1.testBase2.getId();
 
         List<Class> classes2 = new ArrayList<>();
         classes2.add(TestUpgrade3.class);
@@ -411,7 +411,7 @@ public class UpgradeTests extends ApplicationTestCase<Application> {
         test1.testBase2List.add(new TestBase2());
         test1.testBase2List.add(new TestBase2());
         test1.save();
-        long id = test1.getId();
+        String id = test1.getId();
 
         List<Class> classes2 = new ArrayList<>();
         classes2.add(TestUpgrade3.class);
@@ -431,8 +431,8 @@ public class UpgradeTests extends ApplicationTestCase<Application> {
         TestBase1 test1 = new TestBase1();
         test1.testBase2 = new TestBase2();
         test1.save();
-        long id = test1.getId();
-        long testBase2Id = test1.testBase2.getId();
+        String id = test1.getId();
+        String testBase2Id = test1.testBase2.getId();
 
         List<Class> classes2 = new ArrayList<>();
         classes2.add(TestUpgrade4.class);
@@ -454,7 +454,7 @@ public class UpgradeTests extends ApplicationTestCase<Application> {
         test1.testBase2List.add(new TestBase2());
         test1.testBase2List.add(new TestBase2());
         test1.save();
-        long id = test1.getId();
+        String id = test1.getId();
 
         List<Class> classes2 = new ArrayList<>();
         classes2.add(TestUpgrade4.class);
@@ -492,7 +492,7 @@ public class UpgradeTests extends ApplicationTestCase<Application> {
         object.myClass = new MyClass();
         object.myClass.name = "Hello";
         object.save();
-        long id = object.getId();
+        String id = object.getId();
 
         TestCustomColumn loadedObject = new RushSearch().whereId(id).findSingle(TestCustomColumn.class);
         assertTrue(loadedObject.myClass.name.equalsIgnoreCase("Hello"));

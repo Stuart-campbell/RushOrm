@@ -30,13 +30,13 @@ public class AndroidRushStatementRunner extends SQLiteOpenHelper implements Rush
 
     @Override
     public void runRaw(String statement, RushQue que) {
-        try {
+       /* try { */
             getWritableDatabase().execSQL(statement);
-        } catch (SQLiteException exception) {
+       /* } catch (SQLiteException exception) {
             throw new RushSqlException();
-        }
+        }*/
     }
-
+/*
     @Override
     public long runGetLastId(String table, RushQue que) {
         Cursor cursor;
@@ -53,16 +53,16 @@ public class AndroidRushStatementRunner extends SQLiteOpenHelper implements Rush
             cursor.close();
         }
         return id;
-    }
+    }*/
 
     @Override
     public ValuesCallback runGet(String sql, RushQue que) {
         final Cursor cursor;
-        try {
+        /*try {*/
             cursor = getWritableDatabase().rawQuery(sql, null);
-        } catch (SQLiteException exception) {
+        /*} catch (SQLiteException exception) {
             throw new RushSqlException();
-        }
+        }*/
         cursor.moveToFirst();
         return new ValuesCallback() {
             @Override

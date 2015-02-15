@@ -44,10 +44,10 @@ public class ReflectionClassLoader implements RushClassLoader {
 
     @Override
     public <T extends Rush> List<T> loadClasses(Class<T> clazz, RushStatementRunner.ValuesCallback valuesCallback, LoadCallback callback) {
-        return loadClasses(clazz, valuesCallback, callback, new HashMap<Class, Map<Long, T>>(), null);
+        return loadClasses(clazz, valuesCallback, callback, new HashMap<Class, Map<String, T>>(), null);
     }
 
-    public <T extends Rush> List<T> loadClasses(Class<T> clazz, RushStatementRunner.ValuesCallback valuesCallback, LoadCallback callback, Map<Class, Map<Long, T>> loadedClasses, AttachChild<T> attachChild) {
+    public <T extends Rush> List<T> loadClasses(Class<T> clazz, RushStatementRunner.ValuesCallback valuesCallback, LoadCallback callback, Map<Class, Map<String, T>> loadedClasses, AttachChild<T> attachChild) {
         try {
 
             Map<Class, List<Join>> joins = new HashMap<>();
@@ -75,12 +75,12 @@ public class ReflectionClassLoader implements RushClassLoader {
         return null;
     }
 
-    private <T extends Rush> T loadClass(Class<T> clazz, List<String> values, Map<Class, List<Join>> joins, Map<Class, List<String>> joinTables, Map<Class, Map<Long, T>> loadedClasses, LoadCallback callback) throws IllegalAccessException, InstantiationException, ClassNotFoundException {
+    private <T extends Rush> T loadClass(Class<T> clazz, List<String> values, Map<Class, List<Join>> joins, Map<Class, List<String>> joinTables, Map<Class, Map<String, T>> loadedClasses, LoadCallback callback) throws IllegalAccessException, InstantiationException, ClassNotFoundException {
 
-        long id = Long.parseLong(values.get(0));
+        String id = values.get(0);
 
         if(!loadedClasses.containsKey(clazz)) {
-            loadedClasses.put(clazz, new HashMap<Long, T>());
+            loadedClasses.put(clazz, new HashMap<String, T>());
         }
         if(loadedClasses.get(clazz).containsKey(id)) {
             return loadedClasses.get(clazz).get(id);
@@ -141,11 +141,11 @@ public class ReflectionClassLoader implements RushClassLoader {
             "%s" +
             "WHERE %s;";
 
-    private <T extends Rush> void addChildrenToList(final Class<T> clazz, final List<Join> joins, final List<String> tableNames, final Map<Class, Map<Long, T>> loadedClasses, final LoadCallback callback) {
+    private <T extends Rush> void addChildrenToList(final Class<T> clazz, final List<Join> joins, final List<String> tableNames, final Map<Class, Map<String, T>> loadedClasses, final LoadCallback callback) {
 
         final String tableName = ReflectionUtils.tableNameForClass(clazz);
         final Map<Integer, String> tableMap = new HashMap<>();
-        final Map<String, Map<Long, Join>> parentMap = new HashMap<>();
+        final Map<String, Map<String, Join>> parentMap = new HashMap<>();
         final String joinsString = joinSection(tableName, tableNames, tableMap, parentMap);
         final StringBuilder columnsString = new StringBuilder();
 
@@ -160,8 +160,9 @@ public class ReflectionClassLoader implements RushClassLoader {
                 Join join = joins.get(index);
                 parentMap.get(join.tableName).put(join.parent.getId(), join);
                 columnsString.append(join.tableName)
-                        .append(".parent = ")
-                        .append(join.parent.getId());
+                        .append(".parent = '")
+                        .append(join.parent.getId())
+                        .append("'");
             }
 
             @Override
@@ -182,7 +183,7 @@ public class ReflectionClassLoader implements RushClassLoader {
                             i -= 3;
                             offset += 3;
                         }
-                        long parentId = Long.parseLong(values.get(i));
+                        String parentId = values.get(i);
                         String tableName = tableMap.get(offset);
                         Join join = parentMap.get(tableName).get(parentId);
                         Rush parent = join.parent;
@@ -202,7 +203,7 @@ public class ReflectionClassLoader implements RushClassLoader {
         });
     }
 
-    private String joinSection(String tableName, List<String> tableNames, Map<Integer, String> tableMap, Map<String, Map<Long, Join>> parentMap) {
+    private String joinSection(String tableName, List<String> tableNames, Map<Integer, String> tableMap, Map<String, Map<String, Join>> parentMap) {
         StringBuilder stringBuilder = new StringBuilder();
         int counter = (tableNames.size() * 3) - 2;
         for(String joinTableName : tableNames) {
@@ -216,7 +217,7 @@ public class ReflectionClassLoader implements RushClassLoader {
                     .append(joinTableName)
                     .append(".child \n");
             counter -= 3;
-            parentMap.put(joinTableName, new HashMap<Long, Join>());
+            parentMap.put(joinTableName, new HashMap<String, Join>());
         }
         return stringBuilder.toString();
     }

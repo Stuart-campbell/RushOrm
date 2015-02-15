@@ -17,14 +17,14 @@ import co.uk.rushorm.core.RushTableStatementGenerator;
 public class ReflectionTableStatementGenerator implements RushTableStatementGenerator {
 
     private static final String TABLE_TEMPLATE = "CREATE TABLE %s (" +
-            "\n" + ReflectionUtils.RUSH_ID + " integer primary key" +
+            "\n" + ReflectionUtils.RUSH_ID + " text primary key" +
             "%s" +
             "\n);";
 
     private static final String JOIN_TEMPLATE = "CREATE TABLE %s (" +
             "\n" + ReflectionUtils.RUSH_ID + " integer primary key autoincrement" +
-            ",\nparent integer NOT NULL" +
-            ",\nchild integer NOT NULL" +
+            ",\nparent text NOT NULL" +
+            ",\nchild text NOT NULL" +
             ",\nFOREIGN KEY (parent) REFERENCES %s(" + ReflectionUtils.RUSH_ID +")" +
             ",\nFOREIGN KEY (child) REFERENCES %s(" + ReflectionUtils.RUSH_ID + ")" +
             "\n);";

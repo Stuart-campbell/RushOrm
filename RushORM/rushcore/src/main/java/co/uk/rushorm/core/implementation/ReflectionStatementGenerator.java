@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import co.uk.rushorm.core.AnnotationCache;
 import co.uk.rushorm.core.Rush;
@@ -74,12 +75,12 @@ public class ReflectionStatementGenerator implements RushStatementGenerator {
         }
     }
 
-    private void deleteManyJoins(Map<String, List<Long>> joinDeletes, final Callback saveCallback) {
+    private void deleteManyJoins(Map<String, List<String>> joinDeletes, final Callback saveCallback) {
 
-        for (final Map.Entry<String, List<Long>> entry : joinDeletes.entrySet()) {
+        for (final Map.Entry<String, List<String>> entry : joinDeletes.entrySet()) {
             final StringBuilder columnsString = new StringBuilder();
 
-            final List<Long> ids = entry.getValue();
+            final List<String> ids = entry.getValue();
 
             doLoop(ids.size(), GROUP_SIZE, new LoopCallBack() {
                 @Override
@@ -89,8 +90,9 @@ public class ReflectionStatementGenerator implements RushStatementGenerator {
 
                 @Override
                 public void actionAtIndex(int index) {
-                    columnsString.append("parent=")
-                            .append(ids.get(index));
+                    columnsString.append("parent='")
+                            .append(ids.get(index))
+                            .append("'");
                 }
 
                 @Override
@@ -124,9 +126,9 @@ public class ReflectionStatementGenerator implements RushStatementGenerator {
 
     private class BasicUpdate {
         private final List<String> values;
-        private final long id;
+        private final String id;
 
-        private BasicUpdate(List<String> values, long id) {
+        private BasicUpdate(List<String> values, String id) {
             this.values = values;
             this.id = id;
         }
@@ -158,7 +160,7 @@ public class ReflectionStatementGenerator implements RushStatementGenerator {
         Map<Class, List<BasicUpdate>> updateValues = new HashMap<>();
         Map<Class, List<String>> columns = new HashMap<>();
 
-        Map<String, List<Long>> joinDeletes = new HashMap<>();
+        Map<String, List<String>> joinDeletes = new HashMap<>();
         Map<String, List<BasicJoin>> joinValues = new HashMap<>();
 
         for(Rush rush : objects) {
@@ -176,7 +178,7 @@ public class ReflectionStatementGenerator implements RushStatementGenerator {
                                       Map<Class, List<BasicCreate>> createValuesMap,
                                       Map<Class, List<BasicUpdate>> updateValuesMap,
                                       Map<Class, List<String>> columnsMap,
-                                      Map<String, List<Long>> joinDeletesMap,
+                                      Map<String, List<String>> joinDeletesMap,
                                       Map<String, List<BasicJoin>> joinValuesMap) {
 
         if (rushObjects.contains(rush)) {
@@ -212,10 +214,10 @@ public class ReflectionStatementGenerator implements RushStatementGenerator {
                         }
                     }
                 } else {
-                    if (rush.getId() > 0) {
+                    if (rush.getId() != null) {
                         // Clear join tables and re save rows to catch any deleted or changed children
                         if (!joinDeletesMap.containsKey(joinTableName)) {
-                            joinDeletesMap.put(joinTableName, new ArrayList<Long>());
+                            joinDeletesMap.put(joinTableName, new ArrayList<String>());
                         }
                         joinDeletesMap.get(joinTableName).add(rush.getId());
                     }
@@ -231,7 +233,7 @@ public class ReflectionStatementGenerator implements RushStatementGenerator {
             columnsMap.put(rush.getClass(), columns);
         }
 
-        if (rush.getId() < 0) {
+        if (rush.getId() == null) {
             if (!createValuesMap.containsKey(rush.getClass())) {
                 createValuesMap.put(rush.getClass(), new ArrayList<BasicCreate>());
             }
@@ -283,7 +285,6 @@ public class ReflectionStatementGenerator implements RushStatementGenerator {
 
         for (final Map.Entry<Class, List<BasicCreate>> entry : valuesMap.entrySet()) {
             columnsMap.get(entry.getKey()).add(0, ReflectionUtils.RUSH_ID);
-            final long nextId = saveCallback.lastIdInTable(ReflectionUtils.tableNameForClass(entry.getKey())) + 1;
 
             final StringBuilder columnsString = new StringBuilder();
             final List<BasicCreate> creates = entry.getValue();
@@ -296,8 +297,9 @@ public class ReflectionStatementGenerator implements RushStatementGenerator {
 
                 @Override
                 public void actionAtIndex(int index) {
-                    saveCallback.addRush(creates.get(index).rush, nextId + index);
-                    creates.get(index).values.add(0, Long.toString(nextId + index));
+                    String objectId = UUID.randomUUID().toString();
+                    saveCallback.addRush(creates.get(index).rush, objectId);
+                    creates.get(index).values.add(0, "'" + objectId + "'");
                     columnsString.append("(")
                             .append(commaSeparated(creates.get(index).values))
                             .append(")");
@@ -351,8 +353,9 @@ public class ReflectionStatementGenerator implements RushStatementGenerator {
                             .append(updateSection(columnsMap.get(entry.getKey()), values.get(index).values))
                             .append(" Where ")
                             .append(ReflectionUtils.RUSH_ID)
-                            .append("=")
-                            .append(values.get(index).id);
+                            .append("='")
+                            .append(values.get(index).id)
+                            .append("'");
                 }
 
                 @Override
@@ -398,11 +401,11 @@ public class ReflectionStatementGenerator implements RushStatementGenerator {
 
                 @Override
                 public void actionAtIndex(int index) {
-                    columnsString.append("(")
+                    columnsString.append("('")
                             .append(values.get(index).parent.getId())
-                            .append(",")
+                            .append("','")
                             .append(values.get(index).child.getId())
-                            .append(")");
+                            .append("')");
                 }
 
                 @Override
@@ -423,8 +426,8 @@ public class ReflectionStatementGenerator implements RushStatementGenerator {
     /*** Delete ***/
     @Override
     public void generateDelete(List<? extends Rush> objects, Callback callback) {
-        Map<String, List<Long>> joinDeletes = new HashMap<>();
-        Map<String, List<Long>> deletes = new HashMap<>();
+        Map<String, List<String>> joinDeletes = new HashMap<>();
+        Map<String, List<String>> deletes = new HashMap<>();
 
         for (Rush object : objects) {
             generateDelete(object, deletes, joinDeletes, callback);
@@ -434,13 +437,13 @@ public class ReflectionStatementGenerator implements RushStatementGenerator {
         deleteMany(deletes, callback);
     }
 
-    public void generateDelete(Rush rush, Map<String, List<Long>> deletes, Map<String, List<Long>> joinDeletes, Callback callback) {
+    public void generateDelete(Rush rush, Map<String, List<String>> deletes, Map<String, List<String>> joinDeletes, Callback callback) {
 
-        if (rush.getId() < 0) {
+        if (rush.getId() == null) {
             return;
         }
 
-        long id = rush.getId();
+        String id = rush.getId();
         callback.removeRush(rush);
 
         List<Field> fields = new ArrayList<>();
@@ -483,7 +486,7 @@ public class ReflectionStatementGenerator implements RushStatementGenerator {
                 }
                 if(joinTableName != null) {
                     if (!joinDeletes.containsKey(joinTableName)) {
-                        joinDeletes.put(joinTableName, new ArrayList<Long>());
+                        joinDeletes.put(joinTableName, new ArrayList<String>());
                     }
                     joinDeletes.get(joinTableName).add(id);
                 }
@@ -492,17 +495,17 @@ public class ReflectionStatementGenerator implements RushStatementGenerator {
 
         String table = ReflectionUtils.tableNameForClass(rush.getClass());
         if(!deletes.containsKey(table)) {
-            deletes.put(table, new ArrayList<Long>());
+            deletes.put(table, new ArrayList<String>());
         }
         deletes.get(table).add(id);
 
     }
 
-    private void deleteMany(Map<String, List<Long>> deletes, final Callback saveCallback) {
+    private void deleteMany(Map<String, List<String>> deletes, final Callback saveCallback) {
 
-        for (final Map.Entry<String, List<Long>> entry : deletes.entrySet()) {
+        for (final Map.Entry<String, List<String>> entry : deletes.entrySet()) {
             final StringBuilder columnsString = new StringBuilder();
-            final List<Long> values = entry.getValue();
+            final List<String> values = entry.getValue();
 
             doLoop(values.size(), GROUP_SIZE, new LoopCallBack() {
                 @Override
@@ -513,8 +516,9 @@ public class ReflectionStatementGenerator implements RushStatementGenerator {
                 @Override
                 public void actionAtIndex(int index) {
                     columnsString.append(ReflectionUtils.RUSH_ID)
-                            .append("=")
-                            .append(values.get(index));
+                            .append("='")
+                            .append(values.get(index))
+                            .append("'");
                 }
 
                 @Override

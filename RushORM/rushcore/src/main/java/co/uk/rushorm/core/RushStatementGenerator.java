@@ -8,9 +8,8 @@ import java.util.List;
 public interface RushStatementGenerator {
 
     public interface Callback {
-        public void addRush(Rush rush, long id);
+        public void addRush(Rush rush, String id);
         public void removeRush(Rush rush);
-        public long lastIdInTable(String sql);
         public void createdOrUpdateStatement(String sql);
         public void deleteStatement(String sql);
     }

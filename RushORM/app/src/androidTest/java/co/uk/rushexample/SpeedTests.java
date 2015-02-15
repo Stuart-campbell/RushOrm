@@ -113,7 +113,7 @@ public class SpeedTests extends ApplicationTestCase<Application> {
             testObject.children.add(new TestChildObject());
         }
         testObject.save();
-        long id = testObject.getId();
+        String id = testObject.getId();
 
 
         Date date = new Date();
@@ -133,7 +133,7 @@ public class SpeedTests extends ApplicationTestCase<Application> {
             testObject.children.add(new TestChildObject());
         }
         testObject.save();
-        long id = testObject.getId();
+        String id = testObject.getId();
 
         TestObject loadedObject = new RushSearch().whereId(id).findSingle(TestObject.class);
         Date date = new Date();
