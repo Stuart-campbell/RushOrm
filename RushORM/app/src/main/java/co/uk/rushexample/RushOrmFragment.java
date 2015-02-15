@@ -13,7 +13,6 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-import co.uk.rushexample.R;
 import co.uk.rushexample.demo.Car;
 import co.uk.rushexample.demo.Engine;
 import co.uk.rushexample.demo.Wheel;

@@ -3,6 +3,7 @@ package co.uk.rushorm.android;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import java.util.ArrayList;
@@ -10,6 +11,7 @@ import java.util.List;
 
 import co.uk.rushorm.core.RushQue;
 import co.uk.rushorm.core.RushStatementRunner;
+import co.uk.rushorm.core.exceptions.RushSqlException;
 
 /**
  * Created by stuartc on 11/12/14.
@@ -27,25 +29,39 @@ public class AndroidRushStatementRunner extends SQLiteOpenHelper implements Rush
 
     @Override
     public void runRaw(String statement, RushQue que) {
-        getWritableDatabase().execSQL(statement);
+        try {
+            getWritableDatabase().execSQL(statement);
+        } catch (SQLiteException exception) {
+            throw new RushSqlException();
+        }
     }
 
     @Override
     public long runGetLastId(String table, RushQue que) {
-        Cursor c = getWritableDatabase().rawQuery(String.format(LAST_ID, table), null);
+        Cursor cursor;
+        try {
+            cursor = getWritableDatabase().rawQuery(String.format(LAST_ID, table), null);
+        } catch (SQLiteException exception) {
+            throw new RushSqlException();
+        }
         long id = 0;
-        if (c != null ) {
-            if(c.moveToFirst()){
-                id = c.getLong(0); //The 0 is the column index, we only have 1 column, so the index is 0
+        if (cursor != null ) {
+            if(cursor.moveToFirst()){
+                id = cursor.getLong(0); //The 0 is the column index, we only have 1 column, so the index is 0
             }
-            c.close();
+            cursor.close();
         }
         return id;
     }
 
     @Override
     public ValuesCallback runGet(String sql, RushQue que) {
-        final Cursor cursor = getWritableDatabase().rawQuery(sql, null);
+        final Cursor cursor;
+        try {
+            cursor = getWritableDatabase().rawQuery(sql, null);
+        } catch (SQLiteException exception) {
+            throw new RushSqlException();
+        }
         cursor.moveToFirst();
         return new ValuesCallback() {
             @Override

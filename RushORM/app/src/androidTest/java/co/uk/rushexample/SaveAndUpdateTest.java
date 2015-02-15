@@ -405,4 +405,23 @@ public class SaveAndUpdateTest extends ApplicationTestCase<Application> {
         List<TestObject> loadedObjects2 = new RushSearch().find(TestObject.class);
         assertTrue(loadedObjects2.size() == 2);
     }
+
+    public void testSaveThenUpdate2() throws Exception {
+        List<TestObject> objects = new ArrayList<>();
+        TestObject test1 = new TestObject();
+        test1.stringField = "Test1";
+        objects.add(test1);
+
+        RushCore.getInstance().save(objects);
+
+        List<TestObject> loadedObjects = new RushSearch().find(TestObject.class);
+        TestObject test2 = new TestObject();
+        test2.stringField = "Test2";
+        loadedObjects.add(test2);
+
+        RushCore.getInstance().save(loadedObjects);
+
+        List<TestObject> loadedObjects2 = new RushSearch().find(TestObject.class);
+        assertTrue(loadedObjects2.get(0).stringField.equals("Test1") && loadedObjects2.get(1).stringField.equals("Test2") );
+    }
 }
