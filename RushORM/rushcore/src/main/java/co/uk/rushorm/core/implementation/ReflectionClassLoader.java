@@ -97,7 +97,7 @@ public class ReflectionClassLoader implements RushClassLoader {
             annotationCache.put(clazz, new AnnotationCache(clazz, fields));
         }
 
-        int counter = 1;
+        int counter = 3; /* Skip rush_id, rush_created and rush_updated */
         for (Field field : fields) {
             field.setAccessible(true);
             if (!annotationCache.get(clazz).getFieldToIgnore().contains(field.getName())) {

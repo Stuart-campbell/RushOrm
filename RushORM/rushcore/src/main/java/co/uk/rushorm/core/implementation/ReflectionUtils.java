@@ -12,7 +12,9 @@ public class ReflectionUtils {
 
     public static final String RUSH_TABLE_PREFIX = "rush_";
 
-    public static final String RUSH_ID = "id";
+    public static final String RUSH_ID = "rush_id";
+    public static final String RUSH_CREATED = "rush_created";
+    public static final String RUSH_UPDATED = "rush_updated";
 
     public static String tableNameForClass(Class clazz) {
         return tableNameForClass(clazz.getName());

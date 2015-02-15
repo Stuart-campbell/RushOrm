@@ -2,6 +2,7 @@ package co.uk.rushorm.core.implementation;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -283,39 +284,55 @@ public class ReflectionStatementGenerator implements RushStatementGenerator {
 
     private void createObjects(Map<Class, List<BasicCreate>> valuesMap, final Map<Class, List<String>> columnsMap, final Callback saveCallback) {
 
-        for (final Map.Entry<Class, List<BasicCreate>> entry : valuesMap.entrySet()) {
-            columnsMap.get(entry.getKey()).add(0, ReflectionUtils.RUSH_ID);
+        final String created = Long.toString(new Date().getTime());
 
-            final StringBuilder columnsString = new StringBuilder();
+        for (final Map.Entry<Class, List<BasicCreate>> entry : valuesMap.entrySet()) {
+
+            StringBuilder columnsBuilder = new StringBuilder();
+            columnsBuilder.append(ReflectionUtils.RUSH_ID)
+                    .append(",")
+                    .append(ReflectionUtils.RUSH_CREATED)
+                    .append(",")
+                    .append(ReflectionUtils.RUSH_UPDATED)
+                    .append(commaSeparated(columnsMap.get(entry.getKey())));
+
+            final String columns = columnsBuilder.toString();
+
+            final StringBuilder valuesString = new StringBuilder();
             final List<BasicCreate> creates = entry.getValue();
 
             doLoop(creates.size(), GROUP_SIZE, new LoopCallBack() {
                 @Override
                 public void start() {
-                    columnsString.delete(0, columnsString.length());
+                    valuesString.delete(0, valuesString.length());
                 }
 
                 @Override
                 public void actionAtIndex(int index) {
                     String objectId = UUID.randomUUID().toString();
                     saveCallback.addRush(creates.get(index).rush, objectId);
-                    creates.get(index).values.add(0, "'" + objectId + "'");
-                    columnsString.append("(")
+
+                    valuesString.append("('")
+                            .append(objectId)
+                            .append("',")
+                            .append(created)
+                            .append(",")
+                            .append(created)
                             .append(commaSeparated(creates.get(index).values))
                             .append(")");
                 }
 
                 @Override
                 public void join() {
-                    columnsString.append(", ");
+                    valuesString.append(", ");
                 }
 
                 @Override
                 public void doAction() {
                     String sql = String.format(MULTIPLE_INSERT_TEMPLATE,
                             ReflectionUtils.tableNameForClass(entry.getKey()),
-                            commaSeparated(columnsMap.get(entry.getKey())),
-                            columnsString.toString());
+                            columns,
+                            valuesString.toString());
 
                     saveCallback.createdOrUpdateStatement(sql);
                 }
@@ -326,19 +343,19 @@ public class ReflectionStatementGenerator implements RushStatementGenerator {
     private String commaSeparated(List<String> values) {
         StringBuilder string = new StringBuilder();
         for (int i = 0; i < values.size(); i++) {
-            string.append(values.get(i));
-            if (i < values.size() - 1) {
-                string.append(",");
-            }
+            string.append(",")
+            .append(values.get(i));
         }
         return string.toString();
     }
 
     private void updateObjects(Map<Class, List<BasicUpdate>> valuesMap, final Map<Class, List<String>> columnsMap, final Callback saveCallback) {
 
-        for (final Map.Entry<Class, List<BasicUpdate>> entry : valuesMap.entrySet()) {
-            final StringBuilder columnsString = new StringBuilder();
+        final String updated = Long.toString(new Date().getTime());
 
+        for (final Map.Entry<Class, List<BasicUpdate>> entry : valuesMap.entrySet()) {
+
+            final StringBuilder columnsString = new StringBuilder();
             final List<BasicUpdate> values = entry.getValue();
 
             doLoop(values.size(), GROUP_SIZE, new LoopCallBack() {
@@ -349,8 +366,9 @@ public class ReflectionStatementGenerator implements RushStatementGenerator {
 
                 @Override
                 public void actionAtIndex(int index) {
+
                     columnsString.append("\nSet ")
-                            .append(updateSection(columnsMap.get(entry.getKey()), values.get(index).values))
+                            .append(updateSection(columnsMap.get(entry.getKey()), values.get(index).values, updated))
                             .append(" Where ")
                             .append(ReflectionUtils.RUSH_ID)
                             .append("='")
@@ -374,16 +392,20 @@ public class ReflectionStatementGenerator implements RushStatementGenerator {
         }
     }
 
-    private String updateSection(List<String> columns, List<String> values) {
+    private String updateSection(List<String> columns, List<String> values, String updated) {
         StringBuilder string = new StringBuilder();
+
         for (int i = 0; i < columns.size(); i++) {
             string.append(columns.get(i))
                     .append("=")
-                    .append(values.get(i));
-            if (i < columns.size() - 1) {
-                string.append(",");
-            }
+                    .append(values.get(i))
+                    .append(",");
         }
+        /* Add updated date */
+        string.append(ReflectionUtils.RUSH_UPDATED)
+                .append("=")
+                .append(updated);
+
         return string.toString();
     }
 

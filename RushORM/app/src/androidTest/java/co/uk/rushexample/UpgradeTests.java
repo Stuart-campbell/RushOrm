@@ -470,7 +470,7 @@ public class UpgradeTests extends ApplicationTestCase<Application> {
 
         RushConfig rushConfig = new AndroidRushConfig(applicationContext);
         RushStringSanitizer rushStringSanitizer = new AndroidRushStringSanitizer();
-        RushStatementRunner statementRunner = new AndroidRushStatementRunner(applicationContext, rushConfig.dbName(), rushConfig.dbVersion());
+        RushStatementRunner statementRunner = new AndroidRushStatementRunner(applicationContext, rushConfig.dbName(), rushConfig);
         RushQueProvider queProvider = new AndroidRushQueProvider();
         Logger logger = new AndroidLogger(rushConfig);
 

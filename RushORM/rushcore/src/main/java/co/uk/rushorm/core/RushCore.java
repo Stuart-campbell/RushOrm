@@ -58,8 +58,6 @@ public class RushCore {
         rushCore = new RushCore(statementGenerator, statementRunner, queProvider, rushConfig, rushTableStatementGenerator, rushClassLoader, rushStringSanitizer, logger);
         RushQue que = queProvider.blockForNextQue();
         if (rushConfig.firstRun()) {
-            /* Turn off automatic_index to stop logging in Android L */
-            //statementRunner.runRaw("PRAGMA automatic_index=off;", que);
             rushCore.createTables(rushClassFinder, que);
         } else if(rushConfig.inDebug() || rushConfig.upgrade()){
             rushCore.upgrade(rushClassFinder, rushUpgradeManager, que);

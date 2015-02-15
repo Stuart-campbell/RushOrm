@@ -9,6 +9,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import java.util.ArrayList;
 import java.util.List;
 
+import co.uk.rushorm.core.RushConfig;
 import co.uk.rushorm.core.RushQue;
 import co.uk.rushorm.core.RushStatementRunner;
 import co.uk.rushorm.core.exceptions.RushSqlException;
@@ -19,50 +20,40 @@ import co.uk.rushorm.core.implementation.ReflectionUtils;
  */
 public class AndroidRushStatementRunner extends SQLiteOpenHelper implements RushStatementRunner {
 
-    private static final String LAST_ID = "SELECT " + ReflectionUtils.RUSH_ID + " FROM %s ORDER BY " + ReflectionUtils.RUSH_ID + " DESC LIMIT 1";
-
     private int lastRunVersion = -1;
+    private RushConfig rushConfig;
 
-    public AndroidRushStatementRunner(Context context, String name, int version) {
-        super(context, name, null, version);
-        lastRunVersion = version;
+    public AndroidRushStatementRunner(Context context, String name, RushConfig rushConfig) {
+        super(context, name, null, rushConfig.dbVersion());
+        lastRunVersion = rushConfig.dbVersion();
+        this.rushConfig = rushConfig;
     }
 
     @Override
     public void runRaw(String statement, RushQue que) {
-       /* try { */
-            getWritableDatabase().execSQL(statement);
-       /* } catch (SQLiteException exception) {
-            throw new RushSqlException();
-        }*/
-    }
-/*
-    @Override
-    public long runGetLastId(String table, RushQue que) {
-        Cursor cursor;
         try {
-            cursor = getWritableDatabase().rawQuery(String.format(LAST_ID, table), null);
+            getWritableDatabase().execSQL(statement);
         } catch (SQLiteException exception) {
-            throw new RushSqlException();
-        }
-        long id = 0;
-        if (cursor != null ) {
-            if(cursor.moveToFirst()){
-                id = cursor.getLong(0); //The 0 is the column index, we only have 1 column, so the index is 0
+            if(rushConfig.inDebug()) {
+                throw exception;
+            } else {
+                throw new RushSqlException();
             }
-            cursor.close();
         }
-        return id;
-    }*/
+    }
 
     @Override
     public ValuesCallback runGet(String sql, RushQue que) {
         final Cursor cursor;
-        /*try {*/
+        try {
             cursor = getWritableDatabase().rawQuery(sql, null);
-        /*} catch (SQLiteException exception) {
-            throw new RushSqlException();
-        }*/
+        } catch (SQLiteException exception) {
+            if(rushConfig.inDebug()) {
+                throw exception;
+            } else {
+                throw new RushSqlException();
+            }
+        }
         cursor.moveToFirst();
         return new ValuesCallback() {
             @Override

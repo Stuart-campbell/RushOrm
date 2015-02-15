@@ -28,7 +28,7 @@ public class RushAndroid {
         Logger logger = new AndroidLogger(rushConfig);
         RushStringSanitizer rushStringSanitizer = new AndroidRushStringSanitizer();
         RushClassFinder rushClassFinder = new AndroidRushClassFinder(applicationContext, logger);
-        AndroidRushStatementRunner statementRunner = new AndroidRushStatementRunner(applicationContext, rushConfig.dbName(), rushConfig.dbVersion());
+        AndroidRushStatementRunner statementRunner = new AndroidRushStatementRunner(applicationContext, rushConfig.dbName(), rushConfig);
         rushConfig.setLastRunVersion(statementRunner.getLastRunVersion());
         RushQueProvider queProvider = new AndroidRushQueProvider();
 

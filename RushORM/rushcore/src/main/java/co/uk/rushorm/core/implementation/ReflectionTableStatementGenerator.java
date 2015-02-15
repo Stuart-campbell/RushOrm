@@ -17,7 +17,9 @@ import co.uk.rushorm.core.RushTableStatementGenerator;
 public class ReflectionTableStatementGenerator implements RushTableStatementGenerator {
 
     private static final String TABLE_TEMPLATE = "CREATE TABLE %s (" +
-            "\n" + ReflectionUtils.RUSH_ID + " text primary key" +
+            "\n" + ReflectionUtils.RUSH_ID + " text primary key," +
+            "\n" + ReflectionUtils.RUSH_CREATED + " long," +
+            "\n" + ReflectionUtils.RUSH_UPDATED + " long" +
             "%s" +
             "\n);";
 
