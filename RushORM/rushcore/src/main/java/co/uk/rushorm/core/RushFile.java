@@ -24,7 +24,7 @@ public abstract class RushFile extends RushObject {
     }
 
     private String filename() {
-        return directory + getClass().getName() + "_" + getId() + "." + fileExtension();
+        return directory + getId() + "." + fileExtension();
     }
 
     public File file() {

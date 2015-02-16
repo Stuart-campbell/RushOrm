@@ -1,6 +1,5 @@
 package co.uk.rushorm.core;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -11,7 +10,8 @@ import java.util.WeakHashMap;
 import co.uk.rushorm.core.exceptions.RushCoreNotInitializedException;
 import co.uk.rushorm.core.exceptions.RushTableMissingEmptyConstructor;
 import co.uk.rushorm.core.implementation.ReflectionClassLoader;
-import co.uk.rushorm.core.implementation.ReflectionStatementGenerator;
+import co.uk.rushorm.core.implementation.ReflectionDeleteStatementGenerator;
+import co.uk.rushorm.core.implementation.ReflectionSaveStatementGenerator;
 import co.uk.rushorm.core.implementation.ReflectionTableStatementGenerator;
 import co.uk.rushorm.core.implementation.ReflectionUpgradeManager;
 import co.uk.rushorm.core.implementation.RushColumnBoolean;
@@ -29,8 +29,8 @@ import co.uk.rushorm.core.implementation.RushColumnsImplementation;
 public class RushCore {
 
     private static RushCore rushCore;
-    private final Map<Rush, String> idTable = new WeakHashMap<>();
-    private final List<String> deletedIds = new ArrayList<>();
+    private final Map<Rush, RushMetaData> idTable = new WeakHashMap<>();
+    private final List<RushMetaData> deletedIds = new ArrayList<>();
     /* Public */
     public static void initialize(RushClassFinder rushClassFinder, RushStatementRunner statementRunner, RushQueProvider queProvider, RushConfig rushConfig, RushStringSanitizer rushStringSanitizer, Logger logger, List<RushColumn> columns) {
 
@@ -47,15 +47,17 @@ public class RushCore {
 
         Map<Class, AnnotationCache> annotationCache = new HashMap<>();
 
-        RushStatementGenerator statementGenerator = new ReflectionStatementGenerator(rushStringSanitizer, rushColumns, annotationCache);
+        RushSaveStatementGenerator saveStatementGenerator = new ReflectionSaveStatementGenerator(rushStringSanitizer, rushColumns, annotationCache);
+        RushDeleteStatementGenerator deleteStatementGenerator = new ReflectionDeleteStatementGenerator(annotationCache);
+
         RushTableStatementGenerator rushTableStatementGenerator = new ReflectionTableStatementGenerator(rushColumns);
         RushClassLoader rushClassLoader = new ReflectionClassLoader(rushColumns, annotationCache);
 
-        initialize(rushUpgradeManager, statementGenerator, rushClassFinder, rushTableStatementGenerator, statementRunner, queProvider, rushConfig, rushClassLoader, rushStringSanitizer, logger);
+        initialize(rushUpgradeManager, saveStatementGenerator, deleteStatementGenerator, rushClassFinder, rushTableStatementGenerator, statementRunner, queProvider, rushConfig, rushClassLoader, rushStringSanitizer, logger);
     }
 
-    public static void initialize(RushUpgradeManager rushUpgradeManager, RushStatementGenerator statementGenerator, RushClassFinder rushClassFinder, RushTableStatementGenerator rushTableStatementGenerator, RushStatementRunner statementRunner, RushQueProvider queProvider, RushConfig rushConfig, RushClassLoader rushClassLoader, RushStringSanitizer rushStringSanitizer, Logger logger) {
-        rushCore = new RushCore(statementGenerator, statementRunner, queProvider, rushConfig, rushTableStatementGenerator, rushClassLoader, rushStringSanitizer, logger);
+    public static void initialize(RushUpgradeManager rushUpgradeManager, RushSaveStatementGenerator saveStatementGenerator, RushDeleteStatementGenerator deleteStatementGenerator, RushClassFinder rushClassFinder, RushTableStatementGenerator rushTableStatementGenerator, RushStatementRunner statementRunner, RushQueProvider queProvider, RushConfig rushConfig, RushClassLoader rushClassLoader, RushStringSanitizer rushStringSanitizer, Logger logger) {
+        rushCore = new RushCore(saveStatementGenerator, deleteStatementGenerator, statementRunner, queProvider, rushConfig, rushTableStatementGenerator, rushClassLoader, rushStringSanitizer, logger);
         RushQue que = queProvider.blockForNextQue();
         if (rushConfig.firstRun()) {
             rushCore.createTables(rushClassFinder, que);
@@ -74,11 +76,13 @@ public class RushCore {
     }
 
     public String getId(Rush rush) {
-        String id = idTable.get(rush);
-        if (id == null || deletedIds.contains(id)) {
+        RushMetaData rushMetaData = idTable.get(rush);
+        if (rushMetaData == null
+                || !rushMetaData.isSaved()
+                || deletedIds.contains(rushMetaData)) {
             return null;
         }
-        return id;
+        return rushMetaData.getId();
     }
 
     public void save(Rush rush) {
@@ -159,7 +163,8 @@ public class RushCore {
     }
 
     /* private */
-    private final RushStatementGenerator statementGenerator;
+    private final RushSaveStatementGenerator saveStatementGenerator;
+    private final RushDeleteStatementGenerator deleteStatementGenerator;
     private final RushStatementRunner statementRunner;
     private final RushQueProvider queProvider;
     private final RushConfig rushConfig;
@@ -168,8 +173,9 @@ public class RushCore {
     private final Logger logger;
     private final RushStringSanitizer rushStringSanitizer;
 
-    private RushCore(RushStatementGenerator statementGenerator, RushStatementRunner statementRunner, RushQueProvider queProvider, RushConfig rushConfig, RushTableStatementGenerator rushTableStatementGenerator, RushClassLoader rushClassLoader, RushStringSanitizer rushStringSanitizer, Logger logger) {
-        this.statementGenerator = statementGenerator;
+    private RushCore(RushSaveStatementGenerator saveStatementGenerator, RushDeleteStatementGenerator deleteStatementGenerator, RushStatementRunner statementRunner, RushQueProvider queProvider, RushConfig rushConfig, RushTableStatementGenerator rushTableStatementGenerator, RushClassLoader rushClassLoader, RushStringSanitizer rushStringSanitizer, Logger logger) {
+        this.saveStatementGenerator = saveStatementGenerator;
+        this.deleteStatementGenerator = deleteStatementGenerator;
         this.statementRunner = statementRunner;
         this.queProvider = queProvider;
         this.rushConfig = rushConfig;
@@ -218,22 +224,27 @@ public class RushCore {
 
     private void save(List<? extends Rush> objects, final RushQue que) {
         statementRunner.startTransition(que);
-        statementGenerator.generateSaveOrUpdate(objects, new RushStatementGenerator.Callback() {
+        saveStatementGenerator.generateSaveOrUpdate(objects, new RushSaveStatementGenerator.Callback() {
             @Override
-            public void addRush(Rush rush, String id) {
-                RushCore.this.addRush(rush, id);
+            public void addRush(Rush rush, RushMetaData rushMetaData) {
+                RushCore.this.addRush(rush, rushMetaData);
             }
-            @Override
-            public void removeRush(Rush rush) {}
+
             @Override
             public void createdOrUpdateStatement(String sql) {
                 logger.logSql(sql);
                 statementRunner.runRaw(sql, que);
             }
+
             @Override
             public void deleteStatement(String sql) {
                 logger.logSql(sql);
                 statementRunner.runRaw(sql, que);
+            }
+
+            @Override
+            public RushMetaData getMetaData(Rush rush) {
+                return idTable.get(rush);
             }
         });
         statementRunner.endTransition(que);
@@ -242,24 +253,21 @@ public class RushCore {
 
     private void delete(List<? extends Rush> objects, final RushQue que) {
         statementRunner.startTransition(que);
-        statementGenerator.generateDelete(objects, new RushStatementGenerator.Callback() {
-            @Override
-            public void addRush(Rush rush, String id) {
-            }
+        deleteStatementGenerator.generateDelete(objects, new RushDeleteStatementGenerator.Callback() {
 
             @Override
             public void removeRush(Rush rush) {
                 RushCore.this.removeRush(rush);
             }
-
-            @Override
-            public void createdOrUpdateStatement(String sql) {
-            }
-
             @Override
             public void deleteStatement(String sql) {
                 logger.logSql(sql);
                 statementRunner.runRaw(sql, que);
+            }
+
+            @Override
+            public RushMetaData getMetaData(Rush rush) {
+                return idTable.get(rush);
             }
         });
         statementRunner.endTransition(que);
@@ -278,8 +286,8 @@ public class RushCore {
             }
 
             @Override
-            public void didLoadObject(Rush rush, String id) {
-                addRush(rush, id);
+            public void didLoadObject(Rush rush, RushMetaData rushMetaData) {
+                addRush(rush, rushMetaData);
             }
         });
         values.close();
@@ -290,18 +298,19 @@ public class RushCore {
         return objects;
     }
 
-    private void addRush(Rush rush, String id) {
-        idTable.put(rush, id);
+    private void addRush(Rush rush, RushMetaData rushMetaData) {
+        idTable.put(rush, rushMetaData);
     }
 
     private void removeRush(Rush rush) {
-        deletedIds.add(idTable.remove(rush));
+        RushMetaData rushMetaData = idTable.remove(rush);
+        deletedIds.add(rushMetaData);
     }
 
     private void cleanIdMap() {
-        Iterator<Map.Entry<Rush, String>> iterator = idTable.entrySet().iterator();
+        Iterator<Map.Entry<Rush, RushMetaData>> iterator = idTable.entrySet().iterator();
         while (iterator.hasNext()) {
-            Map.Entry<Rush, String> entry = iterator.next();
+            Map.Entry<Rush, RushMetaData> entry = iterator.next();
             if (deletedIds.contains(entry.getValue())) {
                 iterator.remove();
             }

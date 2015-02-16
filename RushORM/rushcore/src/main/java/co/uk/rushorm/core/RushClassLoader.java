@@ -9,7 +9,7 @@ public interface RushClassLoader {
 
     public interface LoadCallback {
         public RushStatementRunner.ValuesCallback runStatement(String string);
-        public void didLoadObject(Rush rush, String id);
+        public void didLoadObject(Rush rush, RushMetaData rushMetaData);
     }
 
     public <T extends Rush> List<T> loadClasses(Class<T> clazz, RushStatementRunner.ValuesCallback valuesCallback, LoadCallback callback);

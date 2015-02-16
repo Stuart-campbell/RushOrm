@@ -10,6 +10,7 @@ import co.uk.rushorm.core.AnnotationCache;
 import co.uk.rushorm.core.Rush;
 import co.uk.rushorm.core.RushClassLoader;
 import co.uk.rushorm.core.RushColumns;
+import co.uk.rushorm.core.RushMetaData;
 import co.uk.rushorm.core.RushStatementRunner;
 import co.uk.rushorm.core.annotations.RushIgnore;
 import co.uk.rushorm.core.annotations.RushList;
@@ -77,18 +78,18 @@ public class ReflectionClassLoader implements RushClassLoader {
 
     private <T extends Rush> T loadClass(Class<T> clazz, List<String> values, Map<Class, List<Join>> joins, Map<Class, List<String>> joinTables, Map<Class, Map<String, T>> loadedClasses, LoadCallback callback) throws IllegalAccessException, InstantiationException, ClassNotFoundException {
 
-        String id = values.get(0);
+        RushMetaData rushMetaData = new RushMetaData(values.get(0), Long.parseLong(values.get(1)), Long.parseLong(values.get(2)), Long.parseLong(values.get(3)));
 
         if(!loadedClasses.containsKey(clazz)) {
             loadedClasses.put(clazz, new HashMap<String, T>());
         }
-        if(loadedClasses.get(clazz).containsKey(id)) {
-            return loadedClasses.get(clazz).get(id);
+        if(loadedClasses.get(clazz).containsKey(rushMetaData.getId())) {
+            return loadedClasses.get(clazz).get(rushMetaData.getId());
         }
         T object = clazz.newInstance();
 
-        loadedClasses.get(clazz).put(id, object);
-        callback.didLoadObject(object, id);
+        loadedClasses.get(clazz).put(rushMetaData.getId(), object);
+        callback.didLoadObject(object, rushMetaData);
 
         List<Field> fields = new ArrayList<>();
         ReflectionUtils.getAllFields(fields, clazz);
@@ -97,7 +98,7 @@ public class ReflectionClassLoader implements RushClassLoader {
             annotationCache.put(clazz, new AnnotationCache(clazz, fields));
         }
 
-        int counter = 3; /* Skip rush_id, rush_created and rush_updated */
+        int counter = 4; /* Skip rush_id, rush_created, rush_updated and rush_version */
         for (Field field : fields) {
             field.setAccessible(true);
             if (!annotationCache.get(clazz).getFieldToIgnore().contains(field.getName())) {
