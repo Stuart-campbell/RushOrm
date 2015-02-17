@@ -2,13 +2,13 @@ package co.uk.rushorm.core;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 
 import co.uk.rushorm.core.exceptions.RushCoreNotInitializedException;
 import co.uk.rushorm.core.exceptions.RushTableMissingEmptyConstructor;
+import co.uk.rushorm.core.implementation.ConflictSaveStatementGenerator;
 import co.uk.rushorm.core.implementation.ReflectionClassLoader;
 import co.uk.rushorm.core.implementation.ReflectionDeleteStatementGenerator;
 import co.uk.rushorm.core.implementation.ReflectionSaveStatementGenerator;
@@ -30,7 +30,7 @@ public class RushCore {
 
     private static RushCore rushCore;
     private final Map<Rush, RushMetaData> idTable = new WeakHashMap<>();
-    private final List<RushMetaData> deletedIds = new ArrayList<>();
+
     /* Public */
     public static void initialize(RushClassFinder rushClassFinder, RushStatementRunner statementRunner, RushQueProvider queProvider, RushConfig rushConfig, RushStringSanitizer rushStringSanitizer, Logger logger, List<RushColumn> columns) {
 
@@ -48,16 +48,17 @@ public class RushCore {
         Map<Class, AnnotationCache> annotationCache = new HashMap<>();
 
         RushSaveStatementGenerator saveStatementGenerator = new ReflectionSaveStatementGenerator(rushStringSanitizer, rushColumns, annotationCache);
+        RushConflictSaveStatementGenerator conflictSaveStatementGenerator = new ConflictSaveStatementGenerator(rushStringSanitizer, rushColumns, annotationCache);
         RushDeleteStatementGenerator deleteStatementGenerator = new ReflectionDeleteStatementGenerator(annotationCache);
 
         RushTableStatementGenerator rushTableStatementGenerator = new ReflectionTableStatementGenerator(rushColumns);
         RushClassLoader rushClassLoader = new ReflectionClassLoader(rushColumns, annotationCache);
 
-        initialize(rushUpgradeManager, saveStatementGenerator, deleteStatementGenerator, rushClassFinder, rushTableStatementGenerator, statementRunner, queProvider, rushConfig, rushClassLoader, rushStringSanitizer, logger);
+        initialize(rushUpgradeManager, saveStatementGenerator, conflictSaveStatementGenerator, deleteStatementGenerator, rushClassFinder, rushTableStatementGenerator, statementRunner, queProvider, rushConfig, rushClassLoader, rushStringSanitizer, logger);
     }
 
-    public static void initialize(RushUpgradeManager rushUpgradeManager, RushSaveStatementGenerator saveStatementGenerator, RushDeleteStatementGenerator deleteStatementGenerator, RushClassFinder rushClassFinder, RushTableStatementGenerator rushTableStatementGenerator, RushStatementRunner statementRunner, RushQueProvider queProvider, RushConfig rushConfig, RushClassLoader rushClassLoader, RushStringSanitizer rushStringSanitizer, Logger logger) {
-        rushCore = new RushCore(saveStatementGenerator, deleteStatementGenerator, statementRunner, queProvider, rushConfig, rushTableStatementGenerator, rushClassLoader, rushStringSanitizer, logger);
+    public static void initialize(RushUpgradeManager rushUpgradeManager, RushSaveStatementGenerator saveStatementGenerator, RushConflictSaveStatementGenerator rushConflictSaveStatementGenerator, RushDeleteStatementGenerator deleteStatementGenerator, RushClassFinder rushClassFinder, RushTableStatementGenerator rushTableStatementGenerator, RushStatementRunner statementRunner, RushQueProvider queProvider, RushConfig rushConfig, RushClassLoader rushClassLoader, RushStringSanitizer rushStringSanitizer, Logger logger) {
+        rushCore = new RushCore(saveStatementGenerator, rushConflictSaveStatementGenerator, deleteStatementGenerator, statementRunner, queProvider, rushConfig, rushTableStatementGenerator, rushClassLoader, rushStringSanitizer, logger);
         RushQue que = queProvider.blockForNextQue();
         if (rushConfig.firstRun()) {
             rushCore.createTables(rushClassFinder, que);
@@ -78,8 +79,7 @@ public class RushCore {
     public String getId(Rush rush) {
         RushMetaData rushMetaData = idTable.get(rush);
         if (rushMetaData == null
-                || !rushMetaData.isSaved()
-                || deletedIds.contains(rushMetaData)) {
+                || !rushMetaData.isSaved()) {
             return null;
         }
         return rushMetaData.getId();
@@ -157,6 +157,39 @@ public class RushCore {
         });
     }
 
+    public List<RushConflict> saveOnlyWithoutConflict(Rush rush) {
+        List<Rush> objects = new ArrayList<>();
+        objects.add(rush);
+        return saveOnlyWithoutConflict(objects);
+    }
+
+    public List<RushConflict> saveOnlyWithoutConflict(List<? extends Rush> objects) {
+        RushQue que = queProvider.blockForNextQue();
+        return saveOnlyWithoutConflict(objects, que);
+    }
+
+    public void saveOnlyWithoutConflict(final Rush rush, final RushConflictCallback callback) {
+        List<Rush> objects = new ArrayList<>();
+        objects.add(rush);
+        saveOnlyWithoutConflict(objects, callback);
+    }
+
+    public void saveOnlyWithoutConflict(final List<? extends Rush> objects, final RushConflictCallback callback) {
+        queProvider.waitForNextQue(new RushQueProvider.RushQueCallback() {
+            @Override
+            public void callback(RushQue rushQue) {
+                List<RushConflict> conflicts = saveOnlyWithoutConflict(objects, rushQue);
+                if(callback != null) {
+                    callback.complete(conflicts);
+                }
+            }
+        });
+    }
+
+    public void importObject(Rush object, RushMetaData rushMetaData) {
+        idTable.put(object, rushMetaData);
+    }
+
     /* protected */
     protected String sanitize(String string) {
         return rushStringSanitizer.sanitize(string);
@@ -164,6 +197,7 @@ public class RushCore {
 
     /* private */
     private final RushSaveStatementGenerator saveStatementGenerator;
+    private final RushConflictSaveStatementGenerator rushConflictSaveStatementGenerator;
     private final RushDeleteStatementGenerator deleteStatementGenerator;
     private final RushStatementRunner statementRunner;
     private final RushQueProvider queProvider;
@@ -173,8 +207,9 @@ public class RushCore {
     private final Logger logger;
     private final RushStringSanitizer rushStringSanitizer;
 
-    private RushCore(RushSaveStatementGenerator saveStatementGenerator, RushDeleteStatementGenerator deleteStatementGenerator, RushStatementRunner statementRunner, RushQueProvider queProvider, RushConfig rushConfig, RushTableStatementGenerator rushTableStatementGenerator, RushClassLoader rushClassLoader, RushStringSanitizer rushStringSanitizer, Logger logger) {
+    private RushCore(RushSaveStatementGenerator saveStatementGenerator, RushConflictSaveStatementGenerator rushConflictSaveStatementGenerator, RushDeleteStatementGenerator deleteStatementGenerator, RushStatementRunner statementRunner, RushQueProvider queProvider, RushConfig rushConfig, RushTableStatementGenerator rushTableStatementGenerator, RushClassLoader rushClassLoader, RushStringSanitizer rushStringSanitizer, Logger logger) {
         this.saveStatementGenerator = saveStatementGenerator;
+        this.rushConflictSaveStatementGenerator = rushConflictSaveStatementGenerator;
         this.deleteStatementGenerator = deleteStatementGenerator;
         this.statementRunner = statementRunner;
         this.queProvider = queProvider;
@@ -224,7 +259,7 @@ public class RushCore {
 
     private void save(List<? extends Rush> objects, final RushQue que) {
         statementRunner.startTransition(que);
-        saveStatementGenerator.generateSaveOrUpdate(objects, new RushSaveStatementGenerator.Callback() {
+        saveStatementGenerator.generateSaveOrUpdate(objects, new RushSaveStatementGeneratorCallback() {
             @Override
             public void addRush(Rush rush, RushMetaData rushMetaData) {
                 RushCore.this.addRush(rush, rushMetaData);
@@ -251,6 +286,48 @@ public class RushCore {
         queProvider.queComplete(que);
     }
 
+    private List<RushConflict> saveOnlyWithoutConflict(List<? extends Rush> objects, final RushQue que) {
+        final List<RushConflict> conflicts = new ArrayList<>();
+        statementRunner.startTransition(que);
+        rushConflictSaveStatementGenerator.conflictsFromGenerateSaveOrUpdate(objects, new RushConflictSaveStatementGenerator.Callback() {
+            @Override
+            public void conflictFound(RushConflict conflict) {
+                conflicts.add(conflict);
+            }
+
+            @Override
+            public <T extends Rush> T load(Class T, String sql) {
+                List<T> objects = RushCore.this.load(T, sql, que);
+                return objects.size() > 0 ? objects.get(0) : null;
+            }
+
+            @Override
+            public void addRush(Rush rush, RushMetaData rushMetaData) {
+                RushCore.this.addRush(rush, rushMetaData);
+            }
+
+            @Override
+            public void createdOrUpdateStatement(String sql) {
+                logger.logSql(sql);
+                statementRunner.runRaw(sql, que);
+            }
+
+            @Override
+            public void deleteStatement(String sql) {
+                logger.logSql(sql);
+                statementRunner.runRaw(sql, que);
+            }
+
+            @Override
+            public RushMetaData getMetaData(Rush rush) {
+                return idTable.get(rush);
+            }
+        });
+        statementRunner.endTransition(que);
+        queProvider.queComplete(que);
+        return conflicts;
+    }
+
     private void delete(List<? extends Rush> objects, final RushQue que) {
         statementRunner.startTransition(que);
         deleteStatementGenerator.generateDelete(objects, new RushDeleteStatementGenerator.Callback() {
@@ -271,7 +348,6 @@ public class RushCore {
             }
         });
         statementRunner.endTransition(que);
-        cleanIdMap();
         queProvider.queComplete(que);
     }
 
@@ -303,18 +379,6 @@ public class RushCore {
     }
 
     private void removeRush(Rush rush) {
-        RushMetaData rushMetaData = idTable.remove(rush);
-        deletedIds.add(rushMetaData);
-    }
-
-    private void cleanIdMap() {
-        Iterator<Map.Entry<Rush, RushMetaData>> iterator = idTable.entrySet().iterator();
-        while (iterator.hasNext()) {
-            Map.Entry<Rush, RushMetaData> entry = iterator.next();
-            if (deletedIds.contains(entry.getValue())) {
-                iterator.remove();
-            }
-        }
-        deletedIds.clear();
+        idTable.remove(rush);
     }
 }

@@ -7,11 +7,6 @@ import java.util.List;
  */
 public interface RushSaveStatementGenerator {
 
-    public interface Callback extends RushStatementGeneratorCallback{
-        public void addRush(Rush rush, RushMetaData rushMetaData);
-        public void createdOrUpdateStatement(String sql);
-    }
-
-    public void generateSaveOrUpdate(List<? extends Rush> objects, Callback saveCallback);
+    public void generateSaveOrUpdate(List<? extends Rush> objects, RushSaveStatementGeneratorCallback saveCallback);
 
 }

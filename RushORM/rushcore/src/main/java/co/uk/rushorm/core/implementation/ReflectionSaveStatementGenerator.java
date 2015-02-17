@@ -11,6 +11,7 @@ import co.uk.rushorm.core.Rush;
 import co.uk.rushorm.core.RushColumns;
 import co.uk.rushorm.core.RushMetaData;
 import co.uk.rushorm.core.RushSaveStatementGenerator;
+import co.uk.rushorm.core.RushSaveStatementGeneratorCallback;
 import co.uk.rushorm.core.RushStringSanitizer;
 
 /**
@@ -18,12 +19,9 @@ import co.uk.rushorm.core.RushStringSanitizer;
  */
 public class ReflectionSaveStatementGenerator implements RushSaveStatementGenerator {
 
-    private static final String MULTIPLE_INSERT_TEMPLATE = "INSERT INTO %s " +
+    private static final String MULTIPLE_INSERT_UPDATE_TEMPLATE = "INSERT OR REPLACE INTO %s " +
             "(%s)\n" +
             "VALUES %s;";
-
-    private static final String MULTIPLE_UPDATE_TEMPLATE = "UPDATE %s " +
-            "%s;";
 
     private static final String MULTIPLE_INSERT_JOIN_TEMPLATE = "INSERT INTO %s " +
             "(parent, child)\n" +
@@ -53,23 +51,15 @@ public class ReflectionSaveStatementGenerator implements RushSaveStatementGenera
         }
     }
 
-    private class BasicUpdate {
-        private final List<String> values;
-        private final RushMetaData rushMetaData;
+    protected class BasicUpdate {
+        protected final List<String> values;
+        protected final Rush object;
+        protected final RushMetaData rushMetaData;
 
-        private BasicUpdate(List<String> values, RushMetaData rushMetaData) {
+        private BasicUpdate(List<String> values, Rush object, RushMetaData rushMetaData) {
             this.values = values;
+            this.object = object;
             this.rushMetaData = rushMetaData;
-        }
-    }
-
-    private class BasicCreate {
-        private final List<String> values;
-        private final Rush rush;
-
-        private BasicCreate(List<String> values, Rush rush) {
-            this.values = values;
-            this.rush = rush;
         }
     }
 
@@ -81,11 +71,10 @@ public class ReflectionSaveStatementGenerator implements RushSaveStatementGenera
     }
 
     @Override
-    public void generateSaveOrUpdate(List<? extends Rush> objects, Callback saveCallback) {
+    public void generateSaveOrUpdate(List<? extends Rush> objects, RushSaveStatementGeneratorCallback saveCallback) {
 
         List<Rush> rushObjects = new ArrayList<>();
 
-        Map<Class, List<BasicCreate>> createValues = new HashMap<>();
         Map<Class, List<BasicUpdate>> updateValues = new HashMap<>();
         Map<Class, List<String>> columns = new HashMap<>();
 
@@ -93,23 +82,22 @@ public class ReflectionSaveStatementGenerator implements RushSaveStatementGenera
         Map<String, List<BasicJoin>> joinValues = new HashMap<>();
 
         for(Rush rush : objects) {
-            generateSaveOrUpdate(rush, rushObjects, createValues, updateValues, columns, joinDeletes, joinValues, saveCallback);
+            generateSaveOrUpdate(rush, rushObjects, updateValues, columns, joinDeletes, joinValues, saveCallback);
         }
 
         ReflectionUtils.deleteManyJoins(joinDeletes, saveCallback);
-        updateObjects(updateValues, columns, saveCallback);
-        createObjects(createValues, columns, saveCallback);
+        createOrUpdateObjects(updateValues, columns, saveCallback);
+
         createManyJoins(joinValues, saveCallback);
 
     }
 
     private void generateSaveOrUpdate(Rush rush, List<Rush> rushObjects,
-                                      Map<Class, List<BasicCreate>> createValuesMap,
                                       Map<Class, List<BasicUpdate>> updateValuesMap,
                                       Map<Class, List<String>> columnsMap,
                                       Map<String, List<String>> joinDeletesMap,
                                       Map<String, List<BasicJoin>> joinValuesMap,
-                                      Callback saveCallback) {
+                                      RushSaveStatementGeneratorCallback saveCallback) {
 
         if (rushObjects.contains(rush)) {
             // Exit if object is referenced by child
@@ -152,7 +140,7 @@ public class ReflectionSaveStatementGenerator implements RushSaveStatementGenera
                         joinDeletesMap.get(joinTableName).add(rush.getId());
                     }
                     for(BasicJoin join : joins) {
-                        generateSaveOrUpdate(join.child, rushObjects, createValuesMap, updateValuesMap, columnsMap, joinDeletesMap, joinValuesMap, saveCallback);
+                        generateSaveOrUpdate(join.child, rushObjects, updateValuesMap, columnsMap, joinDeletesMap, joinValuesMap, saveCallback);
                         addJoin(joinValuesMap, join);
                     }
                 }
@@ -163,17 +151,16 @@ public class ReflectionSaveStatementGenerator implements RushSaveStatementGenera
             columnsMap.put(rush.getClass(), columns);
         }
 
-        if (rush.getId() == null) {
-            if (!createValuesMap.containsKey(rush.getClass())) {
-                createValuesMap.put(rush.getClass(), new ArrayList<BasicCreate>());
-            }
-            createValuesMap.get(rush.getClass()).add(new BasicCreate(values, rush));
-        } else if (columns.size() > 0) {
-            if (!updateValuesMap.containsKey(rush.getClass())) {
-                updateValuesMap.put(rush.getClass(), new ArrayList<BasicUpdate>());
-            }
-            updateValuesMap.get(rush.getClass()).add(new BasicUpdate(values, saveCallback.getMetaData(rush)));
+        if (!updateValuesMap.containsKey(rush.getClass())) {
+            updateValuesMap.put(rush.getClass(), new ArrayList<BasicUpdate>());
         }
+
+        RushMetaData rushMetaData = saveCallback.getMetaData(rush);
+        if(rushMetaData == null) {
+            rushMetaData = new RushMetaData();
+            saveCallback.addRush(rush, rushMetaData);
+        }
+            updateValuesMap.get(rush.getClass()).add(new BasicUpdate(values, rush, rushMetaData));
     }
 
     private String joinFromField(List<BasicJoin> joins, Rush rush, Field field) {
@@ -211,144 +198,7 @@ public class ReflectionSaveStatementGenerator implements RushSaveStatementGenera
         return null;
     }
 
-    private void createObjects(Map<Class, List<BasicCreate>> valuesMap, final Map<Class, List<String>> columnsMap, final Callback saveCallback) {
-
-        for (final Map.Entry<Class, List<BasicCreate>> entry : valuesMap.entrySet()) {
-
-            StringBuilder columnsBuilder = new StringBuilder();
-            columnsBuilder.append(ReflectionUtils.RUSH_ID)
-                    .append(",")
-                    .append(ReflectionUtils.RUSH_CREATED)
-                    .append(",")
-                    .append(ReflectionUtils.RUSH_UPDATED)
-                    .append(",")
-                    .append(ReflectionUtils.RUSH_VERSION)
-                    .append(commaSeparated(columnsMap.get(entry.getKey())));
-
-            final String columns = columnsBuilder.toString();
-
-            final StringBuilder valuesString = new StringBuilder();
-            final List<BasicCreate> creates = entry.getValue();
-
-            ReflectionUtils.doLoop(creates.size(), ReflectionUtils.GROUP_SIZE, new ReflectionUtils.LoopCallBack() {
-                @Override
-                public void start() {
-                    valuesString.delete(0, valuesString.length());
-                }
-
-                @Override
-                public void actionAtIndex(int index) {
-
-                    RushMetaData rushMetaData = new RushMetaData();
-                    rushMetaData.save();
-
-                    saveCallback.addRush(creates.get(index).rush, rushMetaData);
-
-                    valuesString.append("('")
-                            .append(rushMetaData.getId())
-                            .append("',")
-                            .append(rushMetaData.getCreated())
-                            .append(",")
-                            .append(rushMetaData.getUpdated())
-                            .append(",")
-                            .append(rushMetaData.getVersion())
-                            .append(commaSeparated(creates.get(index).values))
-                            .append(")");
-                }
-
-                @Override
-                public void join() {
-                    valuesString.append(", ");
-                }
-
-                @Override
-                public void doAction() {
-                    String sql = String.format(MULTIPLE_INSERT_TEMPLATE,
-                            ReflectionUtils.tableNameForClass(entry.getKey()),
-                            columns,
-                            valuesString.toString());
-
-                    saveCallback.createdOrUpdateStatement(sql);
-                }
-            });
-        }
-    }
-
-    private String commaSeparated(List<String> values) {
-        StringBuilder string = new StringBuilder();
-        for (int i = 0; i < values.size(); i++) {
-            string.append(",")
-            .append(values.get(i));
-        }
-        return string.toString();
-    }
-
-    private void updateObjects(Map<Class, List<BasicUpdate>> valuesMap, final Map<Class, List<String>> columnsMap, final Callback saveCallback) {
-
-        for (final Map.Entry<Class, List<BasicUpdate>> entry : valuesMap.entrySet()) {
-
-            final StringBuilder columnsString = new StringBuilder();
-            final List<BasicUpdate> values = entry.getValue();
-
-            ReflectionUtils.doLoop(values.size(), ReflectionUtils.GROUP_SIZE, new ReflectionUtils.LoopCallBack() {
-                @Override
-                public void start() {
-                    columnsString.delete(0, columnsString.length());
-                }
-
-                @Override
-                public void actionAtIndex(int index) {
-
-                    RushMetaData rushMetaData = values.get(index).rushMetaData;
-                    rushMetaData.save();
-
-                    columnsString.append("\nSet ")
-                            .append(updateSection(columnsMap.get(entry.getKey()), values.get(index).values, rushMetaData))
-                            .append(" Where ")
-                            .append(ReflectionUtils.RUSH_ID)
-                            .append("='")
-                            .append(rushMetaData.getId())
-                            .append("'");
-                }
-
-                @Override
-                public void join() {
-                    columnsString.append(", ");
-                }
-
-                @Override
-                public void doAction() {
-                    String sql = String.format(MULTIPLE_UPDATE_TEMPLATE,
-                            ReflectionUtils.tableNameForClass(entry.getKey()),
-                            columnsString.toString());
-                    saveCallback.createdOrUpdateStatement(sql);
-                }
-            });
-        }
-    }
-
-    private String updateSection(List<String> columns, List<String> values, RushMetaData rushMetaData) {
-        StringBuilder string = new StringBuilder();
-
-        for (int i = 0; i < columns.size(); i++) {
-            string.append(columns.get(i))
-                    .append("=")
-                    .append(values.get(i))
-                    .append(",");
-        }
-        /* Add updated date */
-        string.append(ReflectionUtils.RUSH_UPDATED)
-                .append("=")
-                .append(rushMetaData.getUpdated())
-                .append(",")
-                .append(ReflectionUtils.RUSH_VERSION)
-                .append("=")
-                .append(rushMetaData.getVersion());
-
-        return string.toString();
-    }
-
-    private void createManyJoins(Map<String, List<BasicJoin>> joinValues, final Callback saveCallback) {
+    private void createManyJoins(Map<String, List<BasicJoin>> joinValues, final RushSaveStatementGeneratorCallback saveCallback) {
 
         for (final Map.Entry<String, List<BasicJoin>> entry : joinValues.entrySet()) {
             final StringBuilder columnsString = new StringBuilder();
@@ -382,5 +232,75 @@ public class ReflectionSaveStatementGenerator implements RushSaveStatementGenera
                 }
             });
         }
+    }
+
+    protected void createOrUpdateObjects(Map<Class, List<BasicUpdate>> valuesMap, final Map<Class, List<String>> columnsMap, final RushSaveStatementGeneratorCallback saveCallback) {
+
+        for (final Map.Entry<Class, List<BasicUpdate>> entry : valuesMap.entrySet()) {
+
+            StringBuilder columnsBuilder = new StringBuilder();
+            columnsBuilder.append(ReflectionUtils.RUSH_ID)
+                    .append(",")
+                    .append(ReflectionUtils.RUSH_CREATED)
+                    .append(",")
+                    .append(ReflectionUtils.RUSH_UPDATED)
+                    .append(",")
+                    .append(ReflectionUtils.RUSH_VERSION)
+                    .append(commaSeparated(columnsMap.get(entry.getKey())));
+
+            final String columns = columnsBuilder.toString();
+
+            final StringBuilder valuesString = new StringBuilder();
+            final List<BasicUpdate> creates = entry.getValue();
+
+            ReflectionUtils.doLoop(creates.size(), ReflectionUtils.GROUP_SIZE, new ReflectionUtils.LoopCallBack() {
+                @Override
+                public void start() {
+                    valuesString.delete(0, valuesString.length());
+                }
+
+                @Override
+                public void actionAtIndex(int index) {
+
+                    RushMetaData rushMetaData = creates.get(index).rushMetaData;
+                    rushMetaData.save();
+
+                    valuesString.append("('")
+                            .append(rushMetaData.getId())
+                            .append("',")
+                            .append(rushMetaData.getCreated())
+                            .append(",")
+                            .append(rushMetaData.getUpdated())
+                            .append(",")
+                            .append(rushMetaData.getVersion())
+                            .append(commaSeparated(creates.get(index).values))
+                            .append(")");
+                }
+
+                @Override
+                public void join() {
+                    valuesString.append(", ");
+                }
+
+                @Override
+                public void doAction() {
+                    String sql = String.format(MULTIPLE_INSERT_UPDATE_TEMPLATE,
+                            ReflectionUtils.tableNameForClass(entry.getKey()),
+                            columns,
+                            valuesString.toString());
+
+                    saveCallback.createdOrUpdateStatement(sql);
+                }
+            });
+        }
+    }
+
+    private String commaSeparated(List<String> values) {
+        StringBuilder string = new StringBuilder();
+        for (int i = 0; i < values.size(); i++) {
+            string.append(",")
+                    .append(values.get(i));
+        }
+        return string.toString();
     }
 }

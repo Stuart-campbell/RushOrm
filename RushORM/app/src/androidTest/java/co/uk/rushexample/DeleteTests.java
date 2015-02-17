@@ -79,7 +79,7 @@ public class DeleteTests extends ApplicationTestCase<Application> {
         assertNull(childObject);
     }
 
-    public void testDeleteChildIdGone() throws Exception {
+    public void testSaveDeletedChild() throws Exception {
 
         TestObject testObject = new TestObject();
         testObject.childObject = new TestChildObject();
@@ -89,7 +89,11 @@ public class DeleteTests extends ApplicationTestCase<Application> {
         TestChildObject childObject = new RushSearch().whereId(childId).findSingle(TestChildObject.class);
         childObject.delete();
 
-        assertTrue(testObject.childObject.getId() == null);
+        testObject.save();
+
+        TestChildObject loadedChildObject = new RushSearch().whereId(childId).findSingle(TestChildObject.class);
+
+        assertTrue(loadedChildObject != null);
     }
 
     public void testDeleteChild() throws Exception {
@@ -106,6 +110,7 @@ public class DeleteTests extends ApplicationTestCase<Application> {
         TestObject loadedObject = new RushSearch().whereId(id).findSingle(TestObject.class);
         assertNull(loadedObject.childObject);
     }
+
 
     public void testDeleteWithChildrenAndAutoDeleteOff() throws Exception {
 
