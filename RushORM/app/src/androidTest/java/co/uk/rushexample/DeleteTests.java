@@ -4,8 +4,10 @@ import android.app.Application;
 import android.test.ApplicationTestCase;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import co.uk.rushexample.testobjects.TestSelfReference;
+import co.uk.rushorm.core.RushCore;
 import co.uk.rushorm.core.RushSearch;
 import co.uk.rushexample.testobjects.TestChildObject;
 import co.uk.rushexample.testobjects.TestObject;
@@ -133,4 +135,20 @@ public class DeleteTests extends ApplicationTestCase<Application> {
 
         assertTrue(loadedObject.getId() == -1 && loadedObject.child.getId() == -1);
     }
+
+    public void testDeleteList() throws Exception {
+        List<TestObject> objects = new ArrayList<>();
+        objects.add(new TestObject());
+
+
+        RushCore.getInstance().save(objects);
+
+        List<TestObject> loadedObjects = new RushSearch().find(TestObject.class);
+        loadedObjects.add(new TestObject());
+        RushCore.getInstance().delete(loadedObjects);
+
+        List<TestObject> loadedObjects2 = new RushSearch().find(TestObject.class);
+        assertTrue(loadedObjects2.size() == 0);
+    }
+
 }
