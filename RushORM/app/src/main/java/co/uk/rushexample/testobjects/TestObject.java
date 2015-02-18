@@ -20,6 +20,7 @@ public class TestObject extends RushObject {
     public int intField;
     public long longField;
     public short shortField;
+    public MyClass myClass;
     public boolean booleanField;
     public float floatField;
     public Date dateField;
