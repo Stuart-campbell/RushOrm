@@ -4,6 +4,7 @@ import android.app.Application;
 import android.test.ApplicationTestCase;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import co.uk.rushexample.testobjects.TestSelfReference;
@@ -194,6 +195,63 @@ public class SaveAndUpdateTest extends ApplicationTestCase<Application> {
 
         TestObject updatedLoadedObject = new RushSearch().whereId(id).findSingle(TestObject.class);
         assertTrue(!updatedLoadedObject.booleanField);
+    }
+
+    public void testSaveFloat() throws Exception {
+
+        TestObject testObject = new TestObject();
+        testObject.floatField = 0.54f;
+        testObject.save();
+        long id = testObject.getId();
+
+        TestObject loadedObject = new RushSearch().whereId(id).findSingle(TestObject.class);
+
+        assertTrue(loadedObject.floatField == 0.54f);
+    }
+
+    public void testUpdateFloat() throws Exception {
+
+        TestObject testObject = new TestObject();
+        testObject.floatField = 0.54f;
+        testObject.save();
+        long id = testObject.getId();
+
+        TestObject loadedObject = new RushSearch().whereId(id).findSingle(TestObject.class);
+        loadedObject.floatField = 0.64f;
+        loadedObject.save();
+
+        TestObject updatedLoadedObject = new RushSearch().whereId(id).findSingle(TestObject.class);
+        assertTrue(updatedLoadedObject.floatField == 0.64f);
+    }
+
+    public void testSaveDate() throws Exception {
+
+
+        TestObject testObject = new TestObject();
+        testObject.dateField = new Date();
+        long dateLong = testObject.dateField.getTime();
+        testObject.save();
+        long id = testObject.getId();
+
+        TestObject loadedObject = new RushSearch().whereId(id).findSingle(TestObject.class);
+
+        assertTrue(loadedObject.dateField.getTime() == dateLong);
+    }
+
+    public void testUpdateDate() throws Exception {
+
+        TestObject testObject = new TestObject();
+        testObject.dateField = new Date(new Date().getTime() - 1000);
+        testObject.save();
+        long id = testObject.getId();
+
+        TestObject loadedObject = new RushSearch().whereId(id).findSingle(TestObject.class);
+        loadedObject.dateField = new Date();
+        long dateLong = loadedObject.dateField.getTime();
+        loadedObject.save();
+
+        TestObject updatedLoadedObject = new RushSearch().whereId(id).findSingle(TestObject.class);
+        assertTrue(updatedLoadedObject.dateField.getTime() == dateLong);
     }
 
     public void testSaveChild() throws Exception {

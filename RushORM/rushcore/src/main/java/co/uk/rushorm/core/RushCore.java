@@ -16,6 +16,7 @@ import co.uk.rushorm.core.implementation.ReflectionUpgradeManager;
 import co.uk.rushorm.core.implementation.RushColumnBoolean;
 import co.uk.rushorm.core.implementation.RushColumnDate;
 import co.uk.rushorm.core.implementation.RushColumnDouble;
+import co.uk.rushorm.core.implementation.RushColumnFloat;
 import co.uk.rushorm.core.implementation.RushColumnInt;
 import co.uk.rushorm.core.implementation.RushColumnLong;
 import co.uk.rushorm.core.implementation.RushColumnShort;
@@ -39,6 +40,7 @@ public class RushCore {
         columns.add(new RushColumnInt());
         columns.add(new RushColumnLong());
         columns.add(new RushColumnShort());
+        columns.add(new RushColumnFloat());
         columns.add(new RushColumnString());
 
         RushColumns rushColumns = new RushColumnsImplementation(columns);

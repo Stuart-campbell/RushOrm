@@ -107,8 +107,8 @@ public class ReflectionClassLoader implements RushClassLoader {
                         if(value != null && !value.equals("null")) {
                             rushColumns.setField(object, field, value);
                         }
+                        counter++;
                     }
-                    counter++;
                 }
             }
         }

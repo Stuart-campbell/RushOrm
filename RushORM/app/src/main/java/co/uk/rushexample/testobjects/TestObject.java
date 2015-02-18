@@ -1,5 +1,6 @@
 package co.uk.rushexample.testobjects;
 
+import java.util.Date;
 import java.util.List;
 
 import co.uk.rushorm.core.RushObject;
@@ -20,6 +21,8 @@ public class TestObject extends RushObject {
     public long longField;
     public short shortField;
     public boolean booleanField;
+    public float floatField;
+    public Date dateField;
     public TestChildObject childObject;
 
     @RushDisableAutodelete
