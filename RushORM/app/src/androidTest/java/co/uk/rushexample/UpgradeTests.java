@@ -9,12 +9,16 @@ import java.util.List;
 
 import co.uk.rushexample.testobjects.MyClass;
 import co.uk.rushexample.testobjects.TestCustomColumn;
+import co.uk.rushorm.android.AndroidJSONDeserializer;
+import co.uk.rushorm.android.AndroidJSONSerializer;
 import co.uk.rushorm.android.RushAndroid;
 import co.uk.rushorm.core.Logger;
 import co.uk.rushorm.core.RushClassFinder;
 import co.uk.rushorm.core.RushColumn;
 import co.uk.rushorm.core.RushConfig;
 import co.uk.rushorm.core.RushCore;
+import co.uk.rushorm.core.RushObjectDeserializer;
+import co.uk.rushorm.core.RushObjectSerializer;
 import co.uk.rushorm.core.RushQueProvider;
 import co.uk.rushorm.core.RushSearch;
 import co.uk.rushorm.core.RushStatementRunner;
@@ -473,13 +477,15 @@ public class UpgradeTests extends ApplicationTestCase<Application> {
         RushStatementRunner statementRunner = new AndroidRushStatementRunner(applicationContext, rushConfig.dbName(), rushConfig);
         RushQueProvider queProvider = new AndroidRushQueProvider();
         Logger logger = new AndroidLogger(rushConfig);
+        RushObjectDeserializer rushObjectDeserializer = new AndroidJSONDeserializer();
+        RushObjectSerializer rushObjectSerializer = new AndroidJSONSerializer();
 
         RushCore.initialize(new RushClassFinder() {
             @Override
             public List<Class> findClasses(RushConfig rushConfig) {
                 return classes;
             }
-        }, statementRunner, queProvider, rushConfig, rushStringSanitizer, logger, new ArrayList<RushColumn>());
+        }, statementRunner, queProvider, rushConfig, rushStringSanitizer, logger, new ArrayList<RushColumn>(), rushObjectSerializer, rushObjectDeserializer);
     }
 
     public void testCustomColumn() throws Exception {

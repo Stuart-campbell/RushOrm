@@ -47,17 +47,11 @@ public class ReflectionTableStatementGenerator implements RushTableStatementGene
         Class child;
     }
 
-    private final RushColumns rushColumns;
-
-    public ReflectionTableStatementGenerator(RushColumns rushColumns) {
-        this.rushColumns = rushColumns;
-    }
-
     @Override
-    public void generateStatements(List<Class> classes, StatementCallback statementCallback) {
+    public void generateStatements(List<Class> classes, RushColumns rushColumns, StatementCallback statementCallback) {
 
         for(Class clazz : classes) {
-            String sql = classToStatement(clazz);
+            String sql = classToStatement(clazz, rushColumns);
             statementCallback.statementCreated(sql);
         }
 
@@ -69,7 +63,7 @@ public class ReflectionTableStatementGenerator implements RushTableStatementGene
         }
     }
 
-    private String classToStatement(Class clazz) {
+    private String classToStatement(Class clazz, RushColumns rushColumns) {
 
         StringBuilder columnsStatement = new StringBuilder();
 
@@ -78,7 +72,7 @@ public class ReflectionTableStatementGenerator implements RushTableStatementGene
         for (Field field : fields) {
             field.setAccessible(true);
             if(!field.isAnnotationPresent(RushIgnore.class)) {
-                Column column = columnFromField(clazz, field);
+                Column column = columnFromField(clazz, field, rushColumns);
                 if(column != null) {
                     columnsStatement.append(",\n")
                             .append(column.name)
@@ -96,7 +90,7 @@ public class ReflectionTableStatementGenerator implements RushTableStatementGene
                 ReflectionUtils.tableNameForClass(join.child));
     }
 
-    private Column columnFromField(Class clazz, Field field) {
+    private Column columnFromField(Class clazz, Field field, RushColumns rushColumns) {
 
         if(Rush.class.isAssignableFrom(field.getType())){
 

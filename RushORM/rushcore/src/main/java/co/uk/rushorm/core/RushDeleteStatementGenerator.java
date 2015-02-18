@@ -1,6 +1,7 @@
 package co.uk.rushorm.core;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Stuart on 16/02/15.
@@ -12,6 +13,6 @@ public interface RushDeleteStatementGenerator {
         public void deleteStatement(String sql);
     }
 
-    public void generateDelete(List<? extends Rush> objects, Callback deleteCallback);
+    public void generateDelete(List<? extends Rush> objects, Map<Class, AnnotationCache> annotationCache, Callback deleteCallback);
 
 }

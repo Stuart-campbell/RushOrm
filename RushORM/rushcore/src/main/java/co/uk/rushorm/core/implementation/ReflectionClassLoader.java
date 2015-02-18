@@ -20,14 +20,6 @@ import co.uk.rushorm.core.annotations.RushList;
  */
 public class ReflectionClassLoader implements RushClassLoader {
 
-    private final RushColumns rushColumns;
-    private final Map<Class, AnnotationCache> annotationCache;
-
-    public ReflectionClassLoader(RushColumns rushColumns, Map<Class, AnnotationCache> annotationCache) {
-        this.rushColumns = rushColumns;
-        this.annotationCache = annotationCache;
-    }
-
     private class Join {
         private final Rush parent;
         private final String tableName;
@@ -44,11 +36,11 @@ public class ReflectionClassLoader implements RushClassLoader {
     }
 
     @Override
-    public <T extends Rush> List<T> loadClasses(Class<T> clazz, RushStatementRunner.ValuesCallback valuesCallback, LoadCallback callback) {
-        return loadClasses(clazz, valuesCallback, callback, new HashMap<Class, Map<String, T>>(), null);
+    public <T extends Rush> List<T> loadClasses(Class<T> clazz, RushColumns rushColumns, Map<Class, AnnotationCache> annotationCache, RushStatementRunner.ValuesCallback valuesCallback, LoadCallback callback) {
+        return loadClasses(clazz, rushColumns, annotationCache, valuesCallback, callback, new HashMap<Class, Map<String, T>>(), null);
     }
 
-    public <T extends Rush> List<T> loadClasses(Class<T> clazz, RushStatementRunner.ValuesCallback valuesCallback, LoadCallback callback, Map<Class, Map<String, T>> loadedClasses, AttachChild<T> attachChild) {
+    public <T extends Rush> List<T> loadClasses(Class<T> clazz, RushColumns rushColumns, Map<Class, AnnotationCache> annotationCache, RushStatementRunner.ValuesCallback valuesCallback, LoadCallback callback, Map<Class, Map<String, T>> loadedClasses, AttachChild<T> attachChild) {
         try {
 
             Map<Class, List<Join>> joins = new HashMap<>();
@@ -57,7 +49,7 @@ public class ReflectionClassLoader implements RushClassLoader {
             List<T> results = new ArrayList<>();
             while(valuesCallback.hasNext()) {
                 List<String> valuesList = valuesCallback.next();
-                T object = loadClass(clazz, valuesList, joins, joinTables, loadedClasses, callback);
+                T object = loadClass(clazz, rushColumns, annotationCache, valuesList, joins, joinTables, loadedClasses, callback);
                 results.add(object);
                 if(attachChild != null) {
                     attachChild.attach(object, valuesList);
@@ -66,7 +58,7 @@ public class ReflectionClassLoader implements RushClassLoader {
             valuesCallback.close();
 
             for (Map.Entry<Class, List<Join>> entry : joins.entrySet()) {
-                addChildrenToList(entry.getKey(), entry.getValue(), joinTables.get(entry.getKey()), loadedClasses, callback);
+                addChildrenToList(entry.getKey(), rushColumns, annotationCache, entry.getValue(), joinTables.get(entry.getKey()), loadedClasses, callback);
             }
 
             return results;
@@ -76,7 +68,7 @@ public class ReflectionClassLoader implements RushClassLoader {
         return null;
     }
 
-    private <T extends Rush> T loadClass(Class<T> clazz, List<String> values, Map<Class, List<Join>> joins, Map<Class, List<String>> joinTables, Map<Class, Map<String, T>> loadedClasses, LoadCallback callback) throws IllegalAccessException, InstantiationException, ClassNotFoundException {
+    private <T extends Rush> T loadClass(Class<T> clazz, RushColumns rushColumns, Map<Class, AnnotationCache> annotationCache, List<String> values, Map<Class, List<Join>> joins, Map<Class, List<String>> joinTables, Map<Class, Map<String, T>> loadedClasses, LoadCallback callback) throws IllegalAccessException, InstantiationException, ClassNotFoundException {
 
         RushMetaData rushMetaData = new RushMetaData(values.get(0), Long.parseLong(values.get(1)), Long.parseLong(values.get(2)), Long.parseLong(values.get(3)));
 
@@ -102,7 +94,7 @@ public class ReflectionClassLoader implements RushClassLoader {
         for (Field field : fields) {
             field.setAccessible(true);
             if (!annotationCache.get(clazz).getFieldToIgnore().contains(field.getName())) {
-                if (!loadJoinField(object, field, joins, joinTables)) {
+                if (!loadJoinField(object, rushColumns, annotationCache, field, joins, joinTables)) {
                     if(rushColumns.supportsField(field)) {
                         String value = values.get(counter);
                         if(value != null && !value.equals("null")) {
@@ -116,7 +108,7 @@ public class ReflectionClassLoader implements RushClassLoader {
         return object;
     }
 
-    private <T extends Rush> boolean loadJoinField(T object, Field field, Map<Class, List<Join>> joins,  Map<Class, List<String>> joinTables) {
+    private <T extends Rush> boolean loadJoinField(T object, RushColumns rushColumns, Map<Class, AnnotationCache> annotationCache, Field field, Map<Class, List<Join>> joins,  Map<Class, List<String>> joinTables) {
         Class clazz = null;
         if (Rush.class.isAssignableFrom(field.getType())) {
             clazz = field.getType();
@@ -142,7 +134,7 @@ public class ReflectionClassLoader implements RushClassLoader {
             "%s" +
             "WHERE %s;";
 
-    private <T extends Rush> void addChildrenToList(final Class<T> clazz, final List<Join> joins, final List<String> tableNames, final Map<Class, Map<String, T>> loadedClasses, final LoadCallback callback) {
+    private <T extends Rush> void addChildrenToList(final Class<T> clazz, final RushColumns rushColumns, final Map<Class, AnnotationCache> annotationCache, final List<Join> joins, final List<String> tableNames, final Map<Class, Map<String, T>> loadedClasses, final LoadCallback callback) {
 
         final String tableName = ReflectionUtils.tableNameForClass(clazz);
         final Map<Integer, String> tableMap = new HashMap<>();
@@ -175,7 +167,7 @@ public class ReflectionClassLoader implements RushClassLoader {
             public void doAction(int at) {
                 String sql = String.format(SELECT_CHILDREN, tableName, joinsString, columnsString.toString());
                 RushStatementRunner.ValuesCallback values = callback.runStatement(sql);
-                loadClasses(clazz, values, callback, loadedClasses, new AttachChild<T>() {
+                loadClasses(clazz, rushColumns, annotationCache, values, callback, loadedClasses, new AttachChild<T>() {
                     @Override
                     public void attach(T object, List<String> values) throws IllegalAccessException {
                         int i = values.size() - 2;

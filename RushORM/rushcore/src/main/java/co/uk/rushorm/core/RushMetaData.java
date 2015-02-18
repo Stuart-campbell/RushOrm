@@ -19,6 +19,12 @@ public class RushMetaData {
         version = 0;
     }
 
+    public RushMetaData(String id, long version) {
+        this.id = id;
+        this.version = version;
+        created = new Date().getTime();
+    }
+
     public RushMetaData(String id, long created, long updated, long version) {
         this.id = id;
         this.created = created;

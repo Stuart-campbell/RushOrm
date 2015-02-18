@@ -46,7 +46,7 @@ public class ReflectionUtils {
         return parentName + "_" + childName + "_" + fieldName;
     }
 
-    protected static void getAllFields(List<Field> fields, Class<?> type) {
+    public static void getAllFields(List<Field> fields, Class<?> type) {
         if (type.getSuperclass() != null) {
             fields.addAll(Arrays.asList(type.getDeclaredFields()));
             getAllFields(fields, type.getSuperclass());

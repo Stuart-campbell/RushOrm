@@ -23,13 +23,10 @@ public class ConflictSaveStatementGenerator extends ReflectionSaveStatementGener
     private static final String SELECT_TEMPLATE = "SELECT * from %s" +
             "\nWHERE " + ReflectionUtils.RUSH_ID + "='%s';";
 
-    public ConflictSaveStatementGenerator(RushStringSanitizer rushStringSanitizer, RushColumns rushColumns, Map<Class, AnnotationCache> annotationCache) {
-        super(rushStringSanitizer, rushColumns, annotationCache);
-    }
 
     @Override
-    public void conflictsFromGenerateSaveOrUpdate(List<? extends Rush> objects, Callback saveCallback) {
-        generateSaveOrUpdate(objects, saveCallback);
+    public void conflictsFromGenerateSaveOrUpdate(List<? extends Rush> objects, Map<Class, AnnotationCache> annotationCache, RushStringSanitizer rushStringSanitizer, RushColumns rushColumns, Callback saveCallback) {
+        generateSaveOrUpdate(objects, annotationCache, rushStringSanitizer, rushColumns, saveCallback);
     }
 
     @Override

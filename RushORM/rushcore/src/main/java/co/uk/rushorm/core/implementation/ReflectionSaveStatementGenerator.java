@@ -27,17 +27,6 @@ public class ReflectionSaveStatementGenerator implements RushSaveStatementGenera
             "(parent, child)\n" +
             "VALUES %s;";
 
-    private final Map<Class, AnnotationCache> annotationCache;
-
-    private final RushStringSanitizer rushStringSanitizer;
-    private final RushColumns rushColumns;
-
-    public ReflectionSaveStatementGenerator(RushStringSanitizer rushStringSanitizer, RushColumns rushColumns, Map<Class, AnnotationCache> annotationCache) {
-        this.rushStringSanitizer = rushStringSanitizer;
-        this.rushColumns = rushColumns;
-        this.annotationCache = annotationCache;
-    }
-
     /*** Save ***/
     private class BasicJoin {
         private final String table;
@@ -71,7 +60,7 @@ public class ReflectionSaveStatementGenerator implements RushSaveStatementGenera
     }
 
     @Override
-    public void generateSaveOrUpdate(List<? extends Rush> objects, RushSaveStatementGeneratorCallback saveCallback) {
+    public void generateSaveOrUpdate(List<? extends Rush> objects, Map<Class, AnnotationCache> annotationCache, RushStringSanitizer rushStringSanitizer, RushColumns rushColumns, RushSaveStatementGeneratorCallback saveCallback) {
 
         List<Rush> rushObjects = new ArrayList<>();
 
@@ -82,7 +71,7 @@ public class ReflectionSaveStatementGenerator implements RushSaveStatementGenera
         Map<String, List<BasicJoin>> joinValues = new HashMap<>();
 
         for(Rush rush : objects) {
-            generateSaveOrUpdate(rush, rushObjects, updateValues, columns, joinDeletes, joinValues, saveCallback);
+            generateSaveOrUpdate(rush, rushObjects, annotationCache, rushStringSanitizer, rushColumns, updateValues, columns, joinDeletes, joinValues, saveCallback);
         }
 
         ReflectionUtils.deleteManyJoins(joinDeletes, saveCallback);
@@ -93,6 +82,9 @@ public class ReflectionSaveStatementGenerator implements RushSaveStatementGenera
     }
 
     private void generateSaveOrUpdate(Rush rush, List<Rush> rushObjects,
+                                      Map<Class, AnnotationCache> annotationCache,
+                                      RushStringSanitizer rushStringSanitizer,
+                                      RushColumns rushColumns,
                                       Map<Class, List<BasicUpdate>> updateValuesMap,
                                       Map<Class, List<String>> columnsMap,
                                       Map<String, List<String>> joinDeletesMap,
@@ -120,7 +112,7 @@ public class ReflectionSaveStatementGenerator implements RushSaveStatementGenera
             if (!annotationCache.get(rush.getClass()).getFieldToIgnore().contains(field.getName())) {
                 field.setAccessible(true);
                 List<BasicJoin> joins = new ArrayList<>();
-                String joinTableName = joinFromField(joins, rush, field);
+                String joinTableName = joinFromField(joins, rush, field, annotationCache);
                 if (joinTableName == null) {
                     if (rushColumns.supportsField(field)) {
                         try {
@@ -140,7 +132,7 @@ public class ReflectionSaveStatementGenerator implements RushSaveStatementGenera
                         joinDeletesMap.get(joinTableName).add(rush.getId());
                     }
                     for(BasicJoin join : joins) {
-                        generateSaveOrUpdate(join.child, rushObjects, updateValuesMap, columnsMap, joinDeletesMap, joinValuesMap, saveCallback);
+                        generateSaveOrUpdate(join.child, rushObjects, annotationCache, rushStringSanitizer, rushColumns, updateValuesMap, columnsMap, joinDeletesMap, joinValuesMap, saveCallback);
                         addJoin(joinValuesMap, join);
                     }
                 }
@@ -163,7 +155,7 @@ public class ReflectionSaveStatementGenerator implements RushSaveStatementGenera
             updateValuesMap.get(rush.getClass()).add(new BasicUpdate(values, rush, rushMetaData));
     }
 
-    private String joinFromField(List<BasicJoin> joins, Rush rush, Field field) {
+    private String joinFromField(List<BasicJoin> joins, Rush rush, Field field, Map<Class, AnnotationCache> annotationCache) {
 
         if (Rush.class.isAssignableFrom(field.getType())) {
             String tableName = ReflectionUtils.joinTableNameForClass(rush.getClass(), field.getType(), field);
