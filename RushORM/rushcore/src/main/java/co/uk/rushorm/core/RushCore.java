@@ -89,8 +89,12 @@ public class RushCore {
         return rushCore;
     }
 
+    public RushMetaData getMetaData(Rush rush) {
+        return idTable.get(rush);
+    }
+    
     public String getId(Rush rush) {
-        RushMetaData rushMetaData = idTable.get(rush);
+        RushMetaData rushMetaData = getMetaData(rush);
         if (rushMetaData == null
                 || !rushMetaData.isSaved()) {
             return null;
