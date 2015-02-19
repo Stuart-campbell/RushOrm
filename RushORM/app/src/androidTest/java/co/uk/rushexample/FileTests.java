@@ -25,13 +25,11 @@ public class FileTests extends ApplicationTestCase<Application> {
     public void setUp() throws Exception {
         super.setUp();
         getContext().deleteDatabase("rush.db");
-        Thread.sleep(100);
         RushAndroid.initialize(getContext());
     }
 
     @Override
     public void tearDown() throws Exception {
-        getContext().deleteDatabase("rush.db");
         super.tearDown();
     }
 
@@ -39,7 +37,7 @@ public class FileTests extends ApplicationTestCase<Application> {
 
         RushTextFile file = new RushTextFile(getContext().getFilesDir().getAbsolutePath());
         file.setText("Hello world");
-        long id = file.getId();
+        String id = file.getId();
 
         RushTextFile loadedFile = new RushSearch().whereId(id).findSingle(RushTextFile.class);
         assertTrue(loadedFile.getText().equals("Hello world"));
@@ -50,7 +48,7 @@ public class FileTests extends ApplicationTestCase<Application> {
 
         RushTextFile file = new RushTextFile(getContext().getFilesDir().getAbsolutePath());
         file.setText("Hello world");
-        long id = file.getId();
+        String id = file.getId();
 
         RushTextFile loadedFile = new RushSearch().whereId(id).findSingle(RushTextFile.class);
         loadedFile.delete();
@@ -67,7 +65,7 @@ public class FileTests extends ApplicationTestCase<Application> {
 
         RushBitmapFile file = new RushBitmapFile(getContext().getFilesDir().getAbsolutePath());
         file.setImage(bitmap);
-        long id = file.getId();
+        String id = file.getId();
 
         RushBitmapFile loadedFile = new RushSearch().whereId(id).findSingle(RushBitmapFile.class);
 
@@ -83,7 +81,7 @@ public class FileTests extends ApplicationTestCase<Application> {
 
         RushJSONFile file = new RushJSONFile(getContext().getFilesDir().getAbsolutePath());
         file.setJSON(object);
-        long id = file.getId();
+        String id = file.getId();
 
         RushJSONFile loadedFile = new RushSearch().whereId(id).findSingle(RushJSONFile.class);
 

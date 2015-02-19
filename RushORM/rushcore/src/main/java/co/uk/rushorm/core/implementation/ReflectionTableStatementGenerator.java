@@ -17,16 +17,19 @@ import co.uk.rushorm.core.RushTableStatementGenerator;
 public class ReflectionTableStatementGenerator implements RushTableStatementGenerator {
 
     private static final String TABLE_TEMPLATE = "CREATE TABLE %s (" +
-            "\nid integer primary key" +
+            "\n" + ReflectionUtils.RUSH_ID + " text primary key," +
+            "\n" + ReflectionUtils.RUSH_CREATED + " long," +
+            "\n" + ReflectionUtils.RUSH_UPDATED + " long," +
+            "\n" + ReflectionUtils.RUSH_VERSION + " long" +
             "%s" +
             "\n);";
 
     private static final String JOIN_TEMPLATE = "CREATE TABLE %s (" +
-            "\nid integer primary key autoincrement" +
-            ",\nparent integer NOT NULL" +
-            ",\nchild integer NOT NULL" +
-            ",\nFOREIGN KEY (parent) REFERENCES %s(id)" +
-            ",\nFOREIGN KEY (child) REFERENCES %s(id)" +
+            "\n" + ReflectionUtils.RUSH_ID + " integer primary key autoincrement" +
+            ",\nparent text NOT NULL" +
+            ",\nchild text NOT NULL" +
+            ",\nFOREIGN KEY (parent) REFERENCES %s(" + ReflectionUtils.RUSH_ID +")" +
+            ",\nFOREIGN KEY (child) REFERENCES %s(" + ReflectionUtils.RUSH_ID + ")" +
             "\n);";
 
     private static final String CREATE_INDEX = "CREATE INDEX %s_idx ON %s(child);";
@@ -44,17 +47,11 @@ public class ReflectionTableStatementGenerator implements RushTableStatementGene
         Class child;
     }
 
-    private final RushColumns rushColumns;
-
-    public ReflectionTableStatementGenerator(RushColumns rushColumns) {
-        this.rushColumns = rushColumns;
-    }
-
     @Override
-    public void generateStatements(List<Class> classes, StatementCallback statementCallback) {
+    public void generateStatements(List<Class> classes, RushColumns rushColumns, StatementCallback statementCallback) {
 
         for(Class clazz : classes) {
-            String sql = classToStatement(clazz);
+            String sql = classToStatement(clazz, rushColumns);
             statementCallback.statementCreated(sql);
         }
 
@@ -66,7 +63,7 @@ public class ReflectionTableStatementGenerator implements RushTableStatementGene
         }
     }
 
-    private String classToStatement(Class clazz) {
+    private String classToStatement(Class clazz, RushColumns rushColumns) {
 
         StringBuilder columnsStatement = new StringBuilder();
 
@@ -75,7 +72,7 @@ public class ReflectionTableStatementGenerator implements RushTableStatementGene
         for (Field field : fields) {
             field.setAccessible(true);
             if(!field.isAnnotationPresent(RushIgnore.class)) {
-                Column column = columnFromField(clazz, field);
+                Column column = columnFromField(clazz, field, rushColumns);
                 if(column != null) {
                     columnsStatement.append(",\n")
                             .append(column.name)
@@ -93,7 +90,7 @@ public class ReflectionTableStatementGenerator implements RushTableStatementGene
                 ReflectionUtils.tableNameForClass(join.child));
     }
 
-    private Column columnFromField(Class clazz, Field field) {
+    private Column columnFromField(Class clazz, Field field, RushColumns rushColumns) {
 
         if(Rush.class.isAssignableFrom(field.getType())){
 

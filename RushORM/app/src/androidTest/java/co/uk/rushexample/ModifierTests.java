@@ -20,13 +20,11 @@ public class ModifierTests extends ApplicationTestCase<Application> {
     public void setUp() throws Exception {
         super.setUp();
         getContext().deleteDatabase("rush.db");
-        Thread.sleep(100);
         RushAndroid.initialize(getContext());
     }
 
     @Override
     public void tearDown() throws Exception {
-        getContext().deleteDatabase("rush.db");
         super.tearDown();
     }
 
@@ -35,7 +33,7 @@ public class ModifierTests extends ApplicationTestCase<Application> {
         TestModifiers object = new TestModifiers();
         object.publicString = "test";
         object.save();
-        long id = object.getId();
+        String id = object.getId();
 
         TestModifiers loadedObject = new RushSearch().whereId(id).findSingle(TestModifiers.class);
         assertTrue(loadedObject.publicString.equals("test"));
@@ -45,7 +43,7 @@ public class ModifierTests extends ApplicationTestCase<Application> {
 
         TestModifiers object = new TestModifiers("test", "test", "test");
         object.save();
-        long id = object.getId();
+        String id = object.getId();
 
         TestModifiers loadedObject = new RushSearch().whereId(id).findSingle(TestModifiers.class);
         assertTrue(loadedObject.getProtectedString().equals("test"));
@@ -55,7 +53,7 @@ public class ModifierTests extends ApplicationTestCase<Application> {
 
         TestModifiers object = new TestModifiers("test", "test", "test");
         object.save();
-        long id = object.getId();
+        String id = object.getId();
 
         TestModifiers loadedObject = new RushSearch().whereId(id).findSingle(TestModifiers.class);
         assertTrue(loadedObject.getString().equals("test"));
@@ -65,7 +63,7 @@ public class ModifierTests extends ApplicationTestCase<Application> {
 
         TestModifiers object = new TestModifiers("test", "test", "test");
         object.save();
-        long id = object.getId();
+        String id = object.getId();
 
         TestModifiers loadedObject = new RushSearch().whereId(id).findSingle(TestModifiers.class);
         assertTrue(loadedObject.getPrivateString().equals("test"));

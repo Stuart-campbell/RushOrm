@@ -3,9 +3,9 @@ package co.uk.rushorm.core.exceptions;
 /**
  * Created by Stuart on 22/01/15.
  */
-public class RushTableMissingEmptyConstructor extends RuntimeException {
+public class RushTableMissingEmptyConstructorException extends RuntimeException {
 
-    public RushTableMissingEmptyConstructor(Class clazz) {
+    public RushTableMissingEmptyConstructorException(Class clazz) {
         super(clazz.getName() + " Implement: " + clazz.getSimpleName() + "(){}");
     }
 }

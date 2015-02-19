@@ -14,7 +14,7 @@ public class RushColumnBoolean implements RushColumn<Boolean> {
 
     @Override
     public String serialize(Boolean object, RushStringSanitizer stringSanitizer) {
-        return "'" + Boolean.toString(object) + "'";
+        return stringSanitizer.sanitize(Boolean.toString(object));
     }
 
     @Override

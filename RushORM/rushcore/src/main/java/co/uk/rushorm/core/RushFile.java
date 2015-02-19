@@ -24,7 +24,7 @@ public abstract class RushFile extends RushObject {
     }
 
     private String filename() {
-        return directory + getClass().getName() + "_" + getId() + "." + fileExtension();
+        return directory + getId() + "." + fileExtension();
     }
 
     public File file() {
@@ -32,12 +32,12 @@ public abstract class RushFile extends RushObject {
     }
 
     public boolean hasFile() {
-        return !(getId() < 0) && file().exists();
+        return !(getId() == null) && file().exists();
     }
 
     public void writeToFile(byte[] bytes) throws IOException {
 
-        if(getId() < 0) {
+        if(getId() == null) {
             save();
         }
 

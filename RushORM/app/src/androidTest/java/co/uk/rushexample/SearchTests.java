@@ -30,7 +30,6 @@ public class SearchTests extends ApplicationTestCase<Application> {
 
     @Override
     public void tearDown() throws Exception {
-        getContext().deleteDatabase("rush.db");
         super.tearDown();
     }
 
@@ -309,10 +308,11 @@ public class SearchTests extends ApplicationTestCase<Application> {
         testObject3.intField = 8;
         testObject3.save();
 
+        String id = testObject.getId();
 
         // Get all objects with id 1 or stringField "Hello world" and intField greater than 5 order ascending by intField
         List<TestObject> objects = new RushSearch()
-                .whereId(1)
+                .whereId(id)
                 .or()
                 .startGroup()
                 .whereEqual("stringField", "Hello world")
@@ -350,9 +350,11 @@ public class SearchTests extends ApplicationTestCase<Application> {
 
         RushCore.getInstance().save(objects);
 
+        String id = testObject.getId();
+
         // Get all objects with id 1 or stringField "Hello world" and intField greater than 5 order ascending by intField
         List<TestObject> loadedObjects = new RushSearch()
-                .whereId(1)
+                .whereId(id)
                 .or()
                 .startGroup()
                 .whereEqual("stringField", "Hello world")

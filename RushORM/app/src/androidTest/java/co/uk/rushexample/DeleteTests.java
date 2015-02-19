@@ -26,13 +26,11 @@ public class DeleteTests extends ApplicationTestCase<Application> {
     public void setUp() throws Exception {
         super.setUp();
         getContext().deleteDatabase("rush.db");
-        Thread.sleep(200);
         RushAndroid.initialize(getContext());
     }
 
     @Override
     public void tearDown() throws Exception {
-        getContext().deleteDatabase("rush.db");
         super.tearDown();
     }
 
@@ -41,7 +39,7 @@ public class DeleteTests extends ApplicationTestCase<Application> {
         TestObject testObject = new TestObject();
         testObject.stringField = "string";
         testObject.save();
-        long id = testObject.getId();
+        String id = testObject.getId();
 
         TestObject loadedObject = new RushSearch().whereId(id).findSingle(TestObject.class);
         loadedObject.delete();
@@ -55,8 +53,8 @@ public class DeleteTests extends ApplicationTestCase<Application> {
         TestObject testObject = new TestObject();
         testObject.childObject = new TestChildObject();
         testObject.save();
-        long id = testObject.getId();
-        long childId = testObject.childObject.getId();
+        String id = testObject.getId();
+        String childId = testObject.childObject.getId();
 
         TestObject loadedObject = new RushSearch().whereId(id).findSingle(TestObject.class);
         loadedObject.delete();
@@ -71,8 +69,8 @@ public class DeleteTests extends ApplicationTestCase<Application> {
         testObject.children = new ArrayList<>();
         testObject.children.add(new TestChildObject());
         testObject.save();
-        long id = testObject.getId();
-        long childId = testObject.children.get(0).getId();
+        String id = testObject.getId();
+        String childId = testObject.children.get(0).getId();
 
         TestObject loadedObject = new RushSearch().whereId(id).findSingle(TestObject.class);
         loadedObject.delete();
@@ -81,17 +79,21 @@ public class DeleteTests extends ApplicationTestCase<Application> {
         assertNull(childObject);
     }
 
-    public void testDeleteChildIdGone() throws Exception {
+    public void testSaveDeletedChild() throws Exception {
 
         TestObject testObject = new TestObject();
         testObject.childObject = new TestChildObject();
         testObject.save();
-        long childId = testObject.childObject.getId();
+        String childId = testObject.childObject.getId();
 
         TestChildObject childObject = new RushSearch().whereId(childId).findSingle(TestChildObject.class);
         childObject.delete();
 
-        assertTrue(testObject.childObject.getId() < 0);
+        testObject.save();
+
+        TestChildObject loadedChildObject = new RushSearch().whereId(childId).findSingle(TestChildObject.class);
+
+        assertTrue(loadedChildObject != null);
     }
 
     public void testDeleteChild() throws Exception {
@@ -99,8 +101,8 @@ public class DeleteTests extends ApplicationTestCase<Application> {
         TestObject testObject = new TestObject();
         testObject.childObject = new TestChildObject();
         testObject.save();
-        long id = testObject.getId();
-        long childId = testObject.childObject.getId();
+        String id = testObject.getId();
+        String childId = testObject.childObject.getId();
 
         TestChildObject childObject = new RushSearch().whereId(childId).findSingle(TestChildObject.class);
         childObject.delete();
@@ -109,13 +111,14 @@ public class DeleteTests extends ApplicationTestCase<Application> {
         assertNull(loadedObject.childObject);
     }
 
+
     public void testDeleteWithChildrenAndAutoDeleteOff() throws Exception {
 
         TestObject testObject = new TestObject();
         testObject.childObject2 = new TestChildObject();
         testObject.save();
-        long id = testObject.getId();
-        long childId = testObject.childObject2.getId();
+        String id = testObject.getId();
+        String childId = testObject.childObject2.getId();
 
         TestObject loadedObject = new RushSearch().whereId(id).findSingle(TestObject.class);
         loadedObject.delete();
@@ -128,12 +131,12 @@ public class DeleteTests extends ApplicationTestCase<Application> {
         TestSelfReference object = new TestSelfReference();
         object.child = object;
         object.save();
-        long id = object.getId();
+        String id = object.getId();
 
         TestSelfReference loadedObject = new RushSearch().whereId(id).findSingle(TestSelfReference.class);
         loadedObject.delete();
 
-        assertTrue(loadedObject.getId() == -1 && loadedObject.child.getId() == -1);
+        assertTrue(loadedObject.getId() == null && loadedObject.child.getId() == null);
     }
 
     public void testDeleteList() throws Exception {

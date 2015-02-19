@@ -32,7 +32,6 @@ public class SaveAndUpdateTest extends ApplicationTestCase<Application> {
 
     @Override
     public void tearDown() throws Exception {
-        getContext().deleteDatabase("rush.db");
         super.tearDown();
     }
 
@@ -41,7 +40,7 @@ public class SaveAndUpdateTest extends ApplicationTestCase<Application> {
         TestObject testObject = new TestObject();
         testObject.stringField = "string";
         testObject.save();
-        long id = testObject.getId();
+        String id = testObject.getId();
 
         TestObject loadedObject = new RushSearch().whereId(id).findSingle(TestObject.class);
         assertTrue(loadedObject.stringField.equals("string"));
@@ -52,7 +51,7 @@ public class SaveAndUpdateTest extends ApplicationTestCase<Application> {
         TestObject testObject = new TestObject();
         testObject.stringField = "string";
         testObject.save();
-        long id = testObject.getId();
+        String id = testObject.getId();
 
         TestObject loadedObject = new RushSearch().whereId(id).findSingle(TestObject.class);
         loadedObject.stringField = "new string";
@@ -67,7 +66,7 @@ public class SaveAndUpdateTest extends ApplicationTestCase<Application> {
         TestObject testObject = new TestObject();
         testObject.intField = 10;
         testObject.save();
-        long id = testObject.getId();
+        String id = testObject.getId();
 
         TestObject loadedObject = new RushSearch().whereId(id).findSingle(TestObject.class);
 
@@ -79,7 +78,7 @@ public class SaveAndUpdateTest extends ApplicationTestCase<Application> {
         TestObject testObject = new TestObject();
         testObject.intField = 10;
         testObject.save();
-        long id = testObject.getId();
+        String id = testObject.getId();
 
         TestObject loadedObject = new RushSearch().whereId(id).findSingle(TestObject.class);
         loadedObject.intField = 5;
@@ -94,7 +93,7 @@ public class SaveAndUpdateTest extends ApplicationTestCase<Application> {
         TestObject testObject = new TestObject();
         testObject.doubleField = 10.05;
         testObject.save();
-        long id = testObject.getId();
+        String id = testObject.getId();
 
         TestObject loadedObject = new RushSearch().whereId(id).findSingle(TestObject.class);
 
@@ -106,7 +105,7 @@ public class SaveAndUpdateTest extends ApplicationTestCase<Application> {
         TestObject testObject = new TestObject();
         testObject.doubleField = 10.05;
         testObject.save();
-        long id = testObject.getId();
+        String id = testObject.getId();
 
         TestObject loadedObject = new RushSearch().whereId(id).findSingle(TestObject.class);
         loadedObject.doubleField = 8.78;
@@ -121,7 +120,7 @@ public class SaveAndUpdateTest extends ApplicationTestCase<Application> {
         TestObject testObject = new TestObject();
         testObject.shortField = 1;
         testObject.save();
-        long id = testObject.getId();
+        String id = testObject.getId();
 
         TestObject loadedObject = new RushSearch().whereId(id).findSingle(TestObject.class);
 
@@ -133,7 +132,7 @@ public class SaveAndUpdateTest extends ApplicationTestCase<Application> {
         TestObject testObject = new TestObject();
         testObject.shortField = 1;
         testObject.save();
-        long id = testObject.getId();
+        String id = testObject.getId();
 
         TestObject loadedObject = new RushSearch().whereId(id).findSingle(TestObject.class);
         loadedObject.shortField = 0;
@@ -148,7 +147,7 @@ public class SaveAndUpdateTest extends ApplicationTestCase<Application> {
         TestObject testObject = new TestObject();
         testObject.longField = 1000000000;
         testObject.save();
-        long id = testObject.getId();
+        String id = testObject.getId();
 
         TestObject loadedObject = new RushSearch().whereId(id).findSingle(TestObject.class);
 
@@ -160,7 +159,7 @@ public class SaveAndUpdateTest extends ApplicationTestCase<Application> {
         TestObject testObject = new TestObject();
         testObject.longField = 1000000000;
         testObject.save();
-        long id = testObject.getId();
+        String id = testObject.getId();
 
         TestObject loadedObject = new RushSearch().whereId(id).findSingle(TestObject.class);
         loadedObject.longField = 1000000001;
@@ -175,7 +174,7 @@ public class SaveAndUpdateTest extends ApplicationTestCase<Application> {
         TestObject testObject = new TestObject();
         testObject.booleanField = true;
         testObject.save();
-        long id = testObject.getId();
+        String id = testObject.getId();
 
         TestObject loadedObject = new RushSearch().whereId(id).findSingle(TestObject.class);
 
@@ -187,7 +186,7 @@ public class SaveAndUpdateTest extends ApplicationTestCase<Application> {
         TestObject testObject = new TestObject();
         testObject.booleanField = true;
         testObject.save();
-        long id = testObject.getId();
+        String id = testObject.getId();
 
         TestObject loadedObject = new RushSearch().whereId(id).findSingle(TestObject.class);
         loadedObject.booleanField = false;
@@ -202,7 +201,7 @@ public class SaveAndUpdateTest extends ApplicationTestCase<Application> {
         TestObject testObject = new TestObject();
         testObject.floatField = 0.54f;
         testObject.save();
-        long id = testObject.getId();
+        String id = testObject.getId();
 
         TestObject loadedObject = new RushSearch().whereId(id).findSingle(TestObject.class);
 
@@ -214,7 +213,7 @@ public class SaveAndUpdateTest extends ApplicationTestCase<Application> {
         TestObject testObject = new TestObject();
         testObject.floatField = 0.54f;
         testObject.save();
-        long id = testObject.getId();
+        String id = testObject.getId();
 
         TestObject loadedObject = new RushSearch().whereId(id).findSingle(TestObject.class);
         loadedObject.floatField = 0.64f;
@@ -231,7 +230,7 @@ public class SaveAndUpdateTest extends ApplicationTestCase<Application> {
         testObject.dateField = new Date();
         long dateLong = testObject.dateField.getTime();
         testObject.save();
-        long id = testObject.getId();
+        String id = testObject.getId();
 
         TestObject loadedObject = new RushSearch().whereId(id).findSingle(TestObject.class);
 
@@ -243,7 +242,7 @@ public class SaveAndUpdateTest extends ApplicationTestCase<Application> {
         TestObject testObject = new TestObject();
         testObject.dateField = new Date(new Date().getTime() - 1000);
         testObject.save();
-        long id = testObject.getId();
+        String id = testObject.getId();
 
         TestObject loadedObject = new RushSearch().whereId(id).findSingle(TestObject.class);
         loadedObject.dateField = new Date();
@@ -259,7 +258,7 @@ public class SaveAndUpdateTest extends ApplicationTestCase<Application> {
         TestObject testObject = new TestObject();
         testObject.childObject = new TestChildObject();
         testObject.save();
-        long id = testObject.getId();
+        String id = testObject.getId();
 
         TestObject loadedObject = new RushSearch().whereId(id).findSingle(TestObject.class);
 
@@ -274,7 +273,7 @@ public class SaveAndUpdateTest extends ApplicationTestCase<Application> {
         TestObject testObject = new TestObject();
         testObject.childObject = new TestChildObject();
         testObject.save();
-        long id = testObject.getId();
+        String id = testObject.getId();
 
         TestObject loadedObject = new RushSearch().whereId(id).findSingle(TestObject.class);
 
@@ -286,7 +285,7 @@ public class SaveAndUpdateTest extends ApplicationTestCase<Application> {
         TestObject testObject = new TestObject();
         testObject.childObject = new TestChildObject();
         testObject.save();
-        long id = testObject.getId();
+        String id = testObject.getId();
 
         TestObject loadedObject = new RushSearch().whereId(id).findSingle(TestObject.class);
         loadedObject.childObject = null;
@@ -301,16 +300,16 @@ public class SaveAndUpdateTest extends ApplicationTestCase<Application> {
         TestObject testObject = new TestObject();
         testObject.childObject = new TestChildObject();
         testObject.save();
-        long id = testObject.getId();
+        String id = testObject.getId();
 
         TestObject loadedObject = new RushSearch().whereId(id).findSingle(TestObject.class);
-        long childId = loadedObject.childObject.getId();
+        String childId = loadedObject.childObject.getId();
         loadedObject.childObject = new TestChildObject();
         loadedObject.save();
 
         TestObject updatedLoadedObject = new RushSearch().whereId(id).findSingle(TestObject.class);
-        long newChildId = updatedLoadedObject.childObject.getId();
-        assertTrue(newChildId != childId);
+        String newChildId = updatedLoadedObject.childObject.getId();
+        assertTrue(!newChildId.equals(childId));
     }
 
     public void testSaveChildrenSizeOne() throws Exception {
@@ -319,7 +318,7 @@ public class SaveAndUpdateTest extends ApplicationTestCase<Application> {
         testObject.children = new ArrayList<>();
         testObject.children.add(new TestChildObject());
         testObject.save();
-        long id = testObject.getId();
+        String id = testObject.getId();
 
         TestObject loadedObject = new RushSearch().whereId(id).findSingle(TestObject.class);
 
@@ -333,7 +332,7 @@ public class SaveAndUpdateTest extends ApplicationTestCase<Application> {
         testObject.children.add(new TestChildObject());
         testObject.children.add(new TestChildObject());
         testObject.save();
-        long id = testObject.getId();
+        String id = testObject.getId();
 
         TestObject loadedObject = new RushSearch().whereId(id).findSingle(TestObject.class);
 
@@ -345,7 +344,7 @@ public class SaveAndUpdateTest extends ApplicationTestCase<Application> {
         TestObject testObject = new TestObject();
         testObject.ignoredField = "Hello";
         testObject.save();
-        long id = testObject.getId();
+        String id = testObject.getId();
 
         TestObject loadedObject = new RushSearch().whereId(id).findSingle(TestObject.class);
         assertNull(loadedObject.ignoredField);
@@ -402,7 +401,7 @@ public class SaveAndUpdateTest extends ApplicationTestCase<Application> {
         TestObject loadedObject = new RushSearch().whereEqual("stringField", "1").findSingle(TestObject.class);
         TestObject loadedObject2 = new RushSearch().whereEqual("stringField", "2").findSingle(TestObject.class);
 
-        assertTrue(loadedObject.childObject.getId() == loadedObject2.childObject.getId());
+        assertTrue(loadedObject.childObject.getId().equals(loadedObject2.childObject.getId()));
     }
 
     public void testMultiplyReferencedChildSavedInList() throws Exception {
@@ -426,7 +425,7 @@ public class SaveAndUpdateTest extends ApplicationTestCase<Application> {
         TestObject loadedObject = new RushSearch().whereEqual("stringField", "1").findSingle(TestObject.class);
         TestObject loadedObject2 = new RushSearch().whereEqual("stringField", "2").findSingle(TestObject.class);
 
-        assertTrue(loadedObject.childObject.getId() == loadedObject2.childObject.getId());
+        assertTrue(loadedObject.childObject.getId().equals(loadedObject2.childObject.getId()));
     }
 
     public void testCircularReference() throws Exception {
@@ -434,14 +433,14 @@ public class SaveAndUpdateTest extends ApplicationTestCase<Application> {
         object.child = object;
         object.save();
 
-        assertTrue(object.getId() == object.child.getId() && object.getId() != -1);
+        assertTrue(object.getId().equals(object.child.getId()) && object.getId() != null);
     }
 
     public void testCircularReferenceLoad() throws Exception {
         TestSelfReference object = new TestSelfReference();
         object.child = object;
         object.save();
-        long id = object.getId();
+        String id = object.getId();
 
         TestSelfReference loadedObject = new RushSearch().whereId(id).findSingle(TestSelfReference.class);
 
@@ -481,5 +480,36 @@ public class SaveAndUpdateTest extends ApplicationTestCase<Application> {
 
         List<TestObject> loadedObjects2 = new RushSearch().find(TestObject.class);
         assertTrue(loadedObjects2.get(0).stringField.equals("Test1") && loadedObjects2.get(1).stringField.equals("Test2") );
+    }
+
+    public void testSaveThenReSave() throws Exception {
+        List<TestObject> objects = new ArrayList<>();
+        TestObject test1 = new TestObject();
+        test1.stringField = "Test1";
+        objects.add(test1);
+
+        RushCore.getInstance().save(objects);
+        List<TestObject> loadedObjects = new RushSearch().find(TestObject.class);
+        RushCore.getInstance().save(loadedObjects);
+
+        List<TestObject> loadedObjects2 = new RushSearch().find(TestObject.class);
+
+        assertTrue(loadedObjects2.size() == 1);
+    }
+
+    public void testSaveAndUpdate() throws Exception {
+        List<TestObject> objects = new ArrayList<>();
+        TestObject test1 = new TestObject();
+        test1.stringField = "Test1";
+        objects.add(test1);
+
+        RushCore.getInstance().save(objects);
+        List<TestObject> loadedObjects = new RushSearch().find(TestObject.class);
+        loadedObjects.get(0).stringField = "Changed text";
+        RushCore.getInstance().save(loadedObjects);
+
+        List<TestObject> loadedObjects2 = new RushSearch().find(TestObject.class);
+
+        assertTrue(loadedObjects2.size() == 1 && loadedObjects2.get(0).stringField.equals("Changed text"));
     }
 }

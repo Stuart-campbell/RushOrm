@@ -12,7 +12,8 @@ public class SampleApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        RushAndroid.initialize(getApplicationContext());
+        // Commented out because it was interfering with unit tests
+        //RushAndroid.initialize(getApplicationContext());
     }
 
 }

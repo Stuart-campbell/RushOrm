@@ -21,17 +21,7 @@ public class RushColumnDouble implements RushColumn<Double> {
     public Double deserialize(String value) {
         return Double.parseDouble(value);
     }
-/*
-    @Override
-    public String valueFromField(RushTable rushTable, Field field, RushStringSanitizer stringSanitizer) throws IllegalAccessException {
-        return Double.toString(field.getDouble(rushTable));
-    }
 
-    @Override
-    public <T> void setField(T rush, Field field, String value) throws IllegalAccessException {
-        field.setDouble(rush, Double.parseDouble(value));
-    }
-*/
     @Override
     public Class[] classesColumnSupports() {
         return new Class[]{Double.class, double.class};

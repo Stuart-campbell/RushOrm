@@ -27,13 +27,11 @@ public class SpeedTests extends ApplicationTestCase<Application> {
     public void setUp() throws Exception {
         super.setUp();
         getContext().deleteDatabase("rush.db");
-        Thread.sleep(100);
         RushAndroid.initialize(getContext());
     }
 
     @Override
     public void tearDown() throws Exception {
-        getContext().deleteDatabase("rush.db");
         super.tearDown();
     }
 
@@ -113,7 +111,7 @@ public class SpeedTests extends ApplicationTestCase<Application> {
             testObject.children.add(new TestChildObject());
         }
         testObject.save();
-        long id = testObject.getId();
+        String id = testObject.getId();
 
 
         Date date = new Date();
@@ -133,7 +131,7 @@ public class SpeedTests extends ApplicationTestCase<Application> {
             testObject.children.add(new TestChildObject());
         }
         testObject.save();
-        long id = testObject.getId();
+        String id = testObject.getId();
 
         TestObject loadedObject = new RushSearch().whereId(id).findSingle(TestObject.class);
         Date date = new Date();
