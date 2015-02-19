@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.WeakHashMap;
 
 import co.uk.rushorm.core.exceptions.RushCoreNotInitializedException;
-import co.uk.rushorm.core.exceptions.RushTableMissingEmptyConstructor;
+import co.uk.rushorm.core.exceptions.RushTableMissingEmptyConstructorException;
 import co.uk.rushorm.core.implementation.ConflictSaveStatementGenerator;
 import co.uk.rushorm.core.implementation.ReflectionClassLoader;
 import co.uk.rushorm.core.implementation.ReflectionDeleteStatementGenerator;
@@ -439,7 +439,7 @@ public class RushCore {
         values.close();
         queProvider.queComplete(que);
         if(objects == null) {
-            throw new RushTableMissingEmptyConstructor(clazz);
+            throw new RushTableMissingEmptyConstructorException(clazz);
         }
         return objects;
     }

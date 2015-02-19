@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import co.uk.rushorm.core.exceptions.RushTableMissingEmptyConstructor;
 import co.uk.rushorm.core.implementation.ReflectionUtils;
 
 /**
