@@ -24,13 +24,11 @@ public class SerializationTests extends ApplicationTestCase<Application> {
     public void setUp() throws Exception {
         super.setUp();
         getContext().deleteDatabase("rush.db");
-        Thread.sleep(200);
         RushAndroid.initialize(getContext());
     }
 
     @Override
     public void tearDown() throws Exception {
-        getContext().deleteDatabase("rush.db");
         super.tearDown();
     }
 

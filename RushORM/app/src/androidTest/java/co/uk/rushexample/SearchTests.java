@@ -30,7 +30,6 @@ public class SearchTests extends ApplicationTestCase<Application> {
 
     @Override
     public void tearDown() throws Exception {
-        getContext().deleteDatabase("rush.db");
         super.tearDown();
     }
 

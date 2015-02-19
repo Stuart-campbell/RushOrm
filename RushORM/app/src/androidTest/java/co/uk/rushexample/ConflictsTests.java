@@ -22,15 +22,12 @@ public class ConflictsTests extends ApplicationTestCase<Application> {
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        Thread.sleep(200);
         getContext().deleteDatabase("rush.db");
-        Thread.sleep(200);
         RushAndroid.initialize(getContext());
     }
 
     @Override
     public void tearDown() throws Exception {
-        getContext().deleteDatabase("rush.db");
         super.tearDown();
     }
 

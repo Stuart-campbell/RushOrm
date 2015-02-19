@@ -10,6 +10,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import co.uk.rushexample.R;
+import co.uk.rushorm.android.RushAndroid;
 
 public class MainActivity extends Activity implements NavigationDrawerFragment.NavigationDrawerCallbacks {
 
@@ -28,6 +29,9 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
             super.onCreate(savedInstanceState);
             setContentView(R.layout.activity_main);
 
+            // Would normally be in application class but was interfering with tests
+            RushAndroid.initialize(getApplicationContext());
+            
             mNavigationDrawerFragment = (NavigationDrawerFragment)
                     getFragmentManager().findFragmentById(R.id.navigation_drawer);
             mTitle = getTitle();

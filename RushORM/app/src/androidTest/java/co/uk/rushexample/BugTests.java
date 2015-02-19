@@ -23,13 +23,11 @@ public class BugTests extends ApplicationTestCase<Application> {
     public void setUp() throws Exception {
         super.setUp();
         getContext().deleteDatabase("rush.db");
-        Thread.sleep(200);
         RushAndroid.initialize(getContext());
     }
 
     @Override
     public void tearDown() throws Exception {
-        getContext().deleteDatabase("rush.db");
         super.tearDown();
     }
 
@@ -48,10 +46,10 @@ public class BugTests extends ApplicationTestCase<Application> {
         Bug7Parent parent = new Bug7Parent();
         parent.save();
 
-        Bug7Child firstChild = new Bug7Child("String");
+        Bug7Child firstChild = new Bug7Child();
         firstChild.save();
 
-        Bug7Child secondChild = new Bug7Child("String");
+        Bug7Child secondChild = new Bug7Child();
         secondChild.save();
 
         parent.add(firstChild);
@@ -62,6 +60,8 @@ public class BugTests extends ApplicationTestCase<Application> {
         parent.getChildren().get(0).setString("test1");
         parent.save();
 
-        assertNotNull(parent);
+        parent = new RushSearch().find(Bug7Parent.class).get(0);
+        
+        assertNotNull(parent.getChildren().get(0).getString().equals("test1"));
     }
 }
