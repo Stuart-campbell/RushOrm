@@ -202,7 +202,7 @@ public class SaveAndUpdateTest extends ApplicationTestCase<Application> {
         TestObject testObject = new TestObject();
         testObject.floatField = 0.54f;
         testObject.save();
-        long id = testObject.getId();
+        String id = testObject.getId();
 
         TestObject loadedObject = new RushSearch().whereId(id).findSingle(TestObject.class);
 
@@ -214,7 +214,7 @@ public class SaveAndUpdateTest extends ApplicationTestCase<Application> {
         TestObject testObject = new TestObject();
         testObject.floatField = 0.54f;
         testObject.save();
-        long id = testObject.getId();
+        String id = testObject.getId();
 
         TestObject loadedObject = new RushSearch().whereId(id).findSingle(TestObject.class);
         loadedObject.floatField = 0.64f;
@@ -231,7 +231,7 @@ public class SaveAndUpdateTest extends ApplicationTestCase<Application> {
         testObject.dateField = new Date();
         long dateLong = testObject.dateField.getTime();
         testObject.save();
-        long id = testObject.getId();
+        String id = testObject.getId();
 
         TestObject loadedObject = new RushSearch().whereId(id).findSingle(TestObject.class);
 
@@ -243,7 +243,7 @@ public class SaveAndUpdateTest extends ApplicationTestCase<Application> {
         TestObject testObject = new TestObject();
         testObject.dateField = new Date(new Date().getTime() - 1000);
         testObject.save();
-        long id = testObject.getId();
+        String id = testObject.getId();
 
         TestObject loadedObject = new RushSearch().whereId(id).findSingle(TestObject.class);
         loadedObject.dateField = new Date();
