@@ -26,6 +26,7 @@ public class ReflectionUpgradeManager implements RushUpgradeManager {
     }
 
     private class TableMapping {
+        private boolean isJoin;
         private Mapping name;
         private List<Mapping> fields = new ArrayList<>();
         private List<String> indexes = new ArrayList<>();
@@ -49,8 +50,12 @@ public class ReflectionUpgradeManager implements RushUpgradeManager {
     private static final String RENAME_TABLE = "ALTER TABLE %s RENAME TO %s";
     private static final String TABLE_INFO = "SELECT name FROM sqlite_master WHERE type='table';";
     private static final String DROP = "DROP TABLE %s";
-    private static final String MOVE_ROWS = "INSERT INTO %s(id%s)\n" +
-            "SELECT id%s\n" +
+    private static final String MOVE_ROWS = "INSERT INTO %s(" + ReflectionUtils.RUSH_ID + "," + ReflectionUtils.RUSH_CREATED + "," + ReflectionUtils.RUSH_UPDATED + "," + ReflectionUtils.RUSH_VERSION + "%s)\n" +
+            "SELECT " + ReflectionUtils.RUSH_ID + "," + ReflectionUtils.RUSH_CREATED + "," + ReflectionUtils.RUSH_UPDATED + "," + ReflectionUtils.RUSH_VERSION  + "%s\n" +
+            "FROM %s;";
+
+    private static final String MOVE_JOIN_ROWS = "INSERT INTO %s(" + ReflectionUtils.RUSH_ID + "%s)\n" +
+            "SELECT " + ReflectionUtils.RUSH_ID + "%s\n" +
             "FROM %s;";
 
     private static final String DELETE_INDEX = "DROP INDEX %s;";
@@ -71,7 +76,7 @@ public class ReflectionUpgradeManager implements RushUpgradeManager {
                     currentTables.remove(tableName);
                     TableMapping tableMapping = new TableMapping();
                     tableMapping.name = new Mapping(tableName, potentialTableMapping.name.newName);
-
+                    tableMapping.isJoin = false;
                     List<String> columns = tablesFields(tableName, callback);
                     for(PotentialMapping potentialMapping : potentialTableMapping.fields) {
                         String fieldName = nameExists(columns, potentialMapping.oldNames);
@@ -94,6 +99,7 @@ public class ReflectionUpgradeManager implements RushUpgradeManager {
                     joinMapping.fields.add(new Mapping("parent", "parent"));
                     joinMapping.fields.add(new Mapping("child", "child"));
                     joinMapping.indexes.add(tableName + "_idx");
+                    joinMapping.isJoin = true;
                     tableMappings.add(joinMapping);
 
                 }
@@ -156,7 +162,7 @@ public class ReflectionUpgradeManager implements RushUpgradeManager {
         while(values.hasNext()) {
             List<String> columnsInfo = values.next();
             String column = columnsInfo.get(1);
-            if(!column.equals("id")) {
+            if(!column.equals(ReflectionUtils.RUSH_ID)) {
                 columns.add(columnsInfo.get(1));
             }
         }
@@ -265,7 +271,7 @@ public class ReflectionUpgradeManager implements RushUpgradeManager {
             toRows.append(", ")
                     .append(mapping.newName);
         }
-        String sql = String.format(MOVE_ROWS, tableMapping.name.newName, toRows.toString(), fromRows.toString(), tableMapping.name.oldName);
+        String sql = String.format(tableMapping.isJoin ? MOVE_JOIN_ROWS : MOVE_ROWS, tableMapping.name.newName, toRows.toString(), fromRows.toString(), tableMapping.name.oldName);
         upgradeCallback.runRaw(sql);
     }
 }

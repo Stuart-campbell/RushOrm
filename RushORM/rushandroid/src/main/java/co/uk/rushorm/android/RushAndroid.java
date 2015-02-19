@@ -9,6 +9,8 @@ import co.uk.rushorm.core.Logger;
 import co.uk.rushorm.core.RushClassFinder;
 import co.uk.rushorm.core.RushColumn;
 import co.uk.rushorm.core.RushCore;
+import co.uk.rushorm.core.RushObjectDeserializer;
+import co.uk.rushorm.core.RushObjectSerializer;
 import co.uk.rushorm.core.RushQueProvider;
 import co.uk.rushorm.core.RushStringSanitizer;
 
@@ -28,11 +30,13 @@ public class RushAndroid {
         Logger logger = new AndroidLogger(rushConfig);
         RushStringSanitizer rushStringSanitizer = new AndroidRushStringSanitizer();
         RushClassFinder rushClassFinder = new AndroidRushClassFinder(applicationContext, logger);
-        AndroidRushStatementRunner statementRunner = new AndroidRushStatementRunner(applicationContext, rushConfig.dbName(), rushConfig.dbVersion());
+        AndroidRushStatementRunner statementRunner = new AndroidRushStatementRunner(applicationContext, rushConfig.dbName(), rushConfig);
         rushConfig.setLastRunVersion(statementRunner.getLastRunVersion());
         RushQueProvider queProvider = new AndroidRushQueProvider();
+        RushObjectDeserializer rushObjectDeserializer = new AndroidJSONDeserializer();
+        RushObjectSerializer rushObjectSerializer = new AndroidJSONSerializer();
 
-        RushCore.initialize(rushClassFinder, statementRunner, queProvider, rushConfig, rushStringSanitizer, logger, columns);
+        RushCore.initialize(rushClassFinder, statementRunner, queProvider, rushConfig, rushStringSanitizer, logger, columns, rushObjectSerializer, rushObjectDeserializer);
     }
 
 }

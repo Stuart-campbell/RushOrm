@@ -10,7 +10,7 @@ public interface Rush {
 
     public abstract void delete(RushCallback callback);
 
-    public abstract long getId();
+    public abstract String getId();
 
 }
 

@@ -11,6 +11,6 @@ public interface RushTableStatementGenerator {
         public void statementCreated(String statement);
     }
 
-    public void generateStatements(List<Class> classes, StatementCallback statementCallback);
+    public void generateStatements(List<Class> classes, RushColumns rushColumns, StatementCallback statementCallback);
 
 }

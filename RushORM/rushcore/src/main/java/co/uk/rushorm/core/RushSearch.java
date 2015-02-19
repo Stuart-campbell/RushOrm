@@ -14,7 +14,7 @@ public class RushSearch {
 
     private static final String WHERE_TEMPLATE = "SELECT * from %s %s %s %s;";
 
-    private static final String JOIN = "JOIN %s using (id)";
+    private static final String JOIN = "JOIN %s on (%s." + ReflectionUtils.RUSH_ID + "=%s.parent)";
 
     private final List<Where> whereStatements = new ArrayList<>();
     private final List<OrderBy> orderStatements = new ArrayList<>();
@@ -33,11 +33,11 @@ public class RushSearch {
 
     private class WhereHasChild extends Where {
         private final String field;
-        private final long id;
+        private final String id;
         private final Class clazz;
         private final String modifier;
 
-        private WhereHasChild(String field, long id, Class clazz, String modifier) {
+        private WhereHasChild(String field, String id, Class clazz, String modifier) {
             this.field = field;
             this.id = id;
             this.clazz = clazz;
@@ -46,8 +46,9 @@ public class RushSearch {
 
         protected String getStatement(Class parentClazz){
             String joinTable = ReflectionUtils.joinTableNameForClass(parentClazz, clazz, field);
-            joinString.append("\n").append(String.format(JOIN, joinTable));
-            return joinTable + ".child" + modifier + Long.toString(id);
+            String parentTable = ReflectionUtils.tableNameForClass(parentClazz);
+            joinString.append("\n").append(String.format(JOIN, joinTable, parentTable, joinTable));
+            return joinTable + ".child" + modifier + "'" + id + "'";
         }
     }
 
@@ -106,8 +107,8 @@ public class RushSearch {
     }
 
 
-    public RushSearch whereId(long id) {
-        return where("id", "=", Long.toString(id));
+    public RushSearch whereId(String id) {
+        return whereEqual(ReflectionUtils.RUSH_ID, id);
     }
 
     public RushSearch and(){

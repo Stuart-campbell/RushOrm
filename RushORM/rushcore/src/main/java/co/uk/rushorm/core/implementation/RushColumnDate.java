@@ -23,17 +23,6 @@ public class RushColumnDate implements RushColumn<Date> {
     public Date deserialize(String value) {
         return new Date(Long.parseLong(value));
     }
-/*
-    @Override
-    public String valueFromField(RushTable rushTable, Field field, RushStringSanitizer stringSanitizer) throws IllegalAccessException {
-        return Long.toString(((Date)field.get(rushTable)).getTime());
-    }
-
-    @Override
-    public <T> void setField(T rush, Field field, String value) throws IllegalAccessException {
-        Date date = new Date(Long.parseLong(value));
-        field.set(rush, date);
-    }*/
 
     @Override
     public Class[] classesColumnSupports() {

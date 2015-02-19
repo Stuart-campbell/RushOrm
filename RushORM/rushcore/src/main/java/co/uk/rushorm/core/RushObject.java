@@ -1,5 +1,7 @@
 package co.uk.rushorm.core;
 
+import java.util.List;
+
 /**
  * Created by Stuart on 24/01/15.
  */
@@ -15,6 +17,14 @@ public abstract class RushObject implements Rush {
         RushCore.getInstance().save(this, callback);
     }
 
+    public List<RushConflict> saveOnlyWithoutConflict() {
+        return RushCore.getInstance().saveOnlyWithoutConflict(this);
+    }
+
+    public void saveOnlyWithoutConflict(RushConflictCallback callback) {
+        RushCore.getInstance().saveOnlyWithoutConflict(this, callback);
+    }
+
     @Override
     public void delete() {
         RushCore.getInstance().delete(this);
@@ -26,7 +36,7 @@ public abstract class RushObject implements Rush {
     }
 
     @Override
-    public long getId() {
+    public String getId() {
         return RushCore.getInstance().getId(this);
     }
 
