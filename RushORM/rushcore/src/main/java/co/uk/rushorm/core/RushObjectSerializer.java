@@ -12,6 +12,6 @@ public interface RushObjectSerializer {
         public RushMetaData getMetaData(Rush rush);
     }
 
-    public String serialize(List<? extends Rush> objects, RushColumns rushColumns, Map<Class, AnnotationCache> annotationCache, Callback callback);
+    public String serialize(List<? extends Rush> objects, String idName, String versionName, RushColumns rushColumns, Map<Class, AnnotationCache> annotationCache, Callback callback);
 
 }

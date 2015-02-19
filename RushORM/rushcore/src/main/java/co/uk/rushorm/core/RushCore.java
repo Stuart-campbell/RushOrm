@@ -14,6 +14,7 @@ import co.uk.rushorm.core.implementation.ReflectionDeleteStatementGenerator;
 import co.uk.rushorm.core.implementation.ReflectionSaveStatementGenerator;
 import co.uk.rushorm.core.implementation.ReflectionTableStatementGenerator;
 import co.uk.rushorm.core.implementation.ReflectionUpgradeManager;
+import co.uk.rushorm.core.implementation.ReflectionUtils;
 import co.uk.rushorm.core.implementation.RushColumnBoolean;
 import co.uk.rushorm.core.implementation.RushColumnDate;
 import co.uk.rushorm.core.implementation.RushColumnDouble;
@@ -197,7 +198,15 @@ public class RushCore {
     }
 
     public String serialize(List<? extends Rush> rush) {
-        return rushObjectSerializer.serialize(rush, rushColumns, annotationCache, new RushObjectSerializer.Callback() {
+        return serialize(rush, ReflectionUtils.RUSH_ID);
+    }
+
+    public String serialize(List<? extends Rush> rush, String idName) {
+        return serialize(rush, idName, ReflectionUtils.RUSH_VERSION);
+    }
+
+    public String serialize(List<? extends Rush> rush, String idName, String versionName) {
+        return rushObjectSerializer.serialize(rush, idName, versionName, rushColumns, annotationCache, new RushObjectSerializer.Callback() {
             @Override
             public RushMetaData getMetaData(Rush rush) {
                 return idTable.get(rush);
@@ -206,7 +215,15 @@ public class RushCore {
     }
 
     public List<Rush> deserialize(String string) {
-        return rushObjectDeserializer.deserialize(string, rushColumns, annotationCache, new RushObjectDeserializer.Callback() {
+        return deserialize(string, ReflectionUtils.RUSH_ID);
+    }
+
+    public List<Rush> deserialize(String string, String idName) {
+        return deserialize(string, idName, ReflectionUtils.RUSH_VERSION);
+    }
+
+    public List<Rush> deserialize(String string, String idName, String versionName) {
+        return rushObjectDeserializer.deserialize(string, idName, versionName, rushColumns, annotationCache, new RushObjectDeserializer.Callback() {
             @Override
             public void addRush(Rush rush, RushMetaData rushMetaData) {
                 idTable.put(rush, rushMetaData);

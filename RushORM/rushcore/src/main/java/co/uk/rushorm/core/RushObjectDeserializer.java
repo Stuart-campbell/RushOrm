@@ -11,6 +11,6 @@ public interface RushObjectDeserializer {
     public interface Callback {
         public void addRush(Rush rush, RushMetaData rushMetaData);
     }
-    public List<Rush> deserialize(String string, RushColumns rushColumns, Map<Class, AnnotationCache> annotationCache, Callback callback);
+    public List<Rush> deserialize(String string, String idName, String versionName, RushColumns rushColumns, Map<Class, AnnotationCache> annotationCache, Callback callback);
 
 }
