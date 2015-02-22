@@ -4,6 +4,7 @@ import android.app.Application;
 import android.test.ApplicationTestCase;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import co.uk.rushexample.testobjects.TestChildObject;
@@ -37,6 +38,8 @@ public class SerializationTests extends ApplicationTestCase<Application> {
 
         TestObject testObject = new TestObject();
         testObject.stringField = "string";
+        testObject.dateField = new Date();
+        testObject.childObject = new TestChildObject();
         testObject.save();
 
         List<TestObject> objects = new ArrayList<>();
