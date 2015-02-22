@@ -21,4 +21,9 @@ public class RushConflict<T extends Rush> {
         return toBeSaved;
     }
 
+    public void resolve() {
+        RushMetaData toBeSavedMetaData = RushCore.getInstance().getMetaData(toBeSaved);
+        toBeSavedMetaData.setVersion(RushCore.getInstance().getMetaData(inDataBase).getVersion());
+    }
+    
 }

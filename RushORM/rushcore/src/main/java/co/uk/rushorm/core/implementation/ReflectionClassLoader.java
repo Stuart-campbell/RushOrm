@@ -86,10 +86,6 @@ public class ReflectionClassLoader implements RushClassLoader {
         List<Field> fields = new ArrayList<>();
         ReflectionUtils.getAllFields(fields, clazz);
 
-        if(!annotationCache.containsKey(clazz)) {
-            annotationCache.put(clazz, new AnnotationCache(clazz, fields));
-        }
-
         int counter = 4; /* Skip rush_id, rush_created, rush_updated and rush_version */
         for (Field field : fields) {
             field.setAccessible(true);

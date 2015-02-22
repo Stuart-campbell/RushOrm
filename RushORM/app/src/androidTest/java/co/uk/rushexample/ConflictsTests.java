@@ -58,4 +58,54 @@ public class ConflictsTests extends ApplicationTestCase<Application> {
         assertTrue(conflicts.size() == 1);
     }
 
+    public void testUnresolvedConflicts() throws Exception {
+        TestObject original = new TestObject();
+        original.stringField = "version1";
+        original.save();
+
+        TestObject loadedOriginal = new RushSearch().findSingle(TestObject.class);
+        loadedOriginal.stringField = "version2";
+        loadedOriginal.save();
+
+        List<RushConflict> conflicts = original.saveOnlyWithoutConflict();
+        List<RushConflict> conflicts2 = original.saveOnlyWithoutConflict();
+
+        assertTrue(conflicts2.size() == 1);
+    }
+
+    public void testResolvedConflicts() throws Exception {
+        TestObject original = new TestObject();
+        original.stringField = "version1";
+        original.save();
+
+        TestObject loadedOriginal = new RushSearch().findSingle(TestObject.class);
+        loadedOriginal.stringField = "version2";
+        loadedOriginal.save();
+
+        List<RushConflict> conflicts = original.saveOnlyWithoutConflict();
+        conflicts.get(0).resolve();
+        
+        List<RushConflict> conflicts2 = original.saveOnlyWithoutConflict();
+        assertTrue(conflicts2.size() == 0);
+    }
+
+    public void testResolveWithBackgroundSaveConflicts() throws Exception {
+        TestObject original = new TestObject();
+        original.stringField = "version1";
+        original.save();
+
+        TestObject loadedOriginal = new RushSearch().findSingle(TestObject.class);
+        loadedOriginal.stringField = "version2";
+        loadedOriginal.save();
+
+        List<RushConflict> conflicts = original.saveOnlyWithoutConflict();
+        conflicts.get(0).resolve();
+
+        loadedOriginal.stringField = "version3";
+        loadedOriginal.save();
+        
+        List<RushConflict> conflicts2 = original.saveOnlyWithoutConflict();
+        assertTrue(conflicts2.size() == 1);
+    }
+    
 }

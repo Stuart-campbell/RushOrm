@@ -1,5 +1,6 @@
 package co.uk.rushorm.core;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -72,11 +73,13 @@ public class RushCore {
                                   Map<Class, AnnotationCache> annotationCache) {
 
         rushCore = new RushCore(saveStatementGenerator, rushConflictSaveStatementGenerator, deleteStatementGenerator, statementRunner, queProvider, rushConfig, rushTableStatementGenerator, rushClassLoader, rushStringSanitizer, logger, rushObjectSerializer, rushObjectDeserializer, rushColumns, annotationCache);
+        rushCore.loadAnnotationCache(rushClassFinder);
+        
         RushQue que = queProvider.blockForNextQue();
         if (rushConfig.firstRun()) {
-            rushCore.createTables(rushClassFinder, que);
+            rushCore.createTables(new ArrayList<>(rushCore.annotationCache.keySet()), que);
         } else if(rushConfig.inDebug() || rushConfig.upgrade()){
-            rushCore.upgrade(rushClassFinder, rushUpgradeManager, que);
+            rushCore.upgrade(new ArrayList<>(rushCore.annotationCache.keySet()), rushUpgradeManager, que);
         } else {
             queProvider.queComplete(que);
         }
@@ -95,8 +98,7 @@ public class RushCore {
     
     public String getId(Rush rush) {
         RushMetaData rushMetaData = getMetaData(rush);
-        if (rushMetaData == null
-                || !rushMetaData.isSaved()) {
+        if (rushMetaData == null) {
             return null;
         }
         return rushMetaData.getId();
@@ -292,9 +294,13 @@ public class RushCore {
         this.rushColumns = rushColumns;
         this.annotationCache = annotationCache;
     }
-
-    private void createTables(RushClassFinder rushClassFinder, RushQue que) {
-        createTables(rushClassFinder.findClasses(rushConfig), que);
+    
+    private void loadAnnotationCache(RushClassFinder rushClassFinder) {
+        for(Class clazz : rushClassFinder.findClasses(rushConfig)) {
+            List<Field> fields = new ArrayList<>();
+            ReflectionUtils.getAllFields(fields, clazz);
+            annotationCache.put(clazz, new AnnotationCache(clazz, fields));
+        }       
     }
 
     private void createTables(List<Class> classes, final RushQue que) {
@@ -308,8 +314,8 @@ public class RushCore {
         queProvider.queComplete(que);
     }
 
-    private void upgrade(RushClassFinder rushClassFinder, RushUpgradeManager rushUpgradeManager, final RushQue que) {
-        rushUpgradeManager.upgrade(rushClassFinder.findClasses(rushConfig), new RushUpgradeManager.UpgradeCallback() {
+    private void upgrade(List<Class> classes, RushUpgradeManager rushUpgradeManager, final RushQue que) {
+        rushUpgradeManager.upgrade(classes, new RushUpgradeManager.UpgradeCallback() {
             @Override
             public RushStatementRunner.ValuesCallback runStatement(String sql) {
                 logger.logSql(sql);

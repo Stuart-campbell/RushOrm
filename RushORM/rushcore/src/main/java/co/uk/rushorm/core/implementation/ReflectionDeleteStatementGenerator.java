@@ -46,10 +46,6 @@ public class ReflectionDeleteStatementGenerator implements RushDeleteStatementGe
         List<Field> fields = new ArrayList<>();
         ReflectionUtils.getAllFields(fields, rush.getClass());
 
-        if(!annotationCache.containsKey(rush.getClass())) {
-            annotationCache.put(rush.getClass(), new AnnotationCache(rush.getClass(), fields));
-        }
-
         for (Field field : fields) {
             field.setAccessible(true);
             if (!annotationCache.get(rush.getClass()).getFieldToIgnore().contains(field.getName())) {
