@@ -50,7 +50,8 @@ public class AndroidJSONSerializer implements RushObjectSerializer {
         for (Map.Entry<Class, JSONArray> entry : arraysMap.entrySet())
         {
             try {
-                jsonObject.put(entry.getKey().getName(), entry.getValue());
+                String name = annotationCache.get(entry.getKey()).getSerializationName();
+                jsonObject.put(name, entry.getValue());
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -85,10 +86,6 @@ public class AndroidJSONSerializer implements RushObjectSerializer {
 
         List<Field> fields = new ArrayList<>();
         ReflectionUtils.getAllFields(fields, rush.getClass());
-
-        if (!annotationCache.containsKey(rush.getClass())) {
-            annotationCache.put(rush.getClass(), new AnnotationCache(rush.getClass(), fields));
-        }
 
         for (Field field : fields) {
             if (!annotationCache.get(rush.getClass()).getFieldToIgnore().contains(field.getName())) {

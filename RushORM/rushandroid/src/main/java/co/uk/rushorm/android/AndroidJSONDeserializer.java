@@ -33,19 +33,30 @@ public class AndroidJSONDeserializer implements RushObjectDeserializer {
             List<Rush> objects = new ArrayList<>();
             while(stringIterator.hasNext()) {
                 String className = stringIterator.next();
-                Class clazz = Class.forName(className);
-                JSONArray jsonArray = jsonObject.getJSONArray(className);
-                objects.addAll(deserializeJSONArray(jsonArray, idName, versionName, clazz, rushColumns, annotationCache, callback));
+                Class clazz = classFromString(className, annotationCache);
+                if(clazz != null) {
+                    JSONArray jsonArray = jsonObject.getJSONArray(className);
+                    objects.addAll(deserializeJSONArray(jsonArray, idName, versionName, clazz, rushColumns, annotationCache, callback));
+                }
             }
             return objects;
-        } catch (JSONException | ClassNotFoundException | InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+        } catch (JSONException | InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             e.printStackTrace();
         }
 
         return null;
     }
 
-    public List<Rush> deserializeJSONArray(JSONArray jsonArray, String idName, String versionName, Class<? extends Rush> clazz, RushColumns rushColumns, Map<Class, AnnotationCache> annotationCache, Callback callback) throws JSONException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+    private Class classFromString(String name, Map<Class, AnnotationCache> annotationCache) {
+        for (Map.Entry<Class, AnnotationCache> entry : annotationCache.entrySet()) {
+            if(entry.getValue().getSerializationName().equals(name)) {
+                return entry.getKey();
+            }          
+        }
+        return null;
+    }
+    
+    private List<Rush> deserializeJSONArray(JSONArray jsonArray, String idName, String versionName, Class<? extends Rush> clazz, RushColumns rushColumns, Map<Class, AnnotationCache> annotationCache, Callback callback) throws JSONException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         if(jsonArray.length() < 1){
             return null;
         }
@@ -58,14 +69,10 @@ public class AndroidJSONDeserializer implements RushObjectDeserializer {
         return objects;
     }
 
-    public Rush deserializeJSONObject(JSONObject object, String idName, String versionName, Class<? extends Rush> clazz, RushColumns rushColumns, Map<Class, AnnotationCache> annotationCache, Callback callback) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException, JSONException {
+    private Rush deserializeJSONObject(JSONObject object, String idName, String versionName, Class<? extends Rush> clazz, RushColumns rushColumns, Map<Class, AnnotationCache> annotationCache, Callback callback) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException, JSONException {
 
         List<Field> fields = new ArrayList<>();
         ReflectionUtils.getAllFields(fields, clazz);
-
-        if (!annotationCache.containsKey(clazz)) {
-            annotationCache.put(clazz, new AnnotationCache(clazz, fields));
-        }
 
         Rush rush = clazz.getConstructor().newInstance();
 

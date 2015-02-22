@@ -37,10 +37,6 @@ public class RushMetaData {
         updated = new Date().getTime();
     }
 
-    public boolean isSaved() {
-        return version > 0;
-    }
-
     public String getId() {
         return id;
     }
@@ -57,14 +53,7 @@ public class RushMetaData {
         return version;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        RushMetaData that = (RushMetaData) o;
-
-        return !(id != null ? !id.equals(that.id) : that.id != null);
+    public void setVersion(long version) {
+        this.version = version;
     }
-
 }

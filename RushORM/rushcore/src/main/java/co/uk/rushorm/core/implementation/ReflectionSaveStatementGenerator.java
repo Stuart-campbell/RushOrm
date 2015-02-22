@@ -104,10 +104,6 @@ public class ReflectionSaveStatementGenerator implements RushSaveStatementGenera
 
         ReflectionUtils.getAllFields(fields, rush.getClass());
 
-        if(!annotationCache.containsKey(rush.getClass())) {
-            annotationCache.put(rush.getClass(), new AnnotationCache(rush.getClass(), fields));
-        }
-
         for (Field field : fields) {
             if (!annotationCache.get(rush.getClass()).getFieldToIgnore().contains(field.getName())) {
                 field.setAccessible(true);
@@ -152,7 +148,7 @@ public class ReflectionSaveStatementGenerator implements RushSaveStatementGenera
             rushMetaData = new RushMetaData();
             saveCallback.addRush(rush, rushMetaData);
         }
-            updateValuesMap.get(rush.getClass()).add(new BasicUpdate(values, rush, rushMetaData));
+        updateValuesMap.get(rush.getClass()).add(new BasicUpdate(values, rush, rushMetaData));
     }
 
     private String joinFromField(List<BasicJoin> joins, Rush rush, Field field, Map<Class, AnnotationCache> annotationCache) {
