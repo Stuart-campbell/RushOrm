@@ -1,6 +1,8 @@
 # RushOrm 
 ### Object-relational mapping for Android
 
+[![Join the chat at https://gitter.im/Stuart-campbell/RushOrm](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/Stuart-campbell/RushOrm?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 
 RushOrm replaces the need for SQL by mapping java classes to SQL tables.
 <hr>
