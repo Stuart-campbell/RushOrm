@@ -60,7 +60,7 @@ public class AndroidJSONSerializer implements RushObjectSerializer {
         return jsonObject.toString();
     }
 
-    public JSONArray serializeToJSONArray(List<? extends Rush> objects, String idName, String versionName, RushColumns rushColumns, Map<Class, AnnotationCache> annotationCache, RushStringSanitizer rushStringSanitizer, Callback callback) throws JSONException, IllegalAccessException {
+    private JSONArray serializeToJSONArray(List<? extends Rush> objects, String idName, String versionName, RushColumns rushColumns, Map<Class, AnnotationCache> annotationCache, RushStringSanitizer rushStringSanitizer, Callback callback) throws JSONException, IllegalAccessException {
 
         JSONArray jsonArray = new JSONArray();
         if(objects != null) {
@@ -71,7 +71,7 @@ public class AndroidJSONSerializer implements RushObjectSerializer {
         return jsonArray;
     }
 
-    public JSONObject serializeToJSONObject(Rush rush, String idName, String versionName, RushColumns rushColumns, Map<Class, AnnotationCache> annotationCache, RushStringSanitizer rushStringSanitizer, Callback callback) throws IllegalAccessException, JSONException {
+    private JSONObject serializeToJSONObject(Rush rush, String idName, String versionName, RushColumns rushColumns, Map<Class, AnnotationCache> annotationCache, RushStringSanitizer rushStringSanitizer, Callback callback) throws IllegalAccessException, JSONException {
 
         if(rush == null) {
             return null;
