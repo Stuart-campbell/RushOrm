@@ -36,6 +36,24 @@ While there are a number of other ORMs, the areas many seem to fall short is the
 For getting started see http://www.rushorm.com/
 
 <hr>
+
+Rush jar can be downloaded from http://www.rushorm.com/download.html alternatively it can be added as below.
+
+Add the specific repository to your build file:
+
+    repositories {
+       maven {
+           url "https://jitpack.io"
+       }
+    }
+   
+Add the dependency in your build file:
+
+    dependencies {
+       compile 'com.github.Stuart-campbell:RushOrm:v1.0.2'
+    }
+
+<hr>
 ### Licence Apache License, Version 2.0
 Copyright (C) 2015 Stuart Campbell
 Licensed under the Apache License, Version 2.0 (the "License");
