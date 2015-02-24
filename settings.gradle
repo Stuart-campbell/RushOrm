@@ -1,3 +1,0 @@
-include ':rushcore', ':rushandroid'
-project(':rushcore').projectDir = new File(settingsDir, 'RushORM/rushcore')
-project(':rushandroid').projectDir = new File(settingsDir, 'RushORM/rushandroid')
