@@ -44,7 +44,7 @@ public class RushCore {
 
         RushColumns rushColumns = new RushColumnsImplementation(columns);
 
-        RushUpgradeManager rushUpgradeManager = new ReflectionUpgradeManager();
+        RushUpgradeManager rushUpgradeManager = new ReflectionUpgradeManager(logger);
         Map<Class, AnnotationCache> annotationCache = new HashMap<>();
         RushSaveStatementGenerator saveStatementGenerator = new ReflectionSaveStatementGenerator();
         RushConflictSaveStatementGenerator conflictSaveStatementGenerator = new ConflictSaveStatementGenerator();

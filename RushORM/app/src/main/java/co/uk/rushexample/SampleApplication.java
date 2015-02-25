@@ -13,7 +13,7 @@ public class SampleApplication extends Application {
     public void onCreate() {
         super.onCreate();
         // Commented out because it was interfering with unit tests
-        //RushAndroid.initialize(getApplicationContext());
+        // RushAndroid.initialize(getApplicationContext());
     }
 
 }

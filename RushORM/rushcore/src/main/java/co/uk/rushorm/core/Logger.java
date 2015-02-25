@@ -7,5 +7,5 @@ public interface Logger {
 
     public void log(String message);
     public void logSql(String sql);
-    public void logError(String sql);
+    public void logError(String error);
 }
