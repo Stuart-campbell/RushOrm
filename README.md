@@ -50,7 +50,7 @@ Add the specific repository to your build file:
 Add the dependency in your build file:
 
     dependencies {
-       compile 'com.github.Stuart-campbell:RushOrm:v1.0.2'
+       compile 'com.github.Stuart-campbell:RushOrm:v1.0.3'
     }
 
 <hr>
