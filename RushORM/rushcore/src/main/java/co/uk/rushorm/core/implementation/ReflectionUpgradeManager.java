@@ -4,6 +4,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
+import co.uk.rushorm.core.Logger;
 import co.uk.rushorm.core.Rush;
 import co.uk.rushorm.core.RushStatementRunner;
 import co.uk.rushorm.core.RushUpgradeManager;
@@ -46,6 +47,7 @@ public class ReflectionUpgradeManager implements RushUpgradeManager {
         }
     }
 
+    private static final String TEMP_PREFIX = "_temp";
     private static final String COLUMNS_INFO = "PRAGMA table_info(%s)";
     private static final String RENAME_TABLE = "ALTER TABLE %s RENAME TO %s";
     private static final String TABLE_INFO = "SELECT name FROM sqlite_master WHERE type='table';";
@@ -60,6 +62,12 @@ public class ReflectionUpgradeManager implements RushUpgradeManager {
 
     private static final String DELETE_INDEX = "DROP INDEX %s;";
 
+    private final Logger logger;
+
+    public ReflectionUpgradeManager(Logger logger) {
+        this.logger = logger;
+    }
+    
     @Override
     public void upgrade(List<Class> classList, UpgradeCallback callback) {
 
@@ -69,6 +77,8 @@ public class ReflectionUpgradeManager implements RushUpgradeManager {
             List<String> currentTables = currentTables(callback);
             List<TableMapping> tableMappings = new ArrayList<>();
 
+            dropAnyObsoleteTempTables(currentTables, callback);
+            
             for(Class clazz : classList) {
                 PotentialTableMapping potentialTableMapping = potentialMapping(clazz, potentialJoinMappings);
                 String tableName = nameExists(currentTables, potentialTableMapping.name.oldNames);
@@ -101,13 +111,12 @@ public class ReflectionUpgradeManager implements RushUpgradeManager {
                     joinMapping.indexes.add(tableName + "_idx");
                     joinMapping.isJoin = true;
                     tableMappings.add(joinMapping);
-
                 }
             }
 
             for (TableMapping tableMapping : tableMappings) {
                 if(tableMapping.name.oldName.equals(tableMapping.name.newName)) {
-                    tableMapping.name.oldName = tableMapping.name.oldName + "_temp";
+                    tableMapping.name.oldName = tableMapping.name.oldName + TEMP_PREFIX;
                     renameTable(tableMapping.name.oldName, tableMapping.name.newName, callback);
                 }
                 for(String index : tableMapping.indexes) {
@@ -129,7 +138,6 @@ public class ReflectionUpgradeManager implements RushUpgradeManager {
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
-
     }
 
     private String nameExists(List<String> columns, String[] names) {
@@ -143,6 +151,20 @@ public class ReflectionUpgradeManager implements RushUpgradeManager {
         return null;
     }
 
+    private void dropAnyObsoleteTempTables(List<String> tables, UpgradeCallback callback) {
+        List<String> tablesToRemove = new ArrayList<>();
+        for (String table : tables) {
+            if(table.endsWith(TEMP_PREFIX)) {
+                logger.logError("Dropping tmp table \"" + table + "\" from last upgrade, this implies something when wrong during the last upgrade.");
+                callback.runRaw(String.format(DROP, table));
+                tablesToRemove.add(table);
+            }
+        }
+        for (String table : tablesToRemove) {
+            tables.remove(table);
+        }
+    }
+    
     private List<String> currentTables(UpgradeCallback callback) {
         RushStatementRunner.ValuesCallback values = callback.runStatement(TABLE_INFO);
         List<String> tables = new ArrayList<>();
