@@ -55,15 +55,15 @@ public class RushCore {
         initialize(rushUpgradeManager, saveStatementGenerator, conflictSaveStatementGenerator, deleteStatementGenerator, rushClassFinder, rushTableStatementGenerator, statementRunner, queProvider, rushConfig, rushClassLoader, rushStringSanitizer, logger, rushObjectSerializer, rushObjectDeserializer, rushColumns, annotationCache);
     }
 
-    public static void initialize(RushUpgradeManager rushUpgradeManager,
+    public static void initialize(final RushUpgradeManager rushUpgradeManager,
                                   RushSaveStatementGenerator saveStatementGenerator,
                                   RushConflictSaveStatementGenerator rushConflictSaveStatementGenerator,
                                   RushDeleteStatementGenerator deleteStatementGenerator,
                                   RushClassFinder rushClassFinder,
                                   RushTableStatementGenerator rushTableStatementGenerator,
                                   RushStatementRunner statementRunner,
-                                  RushQueProvider queProvider,
-                                  RushConfig rushConfig,
+                                  final RushQueProvider queProvider,
+                                  final RushConfig rushConfig,
                                   RushClassLoader rushClassLoader,
                                   RushStringSanitizer rushStringSanitizer,
                                   Logger logger,
@@ -74,15 +74,20 @@ public class RushCore {
 
         rushCore = new RushCore(saveStatementGenerator, rushConflictSaveStatementGenerator, deleteStatementGenerator, statementRunner, queProvider, rushConfig, rushTableStatementGenerator, rushClassLoader, rushStringSanitizer, logger, rushObjectSerializer, rushObjectDeserializer, rushColumns, annotationCache);
         rushCore.loadAnnotationCache(rushClassFinder);
-        
-        RushQue que = queProvider.blockForNextQue();
-        if (rushConfig.firstRun()) {
-            rushCore.createTables(new ArrayList<>(rushCore.annotationCache.keySet()), que);
-        } else if(rushConfig.inDebug() || rushConfig.upgrade()){
-            rushCore.upgrade(new ArrayList<>(rushCore.annotationCache.keySet()), rushUpgradeManager, que);
-        } else {
-            queProvider.queComplete(que);
-        }
+
+        final RushQue que = queProvider.blockForNextQue();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                if (rushConfig.firstRun()) {
+                    rushCore.createTables(new ArrayList<>(rushCore.annotationCache.keySet()), que);
+                } else if(rushConfig.inDebug() || rushConfig.upgrade()){
+                    rushCore.upgrade(new ArrayList<>(rushCore.annotationCache.keySet()), rushUpgradeManager, que);
+                } else {
+                    queProvider.queComplete(que);
+                }
+            }
+        }).start();
     }
 
     public static RushCore getInstance() {

@@ -468,7 +468,8 @@ public class UpgradeTests extends ApplicationTestCase<Application> {
         assertEquals(test2.testUpgrade5List.size(), 2);
     }
 
-    public static void initializeUpgrade(Context context, final List<Class> classes) {
+    public static void initializeUpgrade(Context context, final List<Class> classes) throws InterruptedException {
+                
         Context applicationContext = context.getApplicationContext();
 
         RushConfig rushConfig = new AndroidRushConfig(applicationContext);
@@ -485,6 +486,8 @@ public class UpgradeTests extends ApplicationTestCase<Application> {
                 return classes;
             }
         }, statementRunner, queProvider, rushConfig, rushStringSanitizer, logger, new ArrayList<RushColumn>(), rushObjectSerializer, rushObjectDeserializer);
+        
+        Thread.sleep(250);
     }
 
     public void testCustomColumn() throws Exception {

@@ -25,8 +25,7 @@ public class DeleteTests extends ApplicationTestCase<Application> {
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        getContext().deleteDatabase("rush.db");
-        RushAndroid.initialize(getContext());
+        Utils.setUp(getContext());
     }
 
     @Override
@@ -142,7 +141,6 @@ public class DeleteTests extends ApplicationTestCase<Application> {
     public void testDeleteList() throws Exception {
         List<TestObject> objects = new ArrayList<>();
         objects.add(new TestObject());
-
 
         RushCore.getInstance().save(objects);
 

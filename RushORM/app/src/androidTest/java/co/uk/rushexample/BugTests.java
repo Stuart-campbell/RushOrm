@@ -6,7 +6,6 @@ import android.test.ApplicationTestCase;
 import co.uk.rushexample.testobjects.Bug6;
 import co.uk.rushexample.testobjects.Bug7Child;
 import co.uk.rushexample.testobjects.Bug7Parent;
-import co.uk.rushexample.testobjects.TestObject;
 import co.uk.rushorm.android.RushAndroid;
 import co.uk.rushorm.core.RushSearch;
 
@@ -22,8 +21,7 @@ public class BugTests extends ApplicationTestCase<Application> {
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        getContext().deleteDatabase("rush.db");
-        RushAndroid.initialize(getContext());
+        Utils.setUp(getContext());
     }
 
     @Override
