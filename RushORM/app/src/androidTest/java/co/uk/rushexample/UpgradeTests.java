@@ -469,7 +469,7 @@ public class UpgradeTests extends ApplicationTestCase<Application> {
     }
 
     public static void initializeUpgrade(Context context, final List<Class> classes) throws InterruptedException {
-                
+
         Context applicationContext = context.getApplicationContext();
 
         RushConfig rushConfig = new AndroidRushConfig(applicationContext);
