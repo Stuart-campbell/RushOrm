@@ -43,14 +43,14 @@ Add the specific repository to your build file:
 
     repositories {
        maven {
-           url "https://jitpack.io"
+           url "http://maven.rushorm.com"
        }
     }
    
 Add the dependency in your build file:
 
     dependencies {
-       compile 'com.github.Stuart-campbell:RushOrm:v1.0.4'
+       compile 'co.uk.rushorm:rushandroid:1.0.4'
     }
 
 <hr>
