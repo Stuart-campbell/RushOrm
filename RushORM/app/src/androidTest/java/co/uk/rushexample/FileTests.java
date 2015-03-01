@@ -24,8 +24,7 @@ public class FileTests extends ApplicationTestCase<Application> {
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        getContext().deleteDatabase("rush.db");
-        RushAndroid.initialize(getContext());
+        Utils.setUp(getContext());
     }
 
     @Override

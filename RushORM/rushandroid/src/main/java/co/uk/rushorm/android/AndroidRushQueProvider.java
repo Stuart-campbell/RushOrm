@@ -17,29 +17,27 @@ public class AndroidRushQueProvider implements RushQueProvider {
     public AndroidRushQueProvider() {
         ques.add(new AndroidRushQue());
     }
-
+    
     @Override
     public RushQue blockForNextQue() {
         synchronized (syncToken) {
             while (ques.size() < 1) {
-                    try {
-                        syncToken.wait();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-
+                try {
+                    syncToken.wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
             return ques.remove(0);
         }
     }
-
+    
     @Override
     public void waitForNextQue(final RushQueCallback rushQueCallback) {
         new Thread(new Runnable() {
             @Override
             public void run() {
                 rushQueCallback.callback(blockForNextQue());
-
             }
         }).start();
     }
