@@ -6,9 +6,17 @@
    <version>1.0.4</version>
    <packaging>jar</packaging>
    <name>RushAndroid</name>
+   <description>Object-relational mapping for Android</description>
+   <url>http://www.rushorm.com</url>
    <properties>
       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
    </properties>
+   <distributionManagement>
+      <repository>
+         <id>rushorm</id>
+         <url>file:../../Server/rush-website/maven/</url>
+      </repository>
+   </distributionManagement>
    <build>
       <resources>
          <resource>
@@ -34,7 +42,6 @@
             </configuration>
             <extensions>true</extensions>
          </plugin>
-         
          <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>build-helper-maven-plugin</artifactId>
@@ -62,8 +69,57 @@
                <target>1.7</target>
             </configuration>
          </plugin>
+         <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-source-plugin</artifactId>
+            <version>2.4</version>
+            <configuration>
+               <sourcepath>RushORM/rushandroid/src/main;RushORM/rushcore/src/main</sourcepath>
+            </configuration>
+            <executions>
+               <execution>
+                  <id>attach-sources</id>
+                  <goals>
+                     <goal>jar</goal>
+                  </goals>
+               </execution>
+            </executions>
+         </plugin>
+         <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <version>2.10.1</version>
+            <configuration>
+               <sourcepath>RushORM/rushandroid/src/main;RushORM/rushcore/src/main</sourcepath>
+            </configuration>
+            <executions>
+               <execution>
+                  <id>attach-javadocs</id>
+                  <goals>
+                     <goal>jar</goal>
+                  </goals>
+               </execution>
+            </executions>
+         </plugin>
       </plugins>
    </build>
+   <licenses>
+      <license>
+         <name>Apache License, Version 2.0</name>
+         <distribution>repo</distribution>
+         <url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
+      </license>
+   </licenses>
+   <developers>
+      <developer>
+         <name>Stuart Campbell</name>
+      </developer>
+   </developers>
+   <scm>
+      <connection>scm:git:git@github.com:Stuart-campbell/RushOrm.git</connection>
+      <developerConnection>scm:git:git@github.com:Stuart-campbell/RushOrm.git</developerConnection>
+      <url>git@github.com:Stuart-campbell/RushOrm.git</url>
+   </scm>
    <dependencies>
       <dependency>
          <groupId>com.google.android</groupId>
@@ -72,11 +128,4 @@
          <scope>provided</scope>
       </dependency>
    </dependencies>
-   <licenses>
-      <license>
-         <name>Apache License, Version 2.0</name>
-         <distribution>repo</distribution>
-         <url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
-      </license>
-   </licenses>
 </project>
