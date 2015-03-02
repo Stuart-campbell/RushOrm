@@ -1,1 +1,1 @@
-include ':app',/* ':rushcore',*/ ':rushandroid'
+include ':app', ':rushcore', ':rushandroid'

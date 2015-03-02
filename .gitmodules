@@ -1,0 +1,3 @@
+[submodule "RushORM/RushCore"]
+	path = RushORM/RushCore
+	url = https://Stuart-campbell@github.com/Stuart-campbell/RushCore.git
