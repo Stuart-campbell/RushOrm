@@ -24,11 +24,8 @@ public class AndroidRushConfig implements RushConfig {
     private boolean debug;
     private boolean log;
     private boolean requiresTableAnnotation;
-    private boolean upgrade;
-    private final Context context;
 
     public AndroidRushConfig(Context context) {
-        this.context = context;
         try {
             ApplicationInfo ai = context.getPackageManager().getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA);
             Bundle bundle = ai.metaData;
@@ -42,10 +39,6 @@ public class AndroidRushConfig implements RushConfig {
         }
     }
 
-    public void setLastRunVersion(int version) {
-        upgrade = dbVersion != version;
-    }
-
     @Override
     public String dbName() {
         return dbName;
@@ -54,22 +47,6 @@ public class AndroidRushConfig implements RushConfig {
     @Override
     public int dbVersion() {
         return dbVersion;
-    }
-
-    @Override
-    public boolean firstRun() {
-        String[] databases = context.databaseList();
-        for (String database : databases) {
-            if(database.equals(dbName())) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    @Override
-    public boolean upgrade() {
-        return upgrade;
     }
 
     @Override
@@ -85,5 +62,10 @@ public class AndroidRushConfig implements RushConfig {
     @Override
     public boolean requireTableAnnotation() {
         return requiresTableAnnotation;
+    }
+
+    @Override
+    public boolean usingMySql() {
+        return false;
     }
 }

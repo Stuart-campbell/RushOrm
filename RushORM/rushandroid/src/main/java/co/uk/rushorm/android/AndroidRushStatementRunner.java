@@ -22,11 +22,13 @@ public class AndroidRushStatementRunner extends SQLiteOpenHelper implements Rush
 
     private int lastRunVersion = -1;
     private RushConfig rushConfig;
-
+    private final Context context;
+    
     public AndroidRushStatementRunner(Context context, String name, RushConfig rushConfig) {
         super(context, name, null, rushConfig.dbVersion());
         lastRunVersion = rushConfig.dbVersion();
         this.rushConfig = rushConfig;
+        this.context = context;
     }
 
     @Override
@@ -89,6 +91,27 @@ public class AndroidRushStatementRunner extends SQLiteOpenHelper implements Rush
     }
 
     @Override
+    public boolean isFirstRun() {
+        String[] databases = context.databaseList();
+        for (String database : databases) {
+            if(database.equals(rushConfig.dbName())) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public void initializeComplete(long version) {
+
+    }
+
+    @Override
+    public boolean requiresUpgrade(long version, RushQue que) {
+        return getLastRunVersion() != version;
+    }
+
+    @Override
     public void onCreate(SQLiteDatabase db) {}
 
     @Override
@@ -96,7 +119,7 @@ public class AndroidRushStatementRunner extends SQLiteOpenHelper implements Rush
         lastRunVersion = oldVersion;
     }
 
-    public int getLastRunVersion(){
+    private int getLastRunVersion(){
         if(lastRunVersion < 0) {
             getReadableDatabase();
         }

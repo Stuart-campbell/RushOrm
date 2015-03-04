@@ -31,7 +31,6 @@ public class RushAndroid {
         RushStringSanitizer rushStringSanitizer = new AndroidRushStringSanitizer();
         RushClassFinder rushClassFinder = new AndroidRushClassFinder(applicationContext, logger);
         AndroidRushStatementRunner statementRunner = new AndroidRushStatementRunner(applicationContext, rushConfig.dbName(), rushConfig);
-        rushConfig.setLastRunVersion(statementRunner.getLastRunVersion());
         RushQueProvider queProvider = new AndroidRushQueProvider();
         RushObjectDeserializer rushObjectDeserializer = new AndroidJSONDeserializer();
         RushObjectSerializer rushObjectSerializer = new AndroidJSONSerializer();
