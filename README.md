@@ -50,7 +50,7 @@ Add the specific repository to your build file:
 Add the dependency in your build file:
 
     dependencies {
-       compile 'co.uk.rushorm:rushandroid:1.0.4'
+       compile 'co.uk.rushorm:rushandroid:1.0.5'
     }
 
 <hr>
