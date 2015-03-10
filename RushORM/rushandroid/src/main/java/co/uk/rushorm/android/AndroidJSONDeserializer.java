@@ -4,6 +4,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -24,19 +25,19 @@ import co.uk.rushorm.core.implementation.ReflectionUtils;
 public class AndroidJSONDeserializer implements RushObjectDeserializer {
 
     @Override
-    public List<Rush> deserialize(String string, String idName, String versionName, RushColumns rushColumns, Map<Class, AnnotationCache> annotationCache, Callback callback) {
-
+    public <T extends Rush> List<T> deserialize(String string, String idName, String versionName, RushColumns rushColumns, Map<Class<? extends Rush>, AnnotationCache> annotationCache, Class<T> clazz, Callback callback) {
         try {
             JSONObject jsonObject = new JSONObject(string);
             Iterator<String> stringIterator = jsonObject.keys();
 
-            List<Rush> objects = new ArrayList<>();
+            List<T> objects = new ArrayList<>();
             while(stringIterator.hasNext()) {
                 String className = stringIterator.next();
-                Class clazz = classFromString(className, annotationCache);
+                Class<? extends Rush> objectClazz = classFromString(className, annotationCache);
                 if(clazz != null) {
                     JSONArray jsonArray = jsonObject.getJSONArray(className);
-                    objects.addAll(deserializeJSONArray(jsonArray, idName, versionName, clazz, rushColumns, annotationCache, callback));
+                    List<? extends Rush> objectList = deserializeJSONArray(jsonArray, idName, versionName, objectClazz, ArrayList.class, rushColumns, annotationCache, callback);
+                    objects.addAll((List<? extends T>) objectList);
                 }
             }
             return objects;
@@ -47,8 +48,8 @@ public class AndroidJSONDeserializer implements RushObjectDeserializer {
         return null;
     }
 
-    private Class classFromString(String name, Map<Class, AnnotationCache> annotationCache) {
-        for (Map.Entry<Class, AnnotationCache> entry : annotationCache.entrySet()) {
+    private Class<? extends Rush> classFromString(String name, Map<Class<? extends Rush>, AnnotationCache> annotationCache) {
+        for (Map.Entry<Class<? extends Rush>, AnnotationCache> entry : annotationCache.entrySet()) {
             if(entry.getValue().getSerializationName().equals(name)) {
                 return entry.getKey();
             }          
@@ -56,12 +57,19 @@ public class AndroidJSONDeserializer implements RushObjectDeserializer {
         return null;
     }
     
-    private List<Rush> deserializeJSONArray(JSONArray jsonArray, String idName, String versionName, Class<? extends Rush> clazz, RushColumns rushColumns, Map<Class, AnnotationCache> annotationCache, Callback callback) throws JSONException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+    private <T extends Rush> List<T> deserializeJSONArray(JSONArray jsonArray, String idName, String versionName, Class<T> clazz, Class<? extends List> listClazz, RushColumns rushColumns, Map<Class<? extends Rush>, AnnotationCache> annotationCache, Callback callback) throws JSONException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         if(jsonArray.length() < 1){
             return null;
         }
 
-        List<Rush> objects = new ArrayList<>();
+        List<T> objects;
+        try {
+            Constructor<? extends List> constructor = listClazz.getConstructor();
+            objects = constructor.newInstance();
+        } catch (InstantiationException | InvocationTargetException | NoSuchMethodException e) {
+            e.printStackTrace();
+            objects = new ArrayList<>();
+        }
         for (int i = 0; i < jsonArray.length(); i ++) {
             JSONObject jsonObject = jsonArray.getJSONObject(i);
             objects.add(deserializeJSONObject(jsonObject, idName, versionName, clazz, rushColumns, annotationCache, callback));
@@ -69,12 +77,12 @@ public class AndroidJSONDeserializer implements RushObjectDeserializer {
         return objects;
     }
 
-    private Rush deserializeJSONObject(JSONObject object, String idName, String versionName, Class<? extends Rush> clazz, RushColumns rushColumns, Map<Class, AnnotationCache> annotationCache, Callback callback) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException, JSONException {
+    private <T extends Rush> T deserializeJSONObject(JSONObject object, String idName, String versionName, Class<T> clazz, RushColumns rushColumns, Map<Class<? extends Rush>, AnnotationCache> annotationCache, Callback callback) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException, JSONException {
 
         List<Field> fields = new ArrayList<>();
         ReflectionUtils.getAllFields(fields, clazz);
 
-        Rush rush = clazz.getConstructor().newInstance();
+        T rush = clazz.getConstructor().newInstance();
 
         for (Field field : fields) {
             if (!annotationCache.get(clazz).getFieldToIgnore().contains(field.getName()) && object.has(field.getName())) {
@@ -83,10 +91,11 @@ public class AndroidJSONDeserializer implements RushObjectDeserializer {
                     JSONObject childJSONObject = object.getJSONObject(field.getName());
                     Rush child = deserializeJSONObject(childJSONObject, idName, versionName, (Class<? extends Rush>) field.getType(), rushColumns, annotationCache, callback);
                     field.set(rush, child);
-                } else if (annotationCache.get(clazz).getListsFields().containsKey(field.getName())) {
-                    Class childClazz = annotationCache.get(clazz).getListsFields().get(field.getName());
+                } else if (annotationCache.get(clazz).getListsClasses().containsKey(field.getName())) {
+                    Class childClazz = annotationCache.get(clazz).getListsClasses().get(field.getName());
+                    Class listClazz = annotationCache.get(clazz).getListsTypes().get(field.getName());
                     JSONArray jsonArray = object.getJSONArray(field.getName());
-                    List<Rush> children = deserializeJSONArray(jsonArray, idName, versionName, childClazz, rushColumns, annotationCache, callback);
+                    List<? extends Rush> children = deserializeJSONArray(jsonArray, idName, versionName, childClazz, listClazz, rushColumns, annotationCache, callback);
                     field.set(rush, children);
                 } else if (rushColumns.supportsField(field)) {
                     String value = object.getString(field.getName());

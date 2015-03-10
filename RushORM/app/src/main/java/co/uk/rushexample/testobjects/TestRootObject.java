@@ -12,7 +12,7 @@ import co.uk.rushorm.core.annotations.RushTableAnnotation;
 @RushTableAnnotation
 public class TestRootObject extends RushObject {
 
-    @RushList(classname = "co.uk.rushexample.testobjects.TestObject")
+    @RushList(classType = TestObject.class)
     public List<TestObject> objects;
 
 }

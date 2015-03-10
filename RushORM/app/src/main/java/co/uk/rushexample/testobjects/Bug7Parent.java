@@ -13,7 +13,7 @@ import co.uk.rushorm.core.annotations.RushTableAnnotation;
 @RushTableAnnotation
 public class Bug7Parent extends RushObject {
 
-    @RushList(classname = "co.uk.rushexample.testobjects.Bug7Child")
+    @RushList(classType = Bug7Child.class)
     private List<Bug7Child> children;
 
     public Bug7Parent() {

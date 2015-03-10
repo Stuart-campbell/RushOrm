@@ -20,6 +20,6 @@ public class TestUpgrade3 extends RushObject {
 
     public TestUpgrade5 testBase2;
 
-    @RushList(classname = "co.uk.rushexample.testobjects.TestUpgrade5")
+    @RushList(classType = TestUpgrade5.class)
     public List<TestUpgrade5> testBase2List;
 }

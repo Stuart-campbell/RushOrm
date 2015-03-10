@@ -32,7 +32,7 @@ public class TestObject extends RushObject {
     @RushIgnore
     public String ignoredField;
 
-    @RushList(classname = "co.uk.rushexample.testobjects.TestChildObject")
+    @RushList(classType = TestChildObject.class)
     public List<TestChildObject> children;
 
 }

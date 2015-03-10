@@ -19,6 +19,6 @@ public class TestBase1 extends RushObject {
     public TestBase2 testBase2;
 
 
-    @RushList(classname = "co.uk.rushexample.testobjects.TestBase2")
+    @RushList(classType = TestBase2.class)
     public List<TestBase2> testBase2List;
 }
