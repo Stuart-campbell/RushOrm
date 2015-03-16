@@ -366,4 +366,61 @@ public class SearchTests extends ApplicationTestCase<Application> {
         TestObject firstChild = loadedObjects.get(0);
         assertTrue(firstChild.intField == 6);
     }
+
+    public void testWhereChildOf() throws Exception {
+
+        TestObject testObject = new TestObject();
+        testObject.children = new ArrayList<>();
+        testObject.children.add(new TestChildObject());
+        testObject.save();
+
+        List<TestChildObject> testChildObject = new RushSearch().whereChildOf(testObject, "children").find(TestChildObject.class);
+        assertTrue(testChildObject.size() == 1);
+
+    }
+
+    public void testWhereChildOf2() throws Exception {
+
+        TestObject testObject = new TestObject();
+        testObject.children = new ArrayList<>();
+        testObject.children.add(new TestChildObject());
+        testObject.save();
+
+        new TestChildObject().save();
+
+        List<TestChildObject> testChildObject = new RushSearch().whereChildOf(testObject, "children").find(TestChildObject.class);
+        assertTrue(testChildObject.size() == 1);
+
+    }
+
+    public void testLimit() throws Exception {
+
+        List<TestObject> list = new ArrayList<>();
+        for (int i = 0; i < 1000; i++) {
+            TestObject testObject = new TestObject();
+            testObject.intField = i;
+            list.add(testObject);
+        }
+
+        RushCore.getInstance().save(list);
+
+        List<TestObject> testObjects = new RushSearch().limit(100).find(TestObject.class);
+        assertTrue(testObjects.size() == 100);
+    }
+
+    public void testOffsetLimit() throws Exception {
+
+        List<TestObject> list = new ArrayList<>();
+        for (int i = 0; i < 1000; i++) {
+            TestObject testObject = new TestObject();
+            testObject.intField = i;
+            list.add(testObject);
+        }
+
+        RushCore.getInstance().save(list);
+
+        List<TestObject> testObjects = new RushSearch().limit(100).offset(100).find(TestObject.class);
+        assertTrue(testObjects.get(0).intField == 100 && testObjects.size() == 100);
+    }
+
 }

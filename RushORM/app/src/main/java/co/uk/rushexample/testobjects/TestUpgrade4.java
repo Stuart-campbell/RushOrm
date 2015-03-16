@@ -26,6 +26,6 @@ public class TestUpgrade4 extends RushObject {
     @RushRenamed(names = {"testBase2"})
     public TestUpgrade5 testUpgrade5;
     @RushRenamed(names = {"testBase2List"})
-    @RushList(classname = "co.uk.rushexample.testobjects.TestUpgrade5")
+    @RushList(classType = TestUpgrade5.class)
     public List<TestUpgrade5> testUpgrade5List;
 }

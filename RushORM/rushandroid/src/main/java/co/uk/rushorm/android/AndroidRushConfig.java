@@ -29,11 +29,11 @@ public class AndroidRushConfig implements RushConfig {
         try {
             ApplicationInfo ai = context.getPackageManager().getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA);
             Bundle bundle = ai.metaData;
-            dbVersion = bundle.containsKey(VERSION_KEY) ? bundle.getInt(VERSION_KEY) : 1;
-            dbName = bundle.containsKey(NAME_KEY) ? bundle.getString(NAME_KEY) : DEFAULT_NAME;
-            debug = bundle.containsKey(DEBUG_KEY) && bundle.getBoolean(DEBUG_KEY);
-            log = bundle.containsKey(LOG_KEY) && bundle.getBoolean(LOG_KEY);
-            requiresTableAnnotation = bundle.containsKey(REQUIRE_TABLE_ANNOTATION_KEY) && bundle.getBoolean(REQUIRE_TABLE_ANNOTATION_KEY);
+            dbVersion = bundle != null && bundle.containsKey(VERSION_KEY) ? bundle.getInt(VERSION_KEY) : 1;
+            dbName = bundle != null && bundle.containsKey(NAME_KEY) ? bundle.getString(NAME_KEY) : DEFAULT_NAME;
+            debug = bundle != null && bundle.containsKey(DEBUG_KEY) && bundle.getBoolean(DEBUG_KEY);
+            log = bundle != null && bundle.containsKey(LOG_KEY) && bundle.getBoolean(LOG_KEY);
+            requiresTableAnnotation = bundle != null && bundle.containsKey(REQUIRE_TABLE_ANNOTATION_KEY) && bundle.getBoolean(REQUIRE_TABLE_ANNOTATION_KEY);
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }

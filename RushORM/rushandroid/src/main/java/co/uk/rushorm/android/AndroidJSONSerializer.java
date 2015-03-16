@@ -31,7 +31,7 @@ public class AndroidJSONSerializer implements RushObjectSerializer {
     };
 
     @Override
-    public String serialize(List<? extends Rush> objects, String idName, String versionName, RushColumns rushColumns, Map<Class, AnnotationCache> annotationCache, Callback callback) {
+    public String serialize(List<? extends Rush> objects, String idName, String versionName, RushColumns rushColumns, Map<Class<? extends Rush>, AnnotationCache> annotationCache, Callback callback) {
 
         Map<Class, JSONArray> arraysMap = new HashMap<>();
 
@@ -60,7 +60,7 @@ public class AndroidJSONSerializer implements RushObjectSerializer {
         return jsonObject.toString();
     }
 
-    private JSONArray serializeToJSONArray(List<? extends Rush> objects, String idName, String versionName, RushColumns rushColumns, Map<Class, AnnotationCache> annotationCache, RushStringSanitizer rushStringSanitizer, Callback callback) throws JSONException, IllegalAccessException {
+    private JSONArray serializeToJSONArray(List<? extends Rush> objects, String idName, String versionName, RushColumns rushColumns, Map<Class<? extends Rush>, AnnotationCache> annotationCache, RushStringSanitizer rushStringSanitizer, Callback callback) throws JSONException, IllegalAccessException {
 
         JSONArray jsonArray = new JSONArray();
         if(objects != null) {
@@ -71,7 +71,7 @@ public class AndroidJSONSerializer implements RushObjectSerializer {
         return jsonArray;
     }
 
-    private JSONObject serializeToJSONObject(Rush rush, String idName, String versionName, RushColumns rushColumns, Map<Class, AnnotationCache> annotationCache, RushStringSanitizer rushStringSanitizer, Callback callback) throws IllegalAccessException, JSONException {
+    private JSONObject serializeToJSONObject(Rush rush, String idName, String versionName, RushColumns rushColumns, Map<Class<? extends Rush>, AnnotationCache> annotationCache, RushStringSanitizer rushStringSanitizer, Callback callback) throws IllegalAccessException, JSONException {
 
         if(rush == null) {
             return null;
@@ -93,7 +93,7 @@ public class AndroidJSONSerializer implements RushObjectSerializer {
                 if (Rush.class.isAssignableFrom(field.getType())) {
                     JSONObject object = serializeToJSONObject((Rush) field.get(rush), idName, versionName, rushColumns, annotationCache, rushStringSanitizer, callback);
                     jsonObject.put(field.getName(), object);
-                } else if (annotationCache.get(rush.getClass()).getListsFields().containsKey(field.getName())) {
+                } else if (annotationCache.get(rush.getClass()).getListsClasses().containsKey(field.getName())) {
                     JSONArray array = serializeToJSONArray((List<Rush>) field.get(rush), idName, versionName, rushColumns, annotationCache, rushStringSanitizer, callback);
                     jsonObject.put(field.getName(), array);
                 } else if (rushColumns.supportsField(field)) {

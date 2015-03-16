@@ -15,7 +15,7 @@ public class Car extends RushObject {
     public String color;
     public Engine engine;
 
-    @RushList(classname = "co.uk.rushexample.demo.Wheel")
+    @RushList(classType = Wheel.class)
     public List<Wheel> wheels;
 
     public Car(){
