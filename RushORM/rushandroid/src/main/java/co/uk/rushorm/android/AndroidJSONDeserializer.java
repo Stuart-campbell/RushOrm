@@ -26,11 +26,12 @@ public class AndroidJSONDeserializer implements RushObjectDeserializer {
 
     @Override
     public <T extends Rush> List<T> deserialize(String string, String idName, String versionName, RushColumns rushColumns, Map<Class<? extends Rush>, AnnotationCache> annotationCache, Class<T> clazz, Callback callback) {
+
+        List<T> objects = new ArrayList<>();
         try {
             JSONObject jsonObject = new JSONObject(string);
             Iterator<String> stringIterator = jsonObject.keys();
 
-            List<T> objects = new ArrayList<>();
             while(stringIterator.hasNext()) {
                 String className = stringIterator.next();
                 Class<? extends Rush> objectClazz = classFromString(className, annotationCache);
@@ -40,12 +41,12 @@ public class AndroidJSONDeserializer implements RushObjectDeserializer {
                     objects.addAll((List<? extends T>) objectList);
                 }
             }
-            return objects;
+
         } catch (JSONException | InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             e.printStackTrace();
         }
 
-        return null;
+        return objects;
     }
 
     private Class<? extends Rush> classFromString(String name, Map<Class<? extends Rush>, AnnotationCache> annotationCache) {

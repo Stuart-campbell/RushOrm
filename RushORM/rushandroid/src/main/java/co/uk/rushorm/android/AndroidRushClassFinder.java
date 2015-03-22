@@ -32,17 +32,17 @@ public class AndroidRushClassFinder implements RushClassFinder {
     }
 
     @Override
-    public List<Class> findClasses(RushConfig rushConfig) {
-        return getDomainClasses(content, rushConfig);
+    public List<Class<? extends Rush>> findClasses(RushConfig rushConfig) {
+        return getRushClasses(content, rushConfig);
     }
 
     /* Loading classes code */
 
-    private List<Class> getDomainClasses(Context context, RushConfig rushConfig) {
-        List<Class> domainClasses = new ArrayList<Class>();
+    private List<Class<? extends Rush>> getRushClasses(Context context, RushConfig rushConfig) {
+        List<Class<? extends Rush>> domainClasses = new ArrayList<>();
         try {
             for (String className : getAllClasses(context)) {
-                Class domainClass = getRushClass(className, context, rushConfig);
+                Class<? extends Rush> domainClass = getRushClass(className, context, rushConfig);
                 if (domainClass != null) domainClasses.add(domainClass);
 
             }
@@ -52,7 +52,7 @@ public class AndroidRushClassFinder implements RushClassFinder {
         return domainClasses;
     }
 
-    private Class getRushClass(String className, Context context, RushConfig rushConfig) {
+    private Class<? extends Rush> getRushClass(String className, Context context, RushConfig rushConfig) {
         Class<?> discoveredClass = null;
         try {
             discoveredClass = Class.forName(className, true, context.getClass().getClassLoader());
@@ -66,7 +66,7 @@ public class AndroidRushClassFinder implements RushClassFinder {
              && (discoveredClass.isAnnotationPresent(RushTableAnnotation.class) || !rushConfig.requireTableAnnotation())
              && !Modifier.isAbstract(discoveredClass.getModifiers())) {
 
-            return discoveredClass;
+            return (Class<? extends Rush>) discoveredClass;
 
         } else {
             return null;

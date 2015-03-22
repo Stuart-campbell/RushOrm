@@ -101,6 +101,15 @@ public class SerializationTests extends ApplicationTestCase<Application> {
         assertTrue(deserialized.children.size() == 1000);
     }
 
+    public void testDeserialize0() throws Exception {
+
+        List<TestObject> objects = new ArrayList<>();
+        String jsonString = RushCore.getInstance().serialize(objects);
+
+        List<Rush> deserializeObject = RushCore.getInstance().deserialize(jsonString);
+        assertTrue(deserializeObject.size() == 0);
+    }
+
     public void testSerializeMix() throws Exception {
 
         TestObject testObject = new TestObject();
