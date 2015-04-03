@@ -20,20 +20,22 @@ public class AndroidLogger implements Logger {
 
     @Override
     public void log(String message) {
-        if(rushConfig.log()) {
+        if(rushConfig.log() && message != null) {
             Log.i(TAG, message);
         }
     }
 
     @Override
     public void logSql(String sql) {
-        if(rushConfig.log()) {
+        if(rushConfig.log() && sql != null) {
             Log.d(TAG, sql);
         }
     }
 
     @Override
     public void logError(String message) {
-        Log.e(TAG, message);
+        if(message != null) {
+            Log.e(TAG, message);
+        }
     }
 }
