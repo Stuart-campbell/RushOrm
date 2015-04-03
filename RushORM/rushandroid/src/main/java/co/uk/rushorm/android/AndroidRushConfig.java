@@ -3,6 +3,7 @@ package co.uk.rushorm.android;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 
 import co.uk.rushorm.core.RushConfig;
@@ -67,5 +68,10 @@ public class AndroidRushConfig implements RushConfig {
     @Override
     public boolean usingMySql() {
         return false;
+    }
+
+    @Override
+    public boolean userBulkInsert() {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN;
     }
 }
