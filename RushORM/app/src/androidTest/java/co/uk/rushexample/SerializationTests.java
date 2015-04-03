@@ -11,7 +11,10 @@ import co.uk.rushexample.testobjects.TestChildObject;
 import co.uk.rushexample.testobjects.TestObject;
 import co.uk.rushorm.android.RushAndroid;
 import co.uk.rushorm.core.Rush;
+import co.uk.rushorm.core.RushColumn;
+import co.uk.rushorm.core.RushColumns;
 import co.uk.rushorm.core.RushCore;
+import co.uk.rushorm.core.implementation.RushColumnBooleanNumerical;
 
 /**
  * Created by Stuart on 18/02/15.
@@ -144,6 +147,13 @@ public class SerializationTests extends ApplicationTestCase<Application> {
         String jsonString = RushCore.getInstance().serialize(objects);
         List<Rush> deserializeObject = RushCore.getInstance().deserialize(jsonString);
         assertTrue(deserializeObject.size() == 3);
+    }
+
+    public void testBoolDeserialize() throws Exception {
+
+        RushColumnBooleanNumerical column = new RushColumnBooleanNumerical();
+        Boolean value = column.deserialize("true");
+        assertTrue(value);
     }
 
 }
