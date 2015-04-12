@@ -14,6 +14,7 @@ import co.uk.rushorm.core.Rush;
 import co.uk.rushorm.core.RushColumn;
 import co.uk.rushorm.core.RushColumns;
 import co.uk.rushorm.core.RushCore;
+import co.uk.rushorm.core.RushSearch;
 import co.uk.rushorm.core.implementation.RushColumnBooleanNumerical;
 
 /**
@@ -154,6 +155,21 @@ public class SerializationTests extends ApplicationTestCase<Application> {
         RushColumnBooleanNumerical column = new RushColumnBooleanNumerical();
         Boolean value = column.deserialize("true");
         assertTrue(value);
+    }
+
+    public void testRegisteringObject() throws Exception {
+
+        TestObject testObject = new TestObject();
+        RushCore.getInstance().registerObjectWithId(testObject, "1");
+        testObject.save();
+
+        TestObject testObject2 = new TestObject();
+        RushCore.getInstance().registerObjectWithId(testObject2, "1");
+        testObject2.save();
+
+        List<TestObject> objects = new RushSearch().find(TestObject.class);
+
+        assertTrue(objects.size() == 1);
     }
 
 }
