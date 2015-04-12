@@ -10,7 +10,7 @@ import co.uk.rushorm.core.annotations.RushTableAnnotation;
 public class Engine extends RushObject {
 
     public Engine(){
-         /* Empty constructor required by SugarORM */
+         /* Empty constructor required */
     }
 
     public int cylinders;
