@@ -10,7 +10,7 @@ import co.uk.rushorm.core.annotations.RushTableAnnotation;
 public class Wheel extends RushObject {
 
     public Wheel(){
-         /* Empty constructor required by SugarORM */
+         /* Empty constructor required */
     }
 
     public String make;

@@ -19,7 +19,7 @@ public class Car extends RushObject {
     public List<Wheel> wheels;
 
     public Car(){
-        /* Empty constructor required by SugarORM */
+        /* Empty constructor required */
     }
 
     public Car(String color, Engine engine){
