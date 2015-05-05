@@ -15,6 +15,8 @@ public class Car extends RushObject {
     public String color;
     public Engine engine;
 
+    public String anotherField;
+
     @RushList(classType = Wheel.class)
     public List<Wheel> wheels;
 

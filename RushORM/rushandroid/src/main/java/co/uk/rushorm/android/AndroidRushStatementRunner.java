@@ -120,10 +120,7 @@ public class AndroidRushStatementRunner extends SQLiteOpenHelper implements Rush
     }
 
     private int getLastRunVersion(){
-        if(lastRunVersion < 0) {
-            getReadableDatabase();
-        }
+        getReadableDatabase().getVersion();
         return lastRunVersion;
     }
-
 }
