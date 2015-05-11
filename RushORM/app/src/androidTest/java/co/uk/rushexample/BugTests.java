@@ -3,6 +3,9 @@ package co.uk.rushexample;
 import android.app.Application;
 import android.test.ApplicationTestCase;
 
+import java.util.List;
+
+import co.uk.rushexample.testobjects.Bug34;
 import co.uk.rushexample.testobjects.Bug6;
 import co.uk.rushexample.testobjects.Bug7Child;
 import co.uk.rushexample.testobjects.Bug7Parent;
@@ -61,5 +64,15 @@ public class BugTests extends ApplicationTestCase<Application> {
         parent = new RushSearch().find(Bug7Parent.class).get(0);
         
         assertNotNull(parent.getChildren().get(0).getString().equals("test1"));
+    }
+
+    public void testBug34() throws Exception {
+
+        Bug34 object = new Bug34();
+        object.save();
+
+        List<Bug34> loaded = new RushSearch().find(Bug34.class);
+
+        assertTrue(loaded.size() == 1);
     }
 }
