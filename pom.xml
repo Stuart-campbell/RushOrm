@@ -3,7 +3,7 @@
    <modelVersion>4.0.0</modelVersion>
    <groupId>co.uk.rushorm</groupId>
    <artifactId>rushandroid</artifactId>
-   <version>1.1.5</version>
+   <version>1.1.6</version>
    <packaging>jar</packaging>
    <name>RushAndroid</name>
    <description>Object-relational mapping for Android</description>
