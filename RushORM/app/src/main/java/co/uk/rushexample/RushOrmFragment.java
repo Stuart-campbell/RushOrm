@@ -108,7 +108,8 @@ public class RushOrmFragment extends Fragment {
                 @Override
                 public void run() {
 
-                    int count = getCars().size();
+                    List<Car> cars = getCars();
+                    int count = cars.size();
 
                     final int loading = count;
                     getActivity().runOnUiThread(new Runnable() {
