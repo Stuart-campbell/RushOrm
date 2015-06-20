@@ -18,6 +18,7 @@ import co.uk.rushexample.demo.Engine;
 import co.uk.rushexample.demo.Wheel;
 import co.uk.rushorm.core.RushCallback;
 import co.uk.rushorm.core.RushCore;
+import co.uk.rushorm.core.RushPageList;
 import co.uk.rushorm.core.RushSearch;
 
 /**
@@ -93,10 +94,6 @@ public class RushOrmFragment extends Fragment {
         }
     };
 
-    private List<Car> getCars() {
-        return new RushSearch().find(Car.class);
-    }
-
     private View.OnClickListener loadListener = new View.OnClickListener() {
         @Override
         public void onClick(final View view) {
@@ -108,7 +105,12 @@ public class RushOrmFragment extends Fragment {
                 @Override
                 public void run() {
 
-                    List<Car> cars = getCars();
+                    // Loads all full objects
+                    List<Car> cars = new RushSearch().find(Car.class);
+
+                    // Lazy loads items as you go through the list iteal for large data sets
+                    //RushPageList<Car> cars = new RushPageList<>(Car.class);
+
                     int count = cars.size();
 
                     final int loading = count;
@@ -138,7 +140,9 @@ public class RushOrmFragment extends Fragment {
             new Thread() {
                 @Override
                 public void run() {
-                    RushCore.getInstance().delete(getCars());
+                    RushCore.getInstance().deleteAll(Car.class);
+                    RushCore.getInstance().deleteAll(Engine.class);
+                    RushCore.getInstance().deleteAll(Wheel.class);
                     getActivity().runOnUiThread(new Runnable() {
                         public void run() {
                             long endTime = System.currentTimeMillis();
