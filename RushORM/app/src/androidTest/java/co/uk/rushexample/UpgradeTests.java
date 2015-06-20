@@ -12,9 +12,11 @@ import java.util.concurrent.TimeUnit;
 import co.uk.rushexample.testobjects.MyClass;
 import co.uk.rushexample.testobjects.SetupObject;
 import co.uk.rushexample.testobjects.TestCustomColumn;
+import co.uk.rushorm.android.AndroidInitializeConfig;
 import co.uk.rushorm.android.AndroidJSONDeserializer;
 import co.uk.rushorm.android.AndroidJSONSerializer;
 import co.uk.rushorm.android.RushAndroid;
+import co.uk.rushorm.core.InitializeListener;
 import co.uk.rushorm.core.Logger;
 import co.uk.rushorm.core.Rush;
 import co.uk.rushorm.core.RushClassFinder;
@@ -474,31 +476,22 @@ public class UpgradeTests extends ApplicationTestCase<Application> {
 
     public static void initializeUpgrade(Context context, final List<Class<? extends Rush>> classes) throws InterruptedException {
 
-        Context applicationContext = context.getApplicationContext();
-
         classes.add(SetupObject.class);
-
-        RushConfig rushConfig = new AndroidRushConfig(applicationContext);
-        RushStringSanitizer rushStringSanitizer = new AndroidRushStringSanitizer();
-        RushStatementRunner statementRunner = new AndroidRushStatementRunner(applicationContext, rushConfig.dbName(), rushConfig);
-        RushQueProvider queProvider = new AndroidRushQueProvider();
-        Logger logger = new AndroidLogger(rushConfig);
-        RushObjectDeserializer rushObjectDeserializer = new AndroidJSONDeserializer();
-        RushObjectSerializer rushObjectSerializer = new AndroidJSONSerializer();
-
-
         final CountDownLatch latch = new CountDownLatch(1);
 
-        RushCore.initialize(new RushClassFinder() {
+        AndroidInitializeConfig androidInitializeConfig = new AndroidInitializeConfig(context);
+        androidInitializeConfig.setClasses(classes);
+        androidInitializeConfig.setInitializeListener(new InitializeListener() {
             @Override
-            public List<Class<? extends Rush>> findClasses(RushConfig rushConfig) {
-                return classes;
+            public void initialized(boolean firstRun) {
+                latch.countDown();
             }
-        }, statementRunner, queProvider, rushConfig, rushStringSanitizer, logger, new ArrayList<RushColumn>(), rushObjectSerializer, rushObjectDeserializer);
+        });
 
+        RushCore.initialize(androidInitializeConfig);
+
+        latch.await(10, TimeUnit.SECONDS);
         new SetupObject().save();
-
-        latch.await(2, TimeUnit.SECONDS);
     }
 
     public void testCustomColumn() throws Exception {
