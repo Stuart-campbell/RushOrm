@@ -9,8 +9,8 @@ import android.support.v4.widget.DrawerLayout;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import co.uk.rushexample.R;
-import co.uk.rushorm.android.RushAndroid;
+import co.uk.rushorm.android.AndroidInitializeConfig;
+import co.uk.rushorm.core.RushCore;
 
 public class MainActivity extends Activity implements NavigationDrawerFragment.NavigationDrawerCallbacks {
 
@@ -30,8 +30,9 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
             setContentView(R.layout.activity_main);
 
             // Would normally be in application class but was interfering with tests
-            RushAndroid.initialize(getApplicationContext());
-            
+            AndroidInitializeConfig config = new AndroidInitializeConfig(getApplicationContext());
+            RushCore.initialize(config);
+
             mNavigationDrawerFragment = (NavigationDrawerFragment)
                     getFragmentManager().findFragmentById(R.id.navigation_drawer);
             mTitle = getTitle();

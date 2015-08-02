@@ -423,4 +423,60 @@ public class SearchTests extends ApplicationTestCase<Application> {
         assertTrue(testObjects.get(0).intField == 100 && testObjects.size() == 100);
     }
 
+    public void testWhereIn() throws Exception {
+
+        List<TestObject> list = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            TestObject testObject = new TestObject();
+            testObject.intField = i;
+            list.add(testObject);
+        }
+
+        RushCore.getInstance().save(list);
+
+        List<String> ints = new ArrayList<>();
+        for (int i = 0; i < 10; i += 2) {
+            ints.add(Integer.toString(i));
+
+        }
+
+        List<TestObject> testObjects = new RushSearch().whereIN("intField", ints).find(TestObject.class);
+        assertTrue(testObjects.size() == 5);
+    }
+
+    public void testGroupBy() throws Exception {
+
+        List<TestObject> list = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            TestObject testObject = new TestObject();
+            testObject.intField = 0;
+            list.add(testObject);
+        }
+
+        RushCore.getInstance().save(list);
+
+        List<TestObject> testObjects = new RushSearch().groupBy("intField").find(TestObject.class);
+        assertTrue(testObjects.size() == 1);
+    }
+
+    public void testGroupByTest2() throws Exception {
+
+        List<TestObject> list = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            TestObject testObject = new TestObject();
+            testObject.intField = 0;
+            if(i % 2 == 0) {
+                testObject.stringField = "even";
+            } else {
+                testObject.stringField = "odd";
+            }
+            list.add(testObject);
+        }
+
+        RushCore.getInstance().save(list);
+
+        List<TestObject> testObjects = new RushSearch().groupBy("intField").groupBy("stringField").find(TestObject.class);
+        assertTrue(testObjects.size() == 2);
+    }
+
 }
