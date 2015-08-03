@@ -105,11 +105,8 @@ public class BugTests extends ApplicationTestCase<Application> {
         // It seems here 2 exactly the same E objects are saving
         bug29C.save();
 
-
-        // we have 4 objects here, expected 2
-        long count = new RushSearch().count(Bug29B.class);
-
-        assertTrue(count == 2);
+        Bug29A bug29ALoaded = new RushSearch().findSingle(Bug29A.class);
+        assertTrue(bug29ALoaded.bug29Bs.size() == 2);
     }
 
     public void testBug61() throws Exception {
