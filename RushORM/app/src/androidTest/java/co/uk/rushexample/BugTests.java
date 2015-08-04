@@ -90,19 +90,40 @@ public class BugTests extends ApplicationTestCase<Application> {
         Bug29B bug29B2 = new Bug29B("bug29B2");
         bug29B2.save();
 
-        // Create Bug29A object with the list of 2 Bug29B objects
-        Bug29A bug29A = new Bug29A("bug29A",
-                Arrays.asList(new RushSearch().whereEqual("name", "bug29B").findSingle(Bug29B.class),
-                        new RushSearch().whereEqual("name", "bug29B2").findSingle(Bug29B.class)));
+        Bug29A bug29A = new Bug29A("bug29A", Arrays.asList(
+                new RushSearch().whereEqual("name", "bug29B").findSingle(Bug29B.class),
+                new RushSearch().whereEqual("name", "bug29B2").findSingle(Bug29B.class)));
+
         bug29A.save();
 
-        // Create Bug29C object with the list of SAME Bug29A objects
-        // If we load Bug29A object once, and add to list, everything works OK
-        // But if we load exactly the same object twice, problem occurs.
-        Bug29C bug29C = new Bug29C(Arrays.asList(new RushSearch().whereEqual("name", "bug29A").findSingle(Bug29A.class),
+        Bug29C bug29C = new Bug29C(Arrays.asList(
+                new RushSearch().whereEqual("name", "bug29A").findSingle(Bug29A.class),
                 new RushSearch().whereEqual("name", "bug29A").findSingle(Bug29A.class)));
 
-        // It seems here 2 exactly the same E objects are saving
+        bug29C.save();
+
+        long count = new RushSearch().count(Bug29B.class);
+        assertTrue(count == 2);
+    }
+
+    public void testBug29test2() throws Exception {
+
+        Bug29B bug29B = new Bug29B("bug29B");
+        bug29B.save();
+
+        Bug29B bug29B2 = new Bug29B("bug29B2");
+        bug29B2.save();
+
+        Bug29A bug29A = new Bug29A("bug29A", Arrays.asList(
+                new RushSearch().whereEqual("name", "bug29B").findSingle(Bug29B.class),
+                new RushSearch().whereEqual("name", "bug29B2").findSingle(Bug29B.class)));
+
+        bug29A.save();
+
+        Bug29C bug29C = new Bug29C(Arrays.asList(
+                new RushSearch().whereEqual("name", "bug29A").findSingle(Bug29A.class),
+                new RushSearch().whereEqual("name", "bug29A").findSingle(Bug29A.class)));
+
         bug29C.save();
 
         Bug29A bug29ALoaded = new RushSearch().findSingle(Bug29A.class);
@@ -146,5 +167,4 @@ public class BugTests extends ApplicationTestCase<Application> {
                 && ladies.get(1).getlBug61Child().getSize().equals("B")
                 && ladies.get(1).getrBug61Child().getSize().equals("A"));
     }
-
 }
