@@ -13,6 +13,7 @@ import java.util.Map;
 import co.uk.rushorm.core.AnnotationCache;
 import co.uk.rushorm.core.Rush;
 import co.uk.rushorm.core.RushColumns;
+import co.uk.rushorm.core.RushConfig;
 import co.uk.rushorm.core.RushMetaData;
 import co.uk.rushorm.core.RushObjectSerializer;
 import co.uk.rushorm.core.RushStringSanitizer;
@@ -23,12 +24,18 @@ import co.uk.rushorm.core.implementation.ReflectionUtils;
  */
 public class AndroidJSONSerializer implements RushObjectSerializer {
 
+    private final RushConfig rushConfig;
+
     private static final RushStringSanitizer rushStringSanitizer = new RushStringSanitizer() {
         @Override
         public String sanitize(String string) {
             return string;
         }
     };
+
+    public AndroidJSONSerializer(RushConfig rushConfig) {
+        this.rushConfig = rushConfig;
+    }
 
     @Override
     public String serialize(List<? extends Rush> objects, String idName, String versionName, RushColumns rushColumns, Map<Class<? extends Rush>, AnnotationCache> annotationCache, Callback callback) {
@@ -85,7 +92,7 @@ public class AndroidJSONSerializer implements RushObjectSerializer {
         }
 
         List<Field> fields = new ArrayList<>();
-        ReflectionUtils.getAllFields(fields, rush.getClass());
+        ReflectionUtils.getAllFields(fields, rush.getClass(), rushConfig.orderColumnsAlphabetically());
 
         for (Field field : fields) {
             if (!annotationCache.get(rush.getClass()).getFieldToIgnore().contains(field.getName())) {

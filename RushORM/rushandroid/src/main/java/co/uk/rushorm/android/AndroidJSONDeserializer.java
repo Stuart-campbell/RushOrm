@@ -15,6 +15,7 @@ import java.util.Map;
 import co.uk.rushorm.core.AnnotationCache;
 import co.uk.rushorm.core.Rush;
 import co.uk.rushorm.core.RushColumns;
+import co.uk.rushorm.core.RushConfig;
 import co.uk.rushorm.core.RushMetaData;
 import co.uk.rushorm.core.RushObjectDeserializer;
 import co.uk.rushorm.core.implementation.ReflectionUtils;
@@ -23,6 +24,12 @@ import co.uk.rushorm.core.implementation.ReflectionUtils;
  * Created by Stuart on 18/02/15.
  */
 public class AndroidJSONDeserializer implements RushObjectDeserializer {
+
+    private final RushConfig rushConfig;
+
+    public AndroidJSONDeserializer(RushConfig rushConfig) {
+        this.rushConfig = rushConfig;
+    }
 
     @Override
     public <T extends Rush> List<T> deserialize(String string, String idName, String versionName, RushColumns rushColumns, Map<Class<? extends Rush>, AnnotationCache> annotationCache, Class<T> clazz, Callback callback) {
@@ -81,7 +88,7 @@ public class AndroidJSONDeserializer implements RushObjectDeserializer {
     private <T extends Rush> T deserializeJSONObject(JSONObject object, String idName, String versionName, Class<T> clazz, RushColumns rushColumns, Map<Class<? extends Rush>, AnnotationCache> annotationCache, Callback callback) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException, JSONException {
 
         List<Field> fields = new ArrayList<>();
-        ReflectionUtils.getAllFields(fields, clazz);
+        ReflectionUtils.getAllFields(fields, clazz, rushConfig.orderColumnsAlphabetically());
 
         T rush = clazz.getConstructor().newInstance();
 

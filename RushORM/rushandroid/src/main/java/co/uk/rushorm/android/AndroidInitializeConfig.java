@@ -74,7 +74,7 @@ public class AndroidInitializeConfig extends RushInitializeConfig {
     @Override
     public RushObjectSerializer getRushObjectSerializer() {
         if(rushObjectSerializer == null){
-            rushObjectSerializer = new AndroidJSONSerializer();
+            rushObjectSerializer = new AndroidJSONSerializer(rushConfig);
         }
         return rushObjectSerializer;
     }
@@ -82,7 +82,7 @@ public class AndroidInitializeConfig extends RushInitializeConfig {
     @Override
     public RushObjectDeserializer getRushObjectDeserializer() {
         if(rushObjectDeserializer == null){
-            rushObjectDeserializer = new AndroidJSONDeserializer();
+            rushObjectDeserializer = new AndroidJSONDeserializer(rushConfig);
         }
         return rushObjectDeserializer;
     }
