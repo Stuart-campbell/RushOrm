@@ -17,6 +17,7 @@ public class AndroidRushConfig implements RushConfig {
     private static final String NAME_KEY = "Rush_db_name";
     private static final String DEBUG_KEY = "Rush_debug";
     private static final String LOG_KEY = "Rush_log";
+    private static final String ORDER_ALPHABETICALLY = "Rush_order_alphabetically";
     private static final String REQUIRE_TABLE_ANNOTATION_KEY = "Rush_requires_table_annotation";
     private static final String DEFAULT_NAME = "rush.db";
 
@@ -24,6 +25,7 @@ public class AndroidRushConfig implements RushConfig {
     private int dbVersion;
     private boolean debug;
     private boolean log;
+    private boolean orderColumnsAlphabetically;
     private boolean requiresTableAnnotation;
 
     public AndroidRushConfig(Context context) {
@@ -34,6 +36,7 @@ public class AndroidRushConfig implements RushConfig {
             dbName = bundle != null && bundle.containsKey(NAME_KEY) ? bundle.getString(NAME_KEY) : DEFAULT_NAME;
             debug = bundle != null && bundle.containsKey(DEBUG_KEY) && bundle.getBoolean(DEBUG_KEY);
             log = bundle != null && bundle.containsKey(LOG_KEY) && bundle.getBoolean(LOG_KEY);
+            orderColumnsAlphabetically = bundle != null && bundle.containsKey(ORDER_ALPHABETICALLY) && bundle.getBoolean(ORDER_ALPHABETICALLY);
             requiresTableAnnotation = bundle != null && bundle.containsKey(REQUIRE_TABLE_ANNOTATION_KEY) && bundle.getBoolean(REQUIRE_TABLE_ANNOTATION_KEY);
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
@@ -73,5 +76,10 @@ public class AndroidRushConfig implements RushConfig {
     @Override
     public boolean userBulkInsert() {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN;
+    }
+
+    @Override
+    public boolean orderColumnsAlphabetically() {
+        return orderColumnsAlphabetically;
     }
 }
