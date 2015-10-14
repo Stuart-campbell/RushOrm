@@ -13,10 +13,12 @@ import co.uk.rushexample.testobjects.Bug34;
 import co.uk.rushexample.testobjects.Bug6;
 import co.uk.rushexample.testobjects.Bug61Child;
 import co.uk.rushexample.testobjects.Bug61Parent;
+import co.uk.rushexample.testobjects.Bug78;
 import co.uk.rushexample.testobjects.Bug7Child;
 import co.uk.rushexample.testobjects.Bug7Parent;
 import co.uk.rushorm.core.RushCore;
 import co.uk.rushorm.core.RushSearch;
+import co.uk.rushorm.core.search.RushWhere;
 
 /**
  * Created by Stuart on 18/02/15.
@@ -166,5 +168,17 @@ public class BugTests extends ApplicationTestCase<Application> {
                 && ladies.get(0).getrBug61Child().getSize().equals("B")
                 && ladies.get(1).getlBug61Child().getSize().equals("B")
                 && ladies.get(1).getrBug61Child().getSize().equals("A"));
+    }
+
+    public void testBug78() throws Exception {
+
+        Bug78 bug78 = new Bug78();
+        bug78.field1 = "field1";
+        bug78.field2 = "field2";
+        bug78.save();
+
+        Bug78 bug78Loaded = new RushSearch().findSingle(Bug78.class);
+        assertNotNull(bug78Loaded.getId());
+
     }
 }
