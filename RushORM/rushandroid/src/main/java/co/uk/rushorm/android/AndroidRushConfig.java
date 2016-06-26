@@ -6,6 +6,9 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import co.uk.rushorm.core.RushConfig;
 
 /**
@@ -19,6 +22,7 @@ public class AndroidRushConfig implements RushConfig {
     private static final String LOG_KEY = "Rush_log";
     private static final String ORDER_ALPHABETICALLY = "Rush_order_alphabetically";
     private static final String REQUIRE_TABLE_ANNOTATION_KEY = "Rush_requires_table_annotation";
+    private static final String RUSH_CLASSES_PACKAGE = "Rush_classes_package";
     private static final String DEFAULT_NAME = "rush.db";
 
     private String dbName;
@@ -27,8 +31,10 @@ public class AndroidRushConfig implements RushConfig {
     private boolean log;
     private boolean orderColumnsAlphabetically;
     private boolean requiresTableAnnotation;
+    private List<String> packages;
 
-    public AndroidRushConfig(Context context) {
+    public AndroidRushConfig(Context context, List<String> packages) {
+        this.packages = packages;
         try {
             ApplicationInfo ai = context.getPackageManager().getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA);
             Bundle bundle = ai.metaData;
@@ -38,8 +44,17 @@ public class AndroidRushConfig implements RushConfig {
             log = bundle != null && bundle.containsKey(LOG_KEY) && bundle.getBoolean(LOG_KEY);
             orderColumnsAlphabetically = bundle != null && bundle.containsKey(ORDER_ALPHABETICALLY) && bundle.getBoolean(ORDER_ALPHABETICALLY);
             requiresTableAnnotation = bundle != null && bundle.containsKey(REQUIRE_TABLE_ANNOTATION_KEY) && bundle.getBoolean(REQUIRE_TABLE_ANNOTATION_KEY);
+
+            if (bundle != null && bundle.containsKey(RUSH_CLASSES_PACKAGE)) {
+                packages.add(bundle.getString(RUSH_CLASSES_PACKAGE));
+            }
+
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
+        }
+
+        if(this.packages.size() == 1) {
+            throw new RushPackageRootNotSetException();
         }
     }
 
@@ -81,5 +96,10 @@ public class AndroidRushConfig implements RushConfig {
     @Override
     public boolean orderColumnsAlphabetically() {
         return orderColumnsAlphabetically;
+    }
+
+    @Override
+    public List<String> getPackages() {
+        return packages;
     }
 }
