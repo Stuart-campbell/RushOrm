@@ -6,7 +6,6 @@ import android.test.ApplicationTestCase;
 
 import org.json.JSONObject;
 
-import co.uk.rushorm.android.RushAndroid;
 import co.uk.rushorm.android.RushBitmapFile;
 import co.uk.rushorm.android.RushJSONFile;
 import co.uk.rushorm.core.RushSearch;

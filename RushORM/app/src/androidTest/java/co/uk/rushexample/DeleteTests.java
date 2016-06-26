@@ -11,7 +11,6 @@ import co.uk.rushorm.core.RushCore;
 import co.uk.rushorm.core.RushSearch;
 import co.uk.rushexample.testobjects.TestChildObject;
 import co.uk.rushexample.testobjects.TestObject;
-import co.uk.rushorm.android.RushAndroid;
 
 /**
  * Created by Stuart on 16/12/14.

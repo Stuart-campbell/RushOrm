@@ -2,6 +2,9 @@ package co.uk.rushorm.android;
 
 import android.content.Context;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import co.uk.rushorm.core.Logger;
 import co.uk.rushorm.core.RushClassFinder;
 import co.uk.rushorm.core.RushConfig;
@@ -19,8 +22,16 @@ public class AndroidInitializeConfig extends RushInitializeConfig {
 
     private final Context context;
 
+    private final List<String> packageRoots;
+
     public AndroidInitializeConfig(Context context) {
         this.context = context.getApplicationContext();
+        packageRoots = new ArrayList<>();
+        packageRoots.add("co.uk.rushorm");
+    }
+
+    public void addPackage(String packageRoot) {
+        packageRoots.add(packageRoot);
     }
 
     @Override
@@ -50,7 +61,7 @@ public class AndroidInitializeConfig extends RushInitializeConfig {
     @Override
     public RushConfig getRushConfig() {
         if(rushConfig == null) {
-            rushConfig = new AndroidRushConfig(context);
+            rushConfig = new AndroidRushConfig(context, packageRoots);
         }
         return rushConfig;
     }

@@ -42,14 +42,29 @@ public class AndroidRushClassFinder implements RushClassFinder {
         List<Class<? extends Rush>> domainClasses = new ArrayList<>();
         try {
             for (String className : getAllClasses(context)) {
-                Class<? extends Rush> domainClass = getRushClass(className, context, rushConfig);
-                if (domainClass != null) domainClasses.add(domainClass);
-
+                if(classNameContainedInPackageRoots(className, rushConfig.getPackages())) {
+                    Class<? extends Rush> domainClass = getRushClass(className, context, rushConfig);
+                    if (domainClass != null) {
+                        domainClasses.add(domainClass);
+                    }
+                }
             }
         } catch (IOException | PackageManager.NameNotFoundException e) {
             logger.logError(e.getMessage());
         }
         return domainClasses;
+    }
+
+    private boolean classNameContainedInPackageRoots(String className, List<String> packageRoots) {
+        if(packageRoots == null) {
+            return true;
+        }
+        for(String packageRoot : packageRoots) {
+            if(className.contains(packageRoot)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private Class<? extends Rush> getRushClass(String className, Context context, RushConfig rushConfig) {
