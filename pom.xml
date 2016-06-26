@@ -18,15 +18,7 @@
       </repository>
    </distributionManagement>
    <build>
-      <resources>
-         <resource>
-            <directory />
-            <includes>
-               <include>LICENSE.md</include>
-               <include>README.md</include>
-            </includes>
-         </resource>
-      </resources>
+      
       <plugins>
          <plugin>
             <groupId>com.jayway.maven.plugins.android.generation2</groupId>
