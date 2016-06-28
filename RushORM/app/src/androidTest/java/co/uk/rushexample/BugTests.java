@@ -35,11 +35,6 @@ public class BugTests extends ApplicationTestCase<Application> {
         Utils.setUp(getContext());
     }
 
-    @Override
-    public void tearDown() throws Exception {
-        super.tearDown();
-    }
-
     public void testBug6() throws Exception {
 
         Bug6 user = new Bug6(null);
