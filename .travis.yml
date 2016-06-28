@@ -9,6 +9,7 @@ env:
 android:
   components:
   - build-tools-23.0.0
+  - extra-android-m2repository
   - $ANDROID_TARGET
   - sys-img-${ANDROID_ABI}-${ANDROID_TARGET}
   - sys-img-${ANDROID_ABI}-${EMULATOR_TARGET}
