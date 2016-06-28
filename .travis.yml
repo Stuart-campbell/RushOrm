@@ -14,7 +14,10 @@ android:
   - sys-img-${ANDROID_ABI}-${EMULATOR_TARGET}
 before_script:
   - cd RushORM
-  - ./gradlew build
+  - cd RushCore
+  - ls
+  - cd ../
+  - ./gradlew build --debug
   - echo no | android create avd --force -n test -t $EMULATOR_TARGET --abi $ANDROID_ABI
   - emulator -avd test -no-audio -no-window &
   - android-wait-for-emulator
