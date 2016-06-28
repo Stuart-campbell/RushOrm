@@ -22,11 +22,6 @@ public class ModifierTests extends ApplicationTestCase<Application> {
         Utils.setUp(getContext());
     }
 
-    @Override
-    public void tearDown() throws Exception {
-        super.tearDown();
-    }
-
     public void testPublic() throws Exception {
 
         TestModifiers object = new TestModifiers();

@@ -29,11 +29,6 @@ public class SpeedTests extends ApplicationTestCase<Application> {
         Utils.setUp(getContext());
     }
 
-    @Override
-    public void tearDown() throws Exception {
-        super.tearDown();
-    }
-
     public void testSave1000ChildRows() throws Exception {
 
         Date date = new Date();

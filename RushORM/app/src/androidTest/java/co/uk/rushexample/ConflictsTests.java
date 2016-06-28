@@ -25,11 +25,6 @@ public class ConflictsTests extends ApplicationTestCase<Application> {
         Utils.setUp(getContext());
     }
 
-    @Override
-    public void tearDown() throws Exception {
-        super.tearDown();
-    }
-
     public void testNoConflicts() throws Exception {
         TestObject original = new TestObject();
         original.stringField = "version1";

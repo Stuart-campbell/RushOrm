@@ -57,11 +57,6 @@ public class UpgradeTests extends ApplicationTestCase<Application> {
         getContext().deleteDatabase("rush.db");
     }
 
-    @Override
-    public void tearDown() throws Exception {
-        super.tearDown();
-    }
-
     public void testUpgradeTableNameString() throws Exception {
         List<Class<? extends Rush>> classes = new ArrayList<>();
         classes.add(TestBase1.class);

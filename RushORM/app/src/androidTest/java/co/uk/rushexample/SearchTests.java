@@ -27,11 +27,6 @@ public class SearchTests extends ApplicationTestCase<Application> {
         Utils.setUp(getContext());
     }
 
-    @Override
-    public void tearDown() throws Exception {
-        super.tearDown();
-    }
-
     public void testFindByString() throws Exception {
 
         TestObject testObject = new TestObject();

@@ -28,11 +28,6 @@ public class RushListFieldTests extends ApplicationTestCase<Application> {
         Utils.setUp(getContext());
     }
 
-    @Override
-    public void tearDown() throws Exception {
-            super.tearDown();
-    }
-
     public void testCount() throws Exception{
 
         List<TestObject> objects = new ArrayList<>();

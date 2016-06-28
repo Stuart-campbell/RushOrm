@@ -29,11 +29,6 @@ public class SaveAndUpdateTest extends ApplicationTestCase<Application> {
         Utils.setUp(getContext());
     }
 
-    @Override
-    public void tearDown() throws Exception {
-        super.tearDown();
-    }
-
     public void testSaveString() throws Exception {
 
         TestObject testObject = new TestObject();

@@ -26,11 +26,6 @@ public class FileTests extends ApplicationTestCase<Application> {
         Utils.setUp(getContext());
     }
 
-    @Override
-    public void tearDown() throws Exception {
-        super.tearDown();
-    }
-
     public void testSaveText() throws Exception {
 
         RushTextFile file = new RushTextFile(getContext().getFilesDir().getAbsolutePath());
