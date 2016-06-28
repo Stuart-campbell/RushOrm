@@ -74,10 +74,14 @@ public class AndroidJSONDeserializer implements RushObjectDeserializer {
         try {
             Constructor<? extends List> constructor = listClazz.getConstructor();
             objects = constructor.newInstance();
-        } catch (InstantiationException | InvocationTargetException | NoSuchMethodException e) {
-            e.printStackTrace();
+        } catch (InstantiationException e){
+            objects = new ArrayList<>();
+        } catch (InvocationTargetException e) {
+            objects = new ArrayList<>();
+        } catch (NoSuchMethodException e) {
             objects = new ArrayList<>();
         }
+
         for (int i = 0; i < jsonArray.length(); i ++) {
             JSONObject jsonObject = jsonArray.getJSONObject(i);
             objects.add(deserializeJSONObject(jsonObject, idName, versionName, clazz, rushColumns, annotationCache, callback));
