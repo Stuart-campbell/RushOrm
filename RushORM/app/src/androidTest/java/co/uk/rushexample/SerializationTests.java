@@ -111,7 +111,7 @@ public class SerializationTests extends ApplicationTestCase<Application> {
         String jsonString = RushCore.getInstance().serialize(objects);
 
         List<Rush> deserializeObject = RushCore.getInstance().deserialize(jsonString);
-        assertTrue(deserializeObject.size() == 0);
+        assertTrue(deserializeObject.isEmpty());
     }
 
     public void testSerializeMix() throws Exception {
