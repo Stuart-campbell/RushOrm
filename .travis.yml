@@ -8,7 +8,7 @@ env:
     - ADB_INSTALL_TIMEOUT=20
 android:
   components:
-  - build-tools-24.0.0
+  - build-tools-23.0.0
   - $ANDROID_TARGET
   - sys-img-${ANDROID_ABI}-${ANDROID_TARGET}
   - sys-img-${ANDROID_ABI}-${EMULATOR_TARGET}
