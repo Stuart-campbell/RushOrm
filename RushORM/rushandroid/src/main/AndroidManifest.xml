@@ -4,6 +4,13 @@
     <application android:allowBackup="true" android:label="@string/app_name"
         android:icon="@drawable/ic_launcher">
 
+        <meta-data android:name="Rush_db_version" android:value="1" />
+        <meta-data android:name="Rush_db_name" android:value="rush.db" />
+        <meta-data android:name="Rush_debug" android:value="true" />
+        <meta-data android:name="Rush_log" android:value="true" />
+        <meta-data android:name="Rush_requires_table_annotation" android:value="true" />
+        <meta-data android:name="Rush_classes_package" android:value="co.uk.rushorm" />
+
     </application>
 
 </manifest>
