@@ -5,6 +5,7 @@
       <module fileurl="file://$PROJECT_DIR$/RushORM.iml" filepath="$PROJECT_DIR$/RushORM.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/rushandroid/rushandroid.iml" filepath="$PROJECT_DIR$/rushandroid/rushandroid.iml" />
+      <module fileurl="file://$PROJECT_DIR$/rushcore/rushcore.iml" filepath="$PROJECT_DIR$/rushcore/rushcore.iml" />
     </modules>
   </component>
 </project>

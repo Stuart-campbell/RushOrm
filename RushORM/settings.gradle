@@ -1,1 +1,1 @@
-include ':app', ':rushandroid'
+include ':app', ':rushcore', ':rushandroid'
