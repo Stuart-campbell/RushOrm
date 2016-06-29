@@ -1,0 +1,24 @@
+language: android
+jdk: oraclejdk7
+env:
+  global:
+    - ANDROID_TARGET=android-23
+    - EMULATOR_TARGET=android-21
+    - ANDROID_ABI=armeabi-v7a
+    - ADB_INSTALL_TIMEOUT=20
+android:
+  components:
+  - build-tools-23.0.0
+  - extra-android-m2repository
+  - $ANDROID_TARGET
+  - sys-img-${ANDROID_ABI}-${ANDROID_TARGET}
+  - sys-img-${ANDROID_ABI}-${EMULATOR_TARGET}
+before_script:
+  - cd RushORM
+  - ./gradlew build
+  - echo no | android create avd --force -n test -t $EMULATOR_TARGET --abi $ANDROID_ABI
+  - emulator -avd test -no-audio -no-window &
+  - android-wait-for-emulator
+  - adb shell input keyevent 82 &
+script: 
+  - ./gradlew connectedCheck -i
