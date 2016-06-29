@@ -143,7 +143,7 @@ public class DeleteTests extends ApplicationTestCase<Application> {
         RushCore.getInstance().delete(loadedObjects);
 
         List<TestObject> loadedObjects2 = new RushSearch().find(TestObject.class);
-        assertTrue(loadedObjects2.size() == 0);
+        assertTrue(loadedObjects2.isEmpty());
     }
 
     public void testDeleteTable() throws Exception {
@@ -153,7 +153,7 @@ public class DeleteTests extends ApplicationTestCase<Application> {
         RushCore.getInstance().deleteAll(TestObject.class);
 
         List<TestObject> loadedObjects = new RushSearch().find(TestObject.class);
-        assertTrue(loadedObjects.size() == 0);
+        assertTrue(loadedObjects.isEmpty());
     }
 
     public void testDeleteDatabase() throws Exception {
@@ -163,7 +163,7 @@ public class DeleteTests extends ApplicationTestCase<Application> {
         RushCore.getInstance().clearDatabase();
 
         List<TestObject> loadedObjects = new RushSearch().find(TestObject.class);
-        assertTrue(loadedObjects.size() == 0);
+        assertTrue(loadedObjects.isEmpty());
     }
 
 }

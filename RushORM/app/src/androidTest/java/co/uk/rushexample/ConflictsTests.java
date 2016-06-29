@@ -35,7 +35,7 @@ public class ConflictsTests extends ApplicationTestCase<Application> {
 
         List<RushConflict> conflicts = loadedOriginal.saveOnlyWithoutConflict();
 
-        assertTrue(conflicts.size() == 0);
+        assertTrue(conflicts.isEmpty());
     }
 
     public void testConflicts() throws Exception {
@@ -80,7 +80,7 @@ public class ConflictsTests extends ApplicationTestCase<Application> {
         conflicts.get(0).resolve();
         
         List<RushConflict> conflicts2 = original.saveOnlyWithoutConflict();
-        assertTrue(conflicts2.size() == 0);
+        assertTrue(conflicts2.isEmpty());
     }
 
     public void testResolveWithBackgroundSaveConflicts() throws Exception {

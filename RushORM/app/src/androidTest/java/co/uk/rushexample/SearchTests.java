@@ -175,7 +175,7 @@ public class SearchTests extends ApplicationTestCase<Application> {
                 .whereEqual("intField", 5)
                 .find(TestObject.class);
 
-        assertTrue(results.size() == 0);
+        assertTrue(results.isEmpty());
     }
 
     public void testFindByStringAndIntWrongString() throws Exception {
@@ -190,7 +190,7 @@ public class SearchTests extends ApplicationTestCase<Application> {
                 .whereEqual("intField", 5)
                 .find(TestObject.class);
 
-        assertTrue(results.size() == 0);
+        assertTrue(results.isEmpty());
     }
 
     public void testFindByStringOrIntWrongInt() throws Exception {
