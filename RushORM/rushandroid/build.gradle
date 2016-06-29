@@ -1,4 +1,5 @@
 apply plugin: 'com.android.library'
+apply plugin: 'com.github.kt3k.coveralls'
 
 android {
     compileSdkVersion 23
@@ -36,6 +37,15 @@ android {
             }
         }
     }
+}
+
+coveralls {
+    jacocoReportPath = "${buildDir}/reports/coverage/debug/report.xml"
+}
+
+tasks.coveralls {
+    dependsOn 'connectedAndroidTest'
+    onlyIf { System.env.'CI' }
 }
 
 // Note: To build jar and javadocs use 'mvn install' on root directory which contains pom.xml file
