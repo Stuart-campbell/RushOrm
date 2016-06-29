@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/Stuart-campbell/RushOrm.svg?branch=master)](https://travis-ci.org/Stuart-campbell/RushOrm)
 [![Android Weekly](http://img.shields.io/badge/Android%20Weekly-%23139-lightgrey.svg?style=flat)](http://androidweekly.net/issues/issue-139)
 [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-RushOrm-blue.svg?style=flat)](http://android-arsenal.com/details/1/1499)
 [![Join the chat at https://gitter.im/Stuart-campbell/RushOrm](https://img.shields.io/badge/Gitter-Join%20Chat-brightgreen.svg?style=flat)](https://gitter.im/Stuart-campbell/RushOrm?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
