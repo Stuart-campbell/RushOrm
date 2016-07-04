@@ -87,6 +87,7 @@ public class SearchTests extends ApplicationTestCase<Application> {
 
         assertTrue(results.size() == 1);
     }
+
     public void testFindByDoubleTwo() throws Exception {
 
         TestObject testObject = new TestObject();
@@ -100,6 +101,17 @@ public class SearchTests extends ApplicationTestCase<Application> {
         List<TestObject> results = new RushSearch().whereEqual("doubleField", 5.1234).find(TestObject.class);
 
         assertTrue(results.size() == 2);
+    }
+
+    public void testFindByShort() throws Exception {
+
+        TestObject testObject = new TestObject();
+        testObject.shortField = 3;
+        testObject.save();
+
+        List<TestObject> results = new RushSearch().whereEqual("shortField", (short)3).find(TestObject.class);
+
+        assertTrue(results.size() == 1);
     }
 
     public void testFindByChild() throws Exception {
@@ -471,6 +483,287 @@ public class SearchTests extends ApplicationTestCase<Application> {
 
         List<TestObject> testObjects = new RushSearch().groupBy("intField").groupBy("stringField").find(TestObject.class);
         assertTrue(testObjects.size() == 2);
+    }
+
+    public void testWhereIsNull() throws Exception {
+
+        TestObject testObject = new TestObject();
+        testObject.save();
+
+        List<TestObject> results = new RushSearch().whereIsNull("stringField").find(TestObject.class);
+
+        assertTrue(results.size() == 1);
+    }
+
+    public void testWhereIsNull2() throws Exception {
+
+        TestObject testObject = new TestObject();
+        testObject.stringField = "not null string";
+        testObject.save();
+
+        List<TestObject> results = new RushSearch().whereIsNull("stringField").find(TestObject.class);
+
+        assertTrue(results.isEmpty());
+    }
+
+    public void testWhereIsNotNull() throws Exception {
+
+        TestObject testObject = new TestObject();
+        testObject.save();
+
+        List<TestObject> results = new RushSearch().whereIsNotNull("stringField").find(TestObject.class);
+
+        assertTrue(results.isEmpty());
+    }
+
+    public void testWhereIsNotNull2() throws Exception {
+
+        TestObject testObject = new TestObject();
+        testObject.stringField = "not null string";
+        testObject.save();
+
+        List<TestObject> results = new RushSearch().whereIsNotNull("stringField").find(TestObject.class);
+
+        assertTrue(results.size() == 1);
+    }
+
+    public void testWhereNotEqualString() throws Exception {
+
+        TestObject testObject = new TestObject();
+        testObject.stringField = "string1";
+        testObject.save();
+
+        List<TestObject> results = new RushSearch().whereNotEqual("stringField", "string1").find(TestObject.class);
+
+        assertTrue(results.isEmpty());
+    }
+
+    public void testWhereNotEqualString2() throws Exception {
+
+        TestObject testObject = new TestObject();
+        testObject.stringField = "string1";
+        testObject.save();
+
+        List<TestObject> results = new RushSearch().whereNotEqual("stringField", "string2").find(TestObject.class);
+
+        assertTrue(results.size() == 1);
+    }
+
+    public void testWhereNotEqualInt() throws Exception {
+
+        TestObject testObject = new TestObject();
+        testObject.intField = 1;
+        testObject.save();
+
+        List<TestObject> results = new RushSearch().whereNotEqual("intField", 1).find(TestObject.class);
+
+        assertTrue(results.isEmpty());
+    }
+
+    public void testWhereNotEqualInt2() throws Exception {
+
+        TestObject testObject = new TestObject();
+        testObject.intField = 1;
+        testObject.save();
+
+        List<TestObject> results = new RushSearch().whereNotEqual("intField", 2).find(TestObject.class);
+
+        assertTrue(results.size() == 1);
+    }
+
+    public void testWhereNotEqualDouble() throws Exception {
+
+        TestObject testObject = new TestObject();
+        testObject.doubleField = 1.001;
+        testObject.save();
+
+        List<TestObject> results = new RushSearch().whereNotEqual("doubleField", 1.001).find(TestObject.class);
+
+        assertTrue(results.isEmpty());
+    }
+
+    public void testWhereNotEqualDouble2() throws Exception {
+
+        TestObject testObject = new TestObject();
+        testObject.doubleField = 1.001;
+        testObject.save();
+
+        List<TestObject> results = new RushSearch().whereNotEqual("doubleField", 1.002).find(TestObject.class);
+
+        assertTrue(results.size() == 1);
+    }
+
+    public void testWhereNotEqualShort() throws Exception {
+
+        TestObject testObject = new TestObject();
+        testObject.shortField = 2;
+        testObject.save();
+
+        List<TestObject> results = new RushSearch().whereNotEqual("shortField", (short)2).find(TestObject.class);
+
+        assertTrue(results.isEmpty());
+    }
+
+    public void testWhereNotEqualShort2() throws Exception {
+
+        TestObject testObject = new TestObject();
+        testObject.shortField = 2;
+        testObject.save();
+
+        List<TestObject> results = new RushSearch().whereNotEqual("shortField", (short)3).find(TestObject.class);
+
+        assertTrue(results.size() == 1);
+    }
+
+    public void testLessThanInt() throws Exception {
+
+        TestObject testObject = new TestObject();
+        testObject.intField = 2;
+        testObject.save();
+
+        List<TestObject> results = new RushSearch().whereLessThan("intField", 2).find(TestObject.class);
+
+        assertTrue(results.isEmpty());
+    }
+
+    public void testLessThanInt2() throws Exception {
+
+        TestObject testObject = new TestObject();
+        testObject.intField = 2;
+        testObject.save();
+
+        List<TestObject> results = new RushSearch().whereLessThan("intField", 3).find(TestObject.class);
+
+        assertTrue(results.size() == 1);
+    }
+
+    public void testGreaterThanInt() throws Exception {
+
+        TestObject testObject = new TestObject();
+        testObject.intField = 2;
+        testObject.save();
+
+        List<TestObject> results = new RushSearch().whereGreaterThan("intField", 2).find(TestObject.class);
+
+        assertTrue(results.isEmpty());
+    }
+
+    public void testGreaterThanInt2() throws Exception {
+
+        TestObject testObject = new TestObject();
+        testObject.intField = 2;
+        testObject.save();
+
+        List<TestObject> results = new RushSearch().whereGreaterThan("intField", 1).find(TestObject.class);
+
+        assertTrue(results.size() == 1);
+    }
+
+    public void testLessThanDouble() throws Exception {
+
+        TestObject testObject = new TestObject();
+        testObject.doubleField = 2.5;
+        testObject.save();
+
+        List<TestObject> results = new RushSearch().whereLessThan("doubleField", 2.5).find(TestObject.class);
+
+        assertTrue(results.isEmpty());
+    }
+
+    public void testLessThanDouble2() throws Exception {
+
+        TestObject testObject = new TestObject();
+        testObject.doubleField = 2.5;
+        testObject.save();
+
+        List<TestObject> results = new RushSearch().whereLessThan("doubleField", 2.6).find(TestObject.class);
+
+        assertTrue(results.size() == 1);
+    }
+
+    public void testGreaterThanDouble() throws Exception {
+
+        TestObject testObject = new TestObject();
+        testObject.doubleField = 2.5;
+        testObject.save();
+
+        List<TestObject> results = new RushSearch().whereGreaterThan("doubleField", 2.5).find(TestObject.class);
+
+        assertTrue(results.isEmpty());
+    }
+
+    public void testGreaterThanDouble2() throws Exception {
+
+        TestObject testObject = new TestObject();
+        testObject.doubleField = 2.5;
+        testObject.save();
+
+        List<TestObject> results = new RushSearch().whereGreaterThan("doubleField", 2.4).find(TestObject.class);
+
+        assertTrue(results.size() == 1);
+    }
+
+    public void testLessThanShort() throws Exception {
+
+        TestObject testObject = new TestObject();
+        testObject.shortField = 2;
+        testObject.save();
+
+        List<TestObject> results = new RushSearch().whereLessThan("shortField", (short)2).find(TestObject.class);
+
+        assertTrue(results.isEmpty());
+    }
+
+    public void testLessThanShort2() throws Exception {
+
+        TestObject testObject = new TestObject();
+        testObject.shortField = 2;
+        testObject.save();
+
+        List<TestObject> results = new RushSearch().whereLessThan("shortField", (short)3).find(TestObject.class);
+
+        assertTrue(results.size() == 1);
+    }
+
+    public void testGreaterThanShort() throws Exception {
+
+        TestObject testObject = new TestObject();
+        testObject.shortField = 2;
+        testObject.save();
+
+        List<TestObject> results = new RushSearch().whereGreaterThan("shortField", (short)2).find(TestObject.class);
+
+        assertTrue(results.isEmpty());
+    }
+
+    public void testGreaterThanShort2() throws Exception {
+
+        TestObject testObject = new TestObject();
+        testObject.shortField = 2;
+        testObject.save();
+
+        List<TestObject> results = new RushSearch().whereGreaterThan("shortField", (short)1).find(TestObject.class);
+
+        assertTrue(results.size() == 1);
+    }
+
+    // This is a bit of a stupid test, if it breaks no big worry,
+    // it should only emphasise that toString should produce valid json
+    public void testToString() throws Exception {
+
+        RushSearch rushSearch = new RushSearch()
+                .whereId("testId")
+                .or()
+                .startGroup()
+                .whereEqual("stringField", "Hello world")
+                .and()
+                .whereGreaterThan("intField", 5)
+                .endGroup()
+                .orderDesc("intField");
+
+        String json = rushSearch.toString();
+        assertEquals(json, "{\"limit\":null,\"offset\":null,\"order\":[{\"field\":\"intField\",\"order\":\"DESC\"}],\"where\":[{\"field\":\"rush_id\",\"modifier\":\"=\",\"value\":\"'testId'\",\"type\":\"whereStatement\"},{\"element\":\" OR \",\"type\":\"where\"},{\"element\":\"(\",\"type\":\"where\"},{\"field\":\"stringField\",\"modifier\":\"=\",\"value\":\"'Hello world'\",\"type\":\"whereStatement\"},{\"element\":\" AND \",\"type\":\"where\"},{\"field\":\"intField\",\"modifier\":\">\",\"value\":\"5\",\"type\":\"whereStatement\"},{\"element\":\")\",\"type\":\"where\"}]}");
+
     }
 
 }
