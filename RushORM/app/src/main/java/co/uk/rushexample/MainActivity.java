@@ -29,10 +29,6 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
             super.onCreate(savedInstanceState);
             setContentView(R.layout.activity_main);
 
-            // Would normally be in application class but was interfering with tests
-            AndroidInitializeConfig config = new AndroidInitializeConfig(getApplicationContext());
-            RushCore.initialize(config);
-
             mNavigationDrawerFragment = (NavigationDrawerFragment)
                     getFragmentManager().findFragmentById(R.id.navigation_drawer);
             mTitle = getTitle();
