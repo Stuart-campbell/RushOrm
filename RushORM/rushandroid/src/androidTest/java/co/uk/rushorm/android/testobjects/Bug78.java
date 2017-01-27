@@ -1,13 +1,10 @@
 package co.uk.rushorm.android.testobjects;
 
 import co.uk.rushorm.core.RushObject;
-import co.uk.rushorm.core.annotations.RushTableAnnotation;
 
 /**
  * Created by Stuart on 14/10/15.
  */
-
-@RushTableAnnotation
 public class Bug78 extends RushObject {
 
     public String field1 = "";

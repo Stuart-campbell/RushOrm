@@ -2,10 +2,10 @@ package co.uk.rushorm.android;
 
 import android.content.Context;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import co.uk.rushorm.core.Logger;
+import co.uk.rushorm.core.Rush;
 import co.uk.rushorm.core.RushClassFinder;
 import co.uk.rushorm.core.RushConfig;
 import co.uk.rushorm.core.RushInitializeConfig;
@@ -14,6 +14,7 @@ import co.uk.rushorm.core.RushObjectSerializer;
 import co.uk.rushorm.core.RushQueProvider;
 import co.uk.rushorm.core.RushStatementRunner;
 import co.uk.rushorm.core.RushStringSanitizer;
+import co.uk.rushorm.core.RushTextFile;
 
 /**
  * Created by Stuart on 20/06/15.
@@ -22,22 +23,24 @@ public class AndroidInitializeConfig extends RushInitializeConfig {
 
     private final Context context;
 
-    private final List<String> packageRoots;
+    private final List<Class<? extends Rush>> clazzes;
 
-    public AndroidInitializeConfig(Context context) {
+    public AndroidInitializeConfig(Context context, List<Class<? extends Rush>> clazzes) {
+        if(clazzes == null || clazzes.size() == 0) {
+            throw new RushNoClassesSetException();
+        }
+
         this.context = context.getApplicationContext();
-        packageRoots = new ArrayList<>();
-        packageRoots.add("co.uk.rushorm");
-    }
-
-    public void addPackage(String packageRoot) {
-        packageRoots.add(packageRoot);
+        this.clazzes = clazzes;
+        this.clazzes.add(RushTextFile.class);
+        this.clazzes.add(RushJSONFile.class);
+        this.clazzes.add(RushBitmapFile.class);
     }
 
     @Override
     public RushClassFinder getRushClassFinder() {
         if(rushClassFinder == null) {
-            rushClassFinder = new AndroidRushClassFinder(context, getRushLogger());
+            rushClassFinder = new AndroidRushClassFinder(clazzes);
         }
         return rushClassFinder;
     }
@@ -61,7 +64,7 @@ public class AndroidInitializeConfig extends RushInitializeConfig {
     @Override
     public RushConfig getRushConfig() {
         if(rushConfig == null) {
-            rushConfig = new AndroidRushConfig(context, packageRoots);
+            rushConfig = new AndroidRushConfig(context);
         }
         return rushConfig;
     }

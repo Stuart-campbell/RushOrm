@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import co.uk.rushorm.core.RushConfig;
+import co.uk.rushorm.core.exceptions.RushClassNotFoundException;
 
 /**
  * Created by stuartc on 11/12/14.
@@ -21,7 +22,6 @@ public class AndroidRushConfig implements RushConfig {
     private static final String DEBUG_KEY = "Rush_debug";
     private static final String LOG_KEY = "Rush_log";
     private static final String ORDER_ALPHABETICALLY = "Rush_order_alphabetically";
-    private static final String REQUIRE_TABLE_ANNOTATION_KEY = "Rush_requires_table_annotation";
     private static final String RUSH_CLASSES_PACKAGE = "Rush_classes_package";
     private static final String DEFAULT_NAME = "rush.db";
 
@@ -30,11 +30,9 @@ public class AndroidRushConfig implements RushConfig {
     private boolean debug;
     private boolean log;
     private boolean orderColumnsAlphabetically;
-    private boolean requiresTableAnnotation;
-    private List<String> packages;
 
-    public AndroidRushConfig(Context context, List<String> packages) {
-        this.packages = packages;
+    public AndroidRushConfig(Context context) {
+
         try {
             ApplicationInfo ai = context.getPackageManager().getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA);
             Bundle bundle = ai.metaData;
@@ -43,19 +41,16 @@ public class AndroidRushConfig implements RushConfig {
             debug = bundle != null && bundle.containsKey(DEBUG_KEY) && bundle.getBoolean(DEBUG_KEY);
             log = bundle != null && bundle.containsKey(LOG_KEY) && bundle.getBoolean(LOG_KEY);
             orderColumnsAlphabetically = bundle != null && bundle.containsKey(ORDER_ALPHABETICALLY) && bundle.getBoolean(ORDER_ALPHABETICALLY);
-            requiresTableAnnotation = bundle != null && bundle.containsKey(REQUIRE_TABLE_ANNOTATION_KEY) && bundle.getBoolean(REQUIRE_TABLE_ANNOTATION_KEY);
 
             if (bundle != null && bundle.containsKey(RUSH_CLASSES_PACKAGE)) {
-                packages.add(bundle.getString(RUSH_CLASSES_PACKAGE));
+                throw new RushDeprecatedException("Class searching no longer supported please remove this tag <meta-data android:name=\"Rush_classes_package\" android:value=\"co.uk.rushorm\" /> from the manifest and instead add your Rush classes directly to the AndroidInitializeConfig. See www.rushorm.com setup for more details.");
+
             }
 
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
 
-        if(this.packages.size() == 1) {
-            throw new RushPackageRootNotSetException();
-        }
     }
 
     @Override
@@ -79,11 +74,6 @@ public class AndroidRushConfig implements RushConfig {
     }
 
     @Override
-    public boolean requireTableAnnotation() {
-        return requiresTableAnnotation;
-    }
-
-    @Override
     public boolean usingMySql() {
         return false;
     }
@@ -98,8 +88,4 @@ public class AndroidRushConfig implements RushConfig {
         return orderColumnsAlphabetically;
     }
 
-    @Override
-    public List<String> getPackages() {
-        return packages;
-    }
 }
