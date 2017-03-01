@@ -5,6 +5,8 @@ import android.content.Context;
 import java.util.ArrayList;
 import java.util.List;
 
+import co.uk.rushorm.android.testobjects.Bug119Child;
+import co.uk.rushorm.android.testobjects.Bug119Parent;
 import co.uk.rushorm.android.testobjects.Bug29A;
 import co.uk.rushorm.android.testobjects.Bug29B;
 import co.uk.rushorm.android.testobjects.Bug29C;
@@ -65,6 +67,8 @@ public class Utils {
         classes.add(Bug61Child.class);
         classes.add(Bug61Parent.class);
         classes.add(Bug78.class);
+        classes.add(Bug119Parent.class);
+        classes.add(Bug119Child.class);
 
         classes.add(SetupObject.class);
         classes.add(TestBase1.class);
