@@ -50,12 +50,7 @@ public class Utils {
     public static void setUp(Context context, List<RushColumn> columns) throws InterruptedException {
         context.deleteDatabase("rush.db");
 
-        RushInitializeConfig rushInitializeConfig = new AndroidInitializeConfig(context);
         final List<Class<? extends Rush>> classes = new ArrayList<>();
-
-        classes.add(RushTextFile.class);
-        classes.add(RushBitmapFile.class);
-        classes.add(RushJSONFile.class);
 
         classes.add(Bug6.class);
         classes.add(Bug7Child.class);
@@ -87,7 +82,7 @@ public class Utils {
         classes.add(TestUpgrade4.class);
         classes.add(TestUpgrade5.class);
 
-        rushInitializeConfig.setClasses(classes);
+        RushInitializeConfig rushInitializeConfig = new AndroidInitializeConfig(context, classes);
 
         if(columns != null) {
             for (RushColumn rushColumn : columns) {

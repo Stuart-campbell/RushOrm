@@ -458,8 +458,7 @@ public class UpgradeTests extends ApplicationTestCase<Application> {
         classes.add(SetupObject.class);
         final CountDownLatch latch = new CountDownLatch(1);
 
-        AndroidInitializeConfig androidInitializeConfig = new AndroidInitializeConfig(context);
-        androidInitializeConfig.setClasses(classes);
+        AndroidInitializeConfig androidInitializeConfig = new AndroidInitializeConfig(context, classes);
         androidInitializeConfig.setInitializeListener(new InitializeListener() {
             @Override
             public void initialized(boolean firstRun) {

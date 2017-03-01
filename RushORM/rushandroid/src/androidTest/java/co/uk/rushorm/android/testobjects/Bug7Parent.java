@@ -5,12 +5,10 @@ import java.util.List;
 
 import co.uk.rushorm.core.RushObject;
 import co.uk.rushorm.core.annotations.RushList;
-import co.uk.rushorm.core.annotations.RushTableAnnotation;
 
 /**
  * Created by stuartc on 19/02/15.
  */
-@RushTableAnnotation
 public class Bug7Parent extends RushObject {
 
     @RushList(classType = Bug7Child.class)

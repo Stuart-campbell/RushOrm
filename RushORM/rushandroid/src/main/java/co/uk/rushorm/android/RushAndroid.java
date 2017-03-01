@@ -4,6 +4,7 @@ import android.content.Context;
 
 import java.util.List;
 
+import co.uk.rushorm.core.Rush;
 import co.uk.rushorm.core.RushColumn;
 import co.uk.rushorm.core.RushCore;
 import co.uk.rushorm.core.RushInitializeConfig;
@@ -13,12 +14,12 @@ import co.uk.rushorm.core.RushInitializeConfig;
  */
 public class RushAndroid {
 
-    public static void initialize(Context context) {
-        initialize(new AndroidInitializeConfig(context));
+    public static void initialize(Context context, List<Class<? extends Rush>> clazzes) {
+        initialize(new AndroidInitializeConfig(context, clazzes));
     }
 
-    public static void initialize(Context context, List<RushColumn> columns) {
-        AndroidInitializeConfig androidInitializeConfig = new AndroidInitializeConfig(context);
+    public static void initialize(Context context, List<Class<? extends Rush>> clazzes, List<RushColumn> columns) {
+        AndroidInitializeConfig androidInitializeConfig = new AndroidInitializeConfig(context, clazzes);
         for(RushColumn rushColumn : columns) {
             androidInitializeConfig.addRushColumn(rushColumn);
         }
