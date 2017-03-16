@@ -3,9 +3,12 @@ package co.uk.rushorm.android;
 import android.app.Application;
 import android.test.ApplicationTestCase;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import co.uk.rushorm.android.testobjects.Bug119Child;
+import co.uk.rushorm.android.testobjects.Bug119Parent;
 import co.uk.rushorm.android.testobjects.Bug29A;
 import co.uk.rushorm.android.testobjects.Bug29B;
 import co.uk.rushorm.android.testobjects.Bug29C;
@@ -175,4 +178,22 @@ public class BugTests extends ApplicationTestCase<Application> {
         assertNotNull(bug78Loaded.getId());
 
     }
+
+    public void testBug119() throws Exception {
+
+        List<Bug119Child> events = new ArrayList<>();
+        events.add(new Bug119Child("event1"));
+
+        Bug119Parent c = new Bug119Parent("channel1", events);
+        c.save();
+
+        Bug119Parent object = new RushSearch().findSingle(Bug119Parent.class);
+
+        object.addEvent(new Bug119Child("added event"));
+        object.save();
+
+        assertEquals(new RushSearch().find(Bug119Parent.class).size(), 1);
+
+    }
+
 }
