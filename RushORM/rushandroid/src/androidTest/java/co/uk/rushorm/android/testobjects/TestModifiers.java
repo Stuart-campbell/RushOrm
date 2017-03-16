@@ -1,12 +1,10 @@
 package co.uk.rushorm.android.testobjects;
 
 import co.uk.rushorm.core.RushObject;
-import co.uk.rushorm.core.annotations.RushTableAnnotation;
 
 /**
  * Created by Stuart on 23/01/15.
  */
-@RushTableAnnotation
 public class TestModifiers extends RushObject {
 
     public String publicString;
