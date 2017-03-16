@@ -41,18 +41,16 @@ For getting started see http://www.rushorm.com/
 
 Rush jar can be downloaded from http://www.rushorm.com/download.html alternatively it can be added as below.
 
-Add the specific repository to your build file:
+Make sure your project is using maven central by including this in your gradle file:
 
     repositories {
-       maven {
-           url "http://maven.rushorm.com"
-       }
+       mavenCentral()
     }
    
 Add the dependency in your build file:
 
     dependencies {
-       compile 'co.uk.rushorm:rushandroid:1.2.0’
+       compile 'co.uk.rushorm:rushandroid:1.3.0’
     }
 
 <hr>
