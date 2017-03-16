@@ -3,12 +3,10 @@ package co.uk.rushorm.android.testobjects;
 import java.util.Date;
 
 import co.uk.rushorm.core.RushObject;
-import co.uk.rushorm.core.annotations.RushTableAnnotation;
 
 /**
  * Created by Stuart on 18/02/15.
  */
-@RushTableAnnotation
 public class Bug6 extends RushObject {
 
     private long mUserId;

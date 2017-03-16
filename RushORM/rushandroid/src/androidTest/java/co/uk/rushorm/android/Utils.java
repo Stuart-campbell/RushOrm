@@ -5,6 +5,8 @@ import android.content.Context;
 import java.util.ArrayList;
 import java.util.List;
 
+import co.uk.rushorm.android.testobjects.Bug119Child;
+import co.uk.rushorm.android.testobjects.Bug119Parent;
 import co.uk.rushorm.android.testobjects.Bug29A;
 import co.uk.rushorm.android.testobjects.Bug29B;
 import co.uk.rushorm.android.testobjects.Bug29C;
@@ -48,12 +50,7 @@ public class Utils {
     public static void setUp(Context context, List<RushColumn> columns) throws InterruptedException {
         context.deleteDatabase("rush.db");
 
-        RushInitializeConfig rushInitializeConfig = new AndroidInitializeConfig(context);
         final List<Class<? extends Rush>> classes = new ArrayList<>();
-
-        classes.add(RushTextFile.class);
-        classes.add(RushBitmapFile.class);
-        classes.add(RushJSONFile.class);
 
         classes.add(Bug6.class);
         classes.add(Bug7Child.class);
@@ -65,6 +62,8 @@ public class Utils {
         classes.add(Bug61Child.class);
         classes.add(Bug61Parent.class);
         classes.add(Bug78.class);
+        classes.add(Bug119Parent.class);
+        classes.add(Bug119Child.class);
 
         classes.add(SetupObject.class);
         classes.add(TestBase1.class);
@@ -83,7 +82,7 @@ public class Utils {
         classes.add(TestUpgrade4.class);
         classes.add(TestUpgrade5.class);
 
-        rushInitializeConfig.setClasses(classes);
+        RushInitializeConfig rushInitializeConfig = new AndroidInitializeConfig(context, classes);
 
         if(columns != null) {
             for (RushColumn rushColumn : columns) {

@@ -6,12 +6,10 @@ import org.json.JSONObject;
 import java.io.IOException;
 
 import co.uk.rushorm.core.RushTextFile;
-import co.uk.rushorm.core.annotations.RushTableAnnotation;
 
 /**
  * Created by Stuart on 19/01/15.
  */
-@RushTableAnnotation
 public class RushJSONFile extends RushTextFile {
 
     public RushJSONFile(String directory) {
