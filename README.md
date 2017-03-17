@@ -10,9 +10,11 @@
 
 RushOrm replaces the need for SQL by mapping java classes to SQL tables.
 <hr>
+
 ### What is the aim?
 The aim is to abstract away all SQLite interaction under a very simple interface to make object storage incredibly quick to implement.
 <hr>
+
 ### What projects is it right for?
 <ul>
     <li>Projects with complex data structures</li>
@@ -20,6 +22,7 @@ The aim is to abstract away all SQLite interaction under a very simple interface
     <li>Projects that talk to a rest api</li>
 </ul>
 <hr>
+
 ### Why was RushOrm written?
 <ul>
     <li>Complex relationships - RushObjects support Lists of other RushObjects</li>
@@ -54,6 +57,7 @@ Add the dependency in your build file:
     }
 
 <hr>
+
 ### Licence Apache License, Version 2.0
 Copyright (C) 2015 Stuart Campbell
 Licensed under the Apache License, Version 2.0 (the "License");
