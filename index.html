@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8"> 
+        <meta charset="utf-8">
+        <title>RushOrm - Object-relational mapping for Android</title>
+		<meta name="description" content="RushOrm for Android is an ORM (Object-relational mapping) library written in Java. 
+		Its focus is to be as developer friendly as possible so that the developer can design their data models without having to think about the underlying SQL." >
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+        <link href="css/bootstrap.min.css" rel="stylesheet">
+        
+        <!--[if lt IE 9]>
+          <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+        
+        <!-- <link rel="shortcut icon" href="/bootstrap/img/favicon.ico">
+        <link rel="apple-touch-icon" href="/bootstrap/img/apple-touch-icon.png">
+        <link rel="apple-touch-icon" sizes="72x72" href="/bootstrap/img/apple-touch-icon-72x72.png">
+        <link rel="apple-touch-icon" sizes="114x114" href="/bootstrap/img/apple-touch-icon-114x114.png"> -->
+
+        <!-- CSS code from Bootply.com editor -->
+        
+        <style type="text/css">
+            /*
+A Bootstrap 3.1 affix sidebar template
+from http://bootply.com
+
+This CSS code should follow the 'bootstrap.css'
+in your HTML file.
+
+license: MIT
+author: bootply.com
+*/
+
+body {
+ padding-top:50px;
+}
+
+#masthead { 
+ min-height:250px;
+}
+
+#masthead h1 {
+ font-size: 30px;
+ line-height: 1;
+ padding-top:20px;
+}
+
+#masthead .well {
+ margin-top:8%;
+}
+
+@media screen and (min-width: 768px) {
+  #masthead h1 {
+    font-size: 50px;
+  }
+}
+
+.navbar-bright {
+ background-color:#111155;
+ color:#fff;
+}
+
+.affix-top,.affix{
+ position: static;
+}
+
+@media (min-width: 979px) {
+  #sidebar.affix-top {
+    position: static;
+  	margin-top:30px;
+  	width:228px;
+  }
+  
+  #sidebar.affix {
+    position: fixed;
+    top:70px;
+    width:228px;
+  }
+}
+
+#sidebar li.active {
+  border:0 #eee solid;
+  border-right-width:5px;
+}
+
+pre {
+   background-color: transparent !important;
+   border: 0px solid transparent !important;
+}
+
+code {
+	min-width: 700px;
+}
+
+        </style>
+    </head>
+    
+    <link rel="stylesheet" href="highlight/styles/default.css">
+    <link class="codestyle" rel="stylesheet" href="highlight/styles/github.css">
+    <!-- HTML code from Bootply.com editor -->
+    
+<body>
+            
+<nav class="navbar navbar-default navbar-fixed-top" role="banner">
+  <div class="container">
+    <div class="navbar-header">
+      <a href="#" class="navbar-brand">RushOrm</a>
+      <a href="https://github.com/Stuart-campbell/RushOrm"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>
+    </div>
+    
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+      	<li class="active"><a href="#">Home</a></li>
+      	<li><a href="advanced.html">Advanced</a></li>
+        <li><a href="download.html">Download</a></li>
+        <li><a href="javadoc">Javadocs</a></li>
+      </ul>
+    </div><!-- /.navbar-collapse -->
+    
+  </div>
+</nav>
+
+<div id="masthead" class="hidden-sm hidden-xs">  
+  <div class="container">
+      <div class="row">
+        <div class="col-md-6">
+          <h1>RushOrm
+            <p class="lead">Object-relational mapping for Android</p>
+          </h1>
+        </div>
+        <div class="col-md-6">
+            <div class="well well-lg"> 
+              <div class="row">
+                <div class="col-sm-4">
+        	      	<img src="assets/database.png" alt="140x140" class="img-responsive">
+                </div>
+                <div class="col-sm-4">
+	              	<img src="assets/black-right-arrow.png" alt="140x140" class="img-responsive">
+                </div>
+                <div class="col-sm-4">
+	              	<img src="assets/android.png" alt="140x140" class="img-responsive">
+                </div>
+              </div>
+            </div>
+        </div>
+      </div> 
+  </div><!--/container-->
+</div><!--/masthead-->
+
+<!--main-->
+<div class="container">
+	<div class="row">
+      <!--left-->
+      <div class="col-md-3" id="leftCol">
+        <ul class="nav nav-stacked" id="sidebar">
+          <li><a href="#Overview">Overview</a></li>
+          <li><a href="#Setup">Setup</a></li>
+          <li><a href="#Tables">Tables</a></li>
+          <li><a href="#Children">Children</a></li>
+          <li><a href="#Select">Select</a></li>
+          <li><a href="#Files">Files</a></li>
+          <li><a href="#Proguard">Proguard</a></li>
+          <li><a href="#Licence">Licence</a></li>         
+        </ul>
+        
+        		
+
+        
+      </div><!--/left-->
+      
+      <!--right-->
+      <div class="col-md-9">
+        <h2 id="Overview">Overview</h2>
+        <p>RushOrm for Android replaces the need for SQL by mapping java classes to SQL tables.</p>
+        <hr>
+          <h3>What is the aim?</h3>
+          	<p>The aim is to abstract away all SQLite interaction under a very simple interface to make object storage incredibly quick to implement.</p> 
+        	<h3>What projects is it right for?</h3>
+        	<p>
+        		<ul>
+        			<li>Projects with complex data structures</li>
+        			<li>Projects that want to implement database storage in the minimum amount of time</li>
+        			<li>Projects that talk to a rest api</li>
+        		</ul>
+        	<p>
+          	
+          	<h3>Why was RushOrm written?</h3>
+          	<p>
+          		<ul>
+        			<li>Complex relationships - RushObjects support Lists of other RushObjects</li>
+        			<li>SQL free migration</li>
+        			<li>Easily extendable</li>
+        			<li>No dependencies</li>
+        			<li>Support asynchronous call</li>
+        			<li>Be fast through compound inserts and selects</li>
+        			<li>Support importing and exporting data to and from JSON</li>
+        			<li>Unique ids to support merging databases</li>
+        			<li>Supports conflict resolution when importing data</li>
+        		</ul>
+          	While there are a number of other ORMs, the areas many seem to fall short is the support of 'one to many' relationships, migration and extensions. While claiming all the same basic feature of most other ORMs RushOrm supports 'List' properties without having to add the parent object to it's children. It also handles migrating the class structure without any SQL scripts being required by the developer. Finally it is designed with the understanding that not every situation can be anticipated so instead it can be easily customized.
+          	</p>
+        
+        <hr>
+        
+        <h2 id="Setup">Setup</h2>
+        <h4>
+          RushOrm needs to be initialized before use. The best place to do this is in the Application class.
+        </h4>
+        <div class="row">
+          <div class="col-md-12">
+          	<pre>
+              	<code class="java">
+    public class ExampleApplication extends Application {
+
+        @Override
+        public void onCreate() {
+            super.onCreate();
+
+            // Rush is initialized asynchronously to recieve a callback after it initialized
+            // set an InitializeListener on the config object
+
+            // All classes that extent RushObject or implement Rush must be added to the config
+            // this is new to v1.3.0 to fix issues introduced in android 6, 
+            // this is far more efficient that searching for classes like in pervious versions
+            List&lt;Class&lt;? extends Rush&gt;&gt; classes = new ArrayList&lt;&gt;();			
+            classes.add(MyRushObject1.class);
+            classes.add(MyRushObject2.class);
+        	...
+
+            AndroidInitializeConfig config 
+                                    = new AndroidInitializeConfig(getApplicationContext(), classes);
+            RushCore.initialize(config);
+        }
+    }
+					</code>
+				</pre>
+          		</div>
+          </div>
+          <h4>Extra information can be optionally added to the Manifest the defaults are specified below. </h4>
+          <div class="row">
+          <div class="col-md-12">
+          	<pre>
+              	<code class="xml">
+              	
+   &lt;application
+              	
+              	...
+              	
+      &lt;!-- Updating this will cause a database upgrade --&gt;
+      &lt;meta-data android:name="Rush_db_version" android:value="1" /&gt;
+   
+      &lt;!-- Database name --&gt;
+      &lt;meta-data android:name="Rush_db_name" android:value="rush.db" /&gt;
+   
+      &lt;!-- Setting this to true will cause a migration to happen every launch, 
+      this is very handy during development although could cause data loss --&gt;
+      &lt;meta-data android:name="Rush_debug" android:value="false" /&gt;
+   
+      &lt;!-- Turning on logging can be done by settings this value to true --&gt;
+      &lt;meta-data android:name="Rush_log" android:value="false" /&gt;
+
+   &lt;/application&gt;
+					</code>
+				</pre>
+          		</div>
+          </div>
+
+        <hr>
+        
+        <h2 id="Tables">Tables</h2>
+        <p>
+        <h4>Simply extend RushObject</h4>
+        </p>
+        <div class="row">
+          <div class="col-md-12">
+          	<pre>
+              	<code class="java">
+    public class ExampleObject extends RushObject {
+        private String stringField;
+        private double doubleField;
+        private int intField;
+        private long longField;
+        private short shortField;
+        private boolean booleanField;
+        private Date dateField;
+    
+    	/* Use @RushIgnore annotation on fields you do not want to be saved */
+    	@RushIgnore
+    	public String ignoredField;
+    
+        /* Classes must include an empty constructer */
+        public ExampleObject(){}
+    }
+
+    /* Create and save */
+    ExampleObject object = new ExampleObject();
+    
+    /* Calling save will create or update table */
+    
+    /* Save synchronously */
+    object.save();
+
+    /* Save asynchronously */
+    object.save(new RushCallback() {
+        @Override
+        public void complete() {
+            /* Callback is on the thread objects where saved on, 
+                not thread that called save */
+        }
+    });
+					</code>
+				</pre>
+          		</div>
+          </div>
+          <p>
+        <h4>If you class hierarchy means you can't extend RushObject, you can instead implement Rush interface and copy in the methods below.</h4>
+        </p>
+        <div class="row">
+          <div class="col-md-12">
+          	<pre>
+              	<code class="java">
+    public class ExampleObject implements Rush {
+        @Override
+        public void save() { RushCore.getInstance().save(this); }
+        @Override
+        public void save(RushCallback callback) { RushCore.getInstance().save(this, callback); }
+        @Override
+        public void delete() { RushCore.getInstance().delete(this); }
+        @Override
+        public void delete(RushCallback callback) { RushCore.getInstance().delete(this, callback); }
+        @Override
+        public String getId() { return RushCore.getInstance().getId(this); }
+    }
+					</code>
+				</pre>
+          		</div>
+          </div>
+        <hr>
+        <h2 id="Children">Children</h2>
+        <p>
+        <h4>Classes can save other RushObject fields or lists.</h4>
+		</p>
+		<div class="row">
+          <div class="col-md-12">
+          	<pre>
+              	<code class="java">
+    public class ExampleObject extends RushObject {
+
+        private ExampleObject otherObject;  
+    
+        /* By default all children are deleted when the parent is deleted,
+            there are many reasons why this might not be wanted,
+            to disable this add the annotation @RushDisableAutodelete */
+    	@RushDisableAutodelete
+    	private ExampleObject multiplyReferencedObject;  
+    
+        /* Lists must have @RushList annotation with classType,
+        	listType can also be added the default is ArrayList */
+        @RushList(classType = ExampleObject.class)
+        private List&lt;ExampleObject&gt; otherObjects;
+    
+        /* Classes must include an empty constructer */
+        public ExampleObject(){}
+    }
+
+    ExampleObject object = new ExampleObject();
+    /* Saving will also save all children */
+    object.save();
+					</code>
+				</pre>
+          		</div>
+          </div>
+        <hr>
+        <h2 id="Select">Select</h2>
+        <p>
+        <h4>Retrieving saved objects is as powerful as raw SQL.</h4>
+		</p>
+		<div class="row">
+          <div class="col-md-12">
+          	<pre>
+              	<code class="java">
+    /* Get all objects */
+    List&lt;ExampleObject&gt; objects = new RushSearch().find(ExampleObject.class);
+              	
+    /* getId() will return object id or null if it has not been saved */
+    ExampleObject table = new RushSearch().whereId("1").findSingle(ExampleObject.class);
+    
+    /* Get all objects with id 1 or intField greater than 5 */
+    List&lt;ExampleObject&gt; objects = new RushSearch()
+    					.whereId("1")
+    					.or()
+    					.whereGreaterThan("intField", 5)
+    					.find(ExampleObject.class);
+    
+    /* Get all objects with id 1 or 
+    	stringField equal "Hello world" and intField greater than 5 */
+    List&lt;ExampleObject&gt; objects = new RushSearch()
+    					.whereId("1")
+    					.or()
+    					.startGroup()
+    					.whereEqual("stringField", "Hello world")
+    					.and()
+    					.whereGreaterThan("intField", 5)
+    					.endGroup()
+    					.find(ExampleObject.class);
+    									
+    /* Get all objects with id 1 or
+    	stringField equal "Hello world" and intField greater than 5 
+    	order ascending by intField */
+    List&lt;ExampleObject&gt; objects = new RushSearch()
+    					.whereId("1")
+    					.or()
+    					.startGroup()
+    					.whereEqual("stringField", "Hello world")
+    					.and()
+    					.whereGreaterThan("intField", 5)
+    					.endGroup()
+    					.orderAsc("intField")
+    					.find(ExampleObject.class);
+
+					</code>
+				</pre>
+          		</div>
+          		<h4>See <a href="http://www.rushorm.com/javadoc/co/uk/rushorm/core/RushSearch.html">RushSearch javadoc</a> for full further details.</h4>
+          </div>
+        <hr>
+        <h2 id="Files">Files</h2>
+        <p>
+        <h4>To handle long string, image or other data RushOrm has RushFile an extension to RushObject which writes data to disk.</h4>
+		</p>
+		<div class="row">
+          <div class="col-md-12">
+          	<pre>
+              	<code class="java">
+    RushTextFile file = new RushTextFile(getContext().getFilesDir().getAbsolutePath());
+    file.setText("Hello world"); /* Set text saves table and write text to file */
+    String text = file.getText();
+    
+    RushJSONFile file = new RushJSONFile(getContext().getFilesDir().getAbsolutePath());
+    file.setJSON(object); /* Set JSON saves table and write text to file */
+    JSONObject jsonObject = file.getJSON():
+    
+    RushBitmapFile file = new RushBitmapFile(getContext().getFilesDir().getAbsolutePath());
+    file.setImage(bitmap); /* Set image saves table and write image to file */
+    Bitmap bitmap = file.getBitmap();
+				</code>
+			</pre>
+          </div>
+        </div>       
+		<br>
+        <hr>
+        <h2 id="Proguard">Proguard</h2>
+        <p>
+        <h4>To use with progaurd you must exluce all classes than implement Rush</h4>
+		</p>
+		<div class="row">
+          <div class="col-md-12">
+          	<pre>
+              	<code class="html">
+    # Add this to the 'proguard-rules.pro' file
+    -keep public class * implements co.uk.rushorm.core.Rush { *; }
+				</code>
+			</pre>
+          	</div>
+          </div>
+        <hr>
+        <h2 id="Licence">Licence</h2>
+        <p>
+        <h4><a href="http://www.apache.org/licenses/LICENSE-2.0.html">Apache License, Version 2.0</a></h4>
+		</p>
+		<div class="row">
+          <div class="col-md-12">
+          	<pre>
+              	<code class="html">
+    Copyright (C) 2015 Stuart Campbell
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+					</code>
+				</pre>
+          		</div>
+          </div>
+        <hr>
+        <h2 id="Contributing">Contributing</h2>
+        <p>
+        <h4>Please get in touch with any feedback or bugs, it is very much appreciated. Its also great to know if you found the project useful.</h4>
+        <h5>Author</h5>
+        <h6>Stuart Campbell | <a href="https://twitter.com/Stu_cams">@stu_cams</a></h6>
+		</p>
+		<hr>
+		<div class="row">
+			  <div class="col-xs-offset-8 col-xs-4">
+				<a href="advanced.html" type="button" class="btn btn-primary">Advanced -></a>
+			</div>
+		</div>
+		
+		<!-- Footer -->
+		
+		<hr>
+		<br>
+		<br>
+		<br>
+		<br>
+        </div><!--/right-->
+  	</div><!--/row-->
+</div><!--/container-->
+
+        <script type='text/javascript' src="js/jquery.min.js"></script>
+        <script type='text/javascript' src="js/bootstrap.min.js"></script>
+  
+        <!-- JavaScript jQuery code from Bootply.com editor  -->
+        
+        <script src="highlight/highlight.pack.js"></script>
+		<script>hljs.initHighlightingOnLoad();</script>
+        
+        <script type='text/javascript'>
+        
+        $(document).ready(function() {
+		
+				/* activate sidebar */
+			$('#sidebar').affix({
+				offset: {
+					top: 235
+				}
+			});
+
+			/* activate scrollspy menu */
+			var $body   = $(document.body);
+			var navHeight = $('.navbar').outerHeight(true) + 10;
+
+			$body.scrollspy({
+				target: '#leftCol',
+				offset: navHeight
+			});
+
+			/* smooth scrolling sections */
+			$('a[href*=#]:not([href=#])').click(function() {
+				if (location.pathname.replace(/^\//,'') == this.pathname.replace(/^\//,'') && location.hostname == this.hostname) {
+				  var target = $(this.hash);
+				  target = target.length ? target : $('[name=' + this.hash.slice(1) +']');
+				  if (target.length) {
+					$('html,body').animate({
+					  scrollTop: target.offset().top - 50
+					}, 1000);
+					return false;
+				  }
+				}
+			});
+        
+        });
+        
+        </script>
+                
+    <script type="text/javascript">
+
+	  var _gaq = _gaq || [];
+	  _gaq.push(['_setAccount', 'UA-39669546-5']);
+	  _gaq.push(['_trackPageview']);
+
+	  (function() {
+		var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+		ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+		var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+	  })();
+
+	</script>
+                
+    </body>
+</html>

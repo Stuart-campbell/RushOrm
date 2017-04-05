@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8"> 
+        <meta charset="utf-8">
+        <title>RushOrm - Object-relational mapping for Android</title>
+		<meta name="description" content="RushOrm for Android is an ORM (Object-relational mapping) library written in Java. 
+		Its focus is to be as developer friendly as possible so that the developer can design their data models without having to think about the underlying SQL." >
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+        <link href="css/bootstrap.min.css" rel="stylesheet">
+        
+        <!--[if lt IE 9]>
+          <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+        
+        <!-- <link rel="shortcut icon" href="/bootstrap/img/favicon.ico">
+        <link rel="apple-touch-icon" href="/bootstrap/img/apple-touch-icon.png">
+        <link rel="apple-touch-icon" sizes="72x72" href="/bootstrap/img/apple-touch-icon-72x72.png">
+        <link rel="apple-touch-icon" sizes="114x114" href="/bootstrap/img/apple-touch-icon-114x114.png"> -->
+
+        <!-- CSS code from Bootply.com editor -->
+        
+        <style type="text/css">
+            /*
+A Bootstrap 3.1 affix sidebar template
+from http://bootply.com
+
+This CSS code should follow the 'bootstrap.css'
+in your HTML file.
+
+license: MIT
+author: bootply.com
+*/
+
+body {
+ padding-top:50px;
+}
+
+#masthead { 
+ min-height:250px;
+}
+
+#masthead h1 {
+ font-size: 30px;
+ line-height: 1;
+ padding-top:20px;
+}
+
+#masthead .well {
+ margin-top:8%;
+}
+
+@media screen and (min-width: 768px) {
+  #masthead h1 {
+    font-size: 50px;
+  }
+}
+
+.navbar-bright {
+ background-color:#111155;
+ color:#fff;
+}
+
+.affix-top,.affix{
+ position: static;
+}
+
+@media (min-width: 979px) {
+  #sidebar.affix-top {
+    position: static;
+  	margin-top:30px;
+  	width:228px;
+  }
+  
+  #sidebar.affix {
+    position: fixed;
+    top:70px;
+    width:228px;
+  }
+}
+
+#sidebar li.active {
+  border:0 #eee solid;
+  border-right-width:5px;
+}
+
+pre {
+   background-color: transparent !important;
+   border: 0px solid transparent !important;
+}
+
+code {
+	min-width: 700px;
+}
+
+        </style>
+    </head>
+    
+    <link rel="stylesheet" href="highlight/styles/default.css">
+    <link class="codestyle" rel="stylesheet" href="highlight/styles/github.css">
+    <!-- HTML code from Bootply.com editor -->
+    
+<body>
+            
+<nav class="navbar navbar-default navbar-fixed-top" role="banner">
+  <div class="container">
+    <div class="navbar-header">
+      <a href="#" class="navbar-brand">RushOrm</a>
+      <a href="https://github.com/Stuart-campbell/RushOrm"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>
+    </div>
+    
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+      	<li><a href="/">Home</a></li>
+      	<li class="active"><a href="#">Advanced</a></li>
+        <li><a href="download.html">Download</a></li>
+        <li><a href="javadoc">Javadocs</a></li>
+      </ul>
+    </div><!-- /.navbar-collapse -->
+    
+  </div>
+</nav>
+
+<div id="masthead" class="hidden-sm hidden-xs">  
+  <div class="container">
+      <div class="row">
+        <div class="col-md-6">
+          <h1>RushOrm
+            <p class="lead">Object-relational mapping for Android</p>
+          </h1>
+        </div>
+      </div> 
+  </div><!--/container-->
+</div><!--/masthead-->
+
+<!--main-->
+<div class="container">
+	<div class="row">
+      <!--left-->
+      <div class="col-md-3" id="leftCol">
+        <ul class="nav nav-stacked" id="sidebar">
+          <li><a href="#Export">Export</a></li>
+          <li><a href="#Import">Import</a></li>
+          <li><a href="#Conflicts">Conflicts</a></li>
+          <li><a href="#Transitions">Transitions</a></li>
+          <li><a href="#Upgrading">Upgrading</a></li>
+          <li><a href="#Customise">Customise</a></li>
+          <li><a href="#Troubleshooting">Troubleshooting</a></li>
+        </ul>
+
+      </div><!--/left-->
+      
+      <!--right-->
+      <div class="col-md-9">
+ 
+ 		<h2 id="Export">Export</h2>
+        <p>
+        <h4>RushOrm can export your RushObjects to JSON</h4>
+		</p>
+		<div class="row">
+          <div class="col-md-12">
+          	<pre>
+              	<code class="java">
+    List&lt;ExampleObject&gt; objects;
+
+    /* Create json string from objects */
+    String jsonString = RushCore.getInstance().serialize(objects);
+
+    /* Below is an example of the JSON structure that is produced. 
+        The name of the root element can be changed from the class 
+        name by adding @RushClassSerializationName annotation to the class */
+	
+    {
+    	"co.uk.rushexample.testobjects.TestObject": [
+        {
+            	"rush_id": "35c4b394-49db-45e1-bb0f-9de7ac788e07",
+            	"rush_version": 1,
+            	"stringField": "string",
+            	"doubleField": "0.0",
+            	"intField": "0",
+            	"longField": "0",
+            	"shortField": "0",
+            	"booleanField": "false",
+            	"dateField":"1424625767166",      
+            	"childObject": {
+                	"rush_id": "90a68ea5-bbcf-4e22-b835-1a0f7c72594c",
+                	"rush_version": 1,
+                	"stringField": "string",
+            		"doubleField": "0.0",
+            		"intField": "0",
+            		"longField": "0",
+            		"shortField": "0"
+            	}    	            	            	
+         } ,
+         {
+            	"rush_id": "925d4a4d-dbf1-4f90-8257-d249233305c0",
+            	"rush_version": 1,
+            	"stringField": "string",
+            	"doubleField": "0.0",
+            	"intField": "0",
+            	"longField": "0",
+            	"shortField": "0",
+            	"booleanField": "false",   	            	            	
+         }]
+    }
+    
+    
+					</code>
+				</pre>
+          		</div>
+          </div>
+        <hr>
+ 
+  		<h2 id="Import">Import</h2>
+        <p>
+        <h4>RushOrm can import your RushObejcts from JSON</h4>
+		</p>
+		<div class="row">
+          <div class="col-md-12">
+          	<pre>
+              	<code class="java">
+
+    /* Create objects from JSON string */
+    List&lt;Rush&gt; objects jsonString = RushCore.getInstance().deserialize(jsonString);
+
+    /* The JSON format must match the export format */
+
+    /* Once imported the object still need to be saved.
+        Using this method rather than another library registers 
+        the rush_id and rush_version with RushCore so that when
+        saved the objects will update any objects already in the
+        database with the same id. If your objects are deserialize
+        in another way RushOrm will treat them as new objects */
+
+					</code>
+				</pre>
+          		</div>
+          </div>
+        <hr>
+ 
+ <h2 id="Conflicts">Conflicts</h2>
+        <p>
+        <h4>RushOrm uses object versioning to detect Conflicts</h4>
+		</p>
+		<div class="row">
+          <div class="col-md-12">
+          	<pre>
+              	<code class="java">
+
+    /* RushOrm classes an object in conflict if its version number 
+        is below that in the database. Every time an object is saved 
+        it's version number is increased. If an object can be saved
+        from multiple places without being reloaded checking for conflicts
+        may be helpful. The main reason for checking for conflicts is if
+        your data is shared between devices, using export and import. */
+        
+    List&lt;Rush&gt; objects jsonString = RushCore.getInstance().deserialize(jsonString);
+
+    List&lt;RushConflict&gt; conflicts = RushCore.getInstance().saveOnlyWithoutConflict(objects);
+
+    List&lt;Rush&gt; resolvedObjects = new ArrayList&lt;&gt;(); 
+    for(RushConflict conflict : conflicts) {
+        Rush toBeSaved = conflict.getToBeSaved();
+        Rush inDataBase = conflict.getInDataBase();
+        /* Pick which one you want or perform any logic to combined changes */
+			
+        if(/* Picked toBeSaved */) {
+            conflict.resolve();
+            resolvedObjects(toBeSaved);
+        }
+    }
+    /* If you are worried the objects in the database 
+        could have been updated during the resolution process
+        you can repeat saveOnlyWithoutConflict if not just call save */
+    
+    List&lt;RushConflict&gt; conflicts = RushCore.getInstance().saveOnlyWithoutConflict(objects);
+
+    /* Note saveOnlyWithoutConflict is far slower than save
+        so should only be used if you care about conflicts */
+					</code>
+				</pre>
+          		</div>
+          </div>
+        <hr>
+ 
+ 		<h2 id="Transitions">Transitions</h2>
+        <p>
+        <h4>Objects and their children are saved in transitions by default but lists of RushObjects can also be saved in a transition.</h4>
+		</p>
+		<div class="row">
+          <div class="col-md-12">
+          	<pre>
+              	<code class="java">
+    List&lt;ExampleObject&gt; objects;
+
+    /* Save synchronously */
+    RushCore.getInstance().save(objects);
+
+    /* Save asynchronously */
+    RushCore.getInstance().save(objects, new RushCallback() {
+        @Override
+        public void complete() {
+            /* Callback is on the thread objects where saved on, 
+                not thread that called save */
+        }
+    });
+					</code>
+				</pre>
+          		</div>
+          </div>
+        <hr>
+ 
+        <h2 id="Upgrading">Upgrading</h2>
+        <p>
+        <h4>When an upgrade is run, RushOrm difs the new class structure against the database, 
+        updating the database as required. This include creating new tables and fields then removing old ones.
+        In debug mode RushOrm will perform an upgrade on ever run making development easy. Debug mode is set in the manifest see <a href="/#Setup">setup</a>.
+        The other way to cause an upgrade is to increate the database version.
+        </h4>
+		</p>
+		<div class="row">
+          <div class="col-md-12">
+          	<pre>
+              	<code class="java">
+    /* RushOrm also supports renaming of classes or fields,
+        to do so add @RushRenamed annotation to the class 
+        or field thats name has change listing all possible old names */
+						
+    /* Old class names must include package */ 						
+    @RushRenamed(names = {"co.uk.rushorm.ExampleObject"})
+    public class RenamedExampleObject extends RushObject {
+											
+        @RushRenamed(names = {"stringField"})
+        private String renamedStringField;							
+    }
+				</code>
+			</pre>
+        	</div>
+          </div>
+          <h5>If a more complex upgrade is required you can implement your own RushUpgradeManager and run custom SQL onUpgrade.</h5>
+          <br>
+		<br>
+		 
+		 <h2 id="Customise">Customise</h2>
+        <p>
+        <h4>RushOrm can have many elements of it customised to fit any purpose. To see the full list of interfaces that define RushOrm, see <a href="https://github.com/Stuart-campbell/RushOrm/blob/master/RushORM/rushcore/src/main/java/co/uk/rushorm/core/RushCore.java">RushCore</a>. If rush does not fit your needs it is likely that reimplementing one of these interfaces will achieve them.</h4>
+		</p>
+		<div class="row">
+          <div class="col-md-12">
+          	<pre>
+              	<code class="java">
+    /* The most common extension to make is to implement custom columns.
+	    This can be done by injecting your own RushColumns into initialize */ 
+              	
+    AndroidInitializeConfig config = new AndroidInitializeConfig(getApplicationContext());
+    config.addRushColumn(new MyColumn());
+    RushCore.initialize(config);
+              	
+    /* Below is an example of creating a custom field */          	
+    public class MyClass {
+        public String name;
+    }
+              	
+    private class MyColumn implements RushColumn&lt;MyClass&gt; {
+        @Override
+        public String sqlColumnType() {
+            return "varchar(255)";
+        }
+
+        @Override
+        public String serialize(MyClass object, RushStringSanitizer stringSanitizer) {
+            return stringSanitizer.sanitize(object.name);
+        }
+
+        @Override
+        public MyClass deserialize(String value) {
+            MyClass myClass = new MyClass();
+            myClass.name = value;
+            return myClass;
+        }
+
+        @Override
+        public Class[] classesColumnSupports() {
+            return new Class[]{MyClass.class};
+        }
+    }
+					</code>
+				</pre>
+          		</div>
+          </div>
+        <hr>
+        <h2 id="Troubleshooting">Troubleshooting</h2>
+        <p>
+        <h4>RushOrm has a known issue with a select number of other libraries. Rush loops through every class in the dex file then loads it to check if it implements Rush, this prosess seems to cause problems with some libaries. Unfortunatly there does not seem to be a way of finding classes without causing this problem.</h4>
+    </p>
+    <div class="row">
+          <div class="col-md-12">
+            <pre>
+                <code class="java">
+
+    /* Luckly there is a very simple work around. 
+      Simple set your classes on the config object and this problem is resolved. */
+    List&lt;Class&lt;? extends Rush&gt;&gt; classes = ArrayList&lt;&gt;();
+    // Add classes
+    classes.add(Example.class);
+    ... 
+
+    AndroidInitializeConfig config = new AndroidInitializeConfig(getApplicationContext());
+    config.setClasses(classes);
+    RushCore.initialize(config);
+
+          </code>
+        </pre>
+              </div>
+          </div>
+        <hr>
+        <h2 id="Contributing">Contributing</h2>
+        <p>
+        <h4>Please get in touch with any feedback or bugs, it is very much appreciated. Its also great to know if you found the project useful.</h4>
+        <h5>Author</h5>
+        <h6>Stuart Campbell | <a href="https://twitter.com/Stu_cams">@stu_cams</a></h6>
+		</p>
+		<hr>
+		<div class="row">
+			  <div class="col-xs-offset-8 col-xs-4">
+				<a href="download.html" type="button" class="btn btn-primary">Download -></a>
+			</div>
+		</div>
+		
+		<!-- Footer -->
+		
+		<hr>
+		<br>
+		<br>
+		<br>
+		<br>
+        </div><!--/right-->
+  	</div><!--/row-->
+</div><!--/container-->
+
+        <script type='text/javascript' src="js/jquery.min.js"></script>
+        <script type='text/javascript' src="js/bootstrap.min.js"></script>
+  
+        <!-- JavaScript jQuery code from Bootply.com editor  -->
+        
+        <script src="highlight/highlight.pack.js"></script>
+		<script>hljs.initHighlightingOnLoad();</script>
+        
+        <script type='text/javascript'>
+        
+        $(document).ready(function() {
+		
+				/* activate sidebar */
+			$('#sidebar').affix({
+				offset: {
+					top: 235
+				}
+			});
+
+			/* activate scrollspy menu */
+			var $body   = $(document.body);
+			var navHeight = $('.navbar').outerHeight(true) + 10;
+
+			$body.scrollspy({
+				target: '#leftCol',
+				offset: navHeight
+			});
+
+			/* smooth scrolling sections */
+			$('a[href*=#]:not([href=#])').click(function() {
+				if (location.pathname.replace(/^\//,'') == this.pathname.replace(/^\//,'') && location.hostname == this.hostname) {
+				  var target = $(this.hash);
+				  target = target.length ? target : $('[name=' + this.hash.slice(1) +']');
+				  if (target.length) {
+					$('html,body').animate({
+					  scrollTop: target.offset().top - 50
+					}, 1000);
+					return false;
+				  }
+				}
+			});
+        
+        });
+        
+        </script>
+                
+    <script type="text/javascript">
+
+	  var _gaq = _gaq || [];
+	  _gaq.push(['_setAccount', 'UA-39669546-5']);
+	  _gaq.push(['_trackPageview']);
+
+	  (function() {
+		var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+		ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+		var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+	  })();
+
+	</script>
+                
+    </body>
+</html>
