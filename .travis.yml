@@ -8,7 +8,7 @@ env:
     - ADB_INSTALL_TIMEOUT=20
 android:
   components:
-  - build-tools-25.0.2
+  - build-tools-25.0.0
   - extra-android-m2repository
   - $ANDROID_TARGET
   - sys-img-${ANDROID_ABI}-${ANDROID_TARGET}
