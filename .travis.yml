@@ -2,13 +2,13 @@ language: android
 jdk: oraclejdk8
 env:
   global:
-    - ANDROID_TARGET=android-23
+    - ANDROID_TARGET=android-25
     - EMULATOR_TARGET=android-21
     - ANDROID_ABI=armeabi-v7a
     - ADB_INSTALL_TIMEOUT=20
 android:
   components:
-  - build-tools-23.0.0
+  - build-tools-25.0.2
   - extra-android-m2repository
   - $ANDROID_TARGET
   - sys-img-${ANDROID_ABI}-${ANDROID_TARGET}
