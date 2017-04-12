@@ -13,6 +13,10 @@ android:
   - $ANDROID_TARGET
   - sys-img-${ANDROID_ABI}-${ANDROID_TARGET}
   - sys-img-${ANDROID_ABI}-${EMULATOR_TARGET}
+licenses:
+  - 'android-sdk-preview-license-.+'
+  - 'android-sdk-license-.+'
+  - 'google-gdk-license-.+'
 before_script:
   - cd RushORM
   - ./gradlew build
