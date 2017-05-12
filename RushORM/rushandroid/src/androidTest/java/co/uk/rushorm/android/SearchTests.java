@@ -450,6 +450,22 @@ public class SearchTests extends ApplicationTestCase<Application> {
         assertTrue(testObjects.size() == 5);
     }
 
+    public void testWhereInEmpty() throws Exception {
+
+        List<TestObject> list = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            TestObject testObject = new TestObject();
+            list.add(testObject);
+        }
+
+        RushCore.getInstance().save(list);
+
+        List<String> strings = new ArrayList<>();
+        List<TestObject> testObjects = new RushSearch().whereIN("stringField", strings).find(TestObject.class);
+        assertTrue(testObjects.size() == 0);
+    }
+
+
     public void testGroupBy() throws Exception {
 
         List<TestObject> list = new ArrayList<>();
