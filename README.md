@@ -38,11 +38,11 @@ The aim is to abstract away all SQLite interaction under a very simple interface
 While there are a number of other ORMs, the areas many seem to fall short is the support of 'one to many' relationships, migration and extensions. While claiming all the same basic feature of most other ORMs RushOrm supports 'List' properties without having to add the parent object to it's children. It also handles migrating the class structure without any SQL scripts being required by the developer. Finally it is designed with the understanding that not every situation can be anticipated so instead it can be easily customized.
 <hr>
 
-For getting started see http://www.rushorm.com/
+For getting started see http://www.rushorm.co.uk/
 
 <hr>
 
-Rush jar can be downloaded from http://www.rushorm.com/download.html alternatively it can be added as below.
+Rush jar can be downloaded from http://www.rushorm.co.uk/download.html alternatively it can be added as below.
 
 Make sure your project is using maven central by including this in your gradle file:
 
