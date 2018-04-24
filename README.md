@@ -53,7 +53,7 @@ Make sure your project is using maven central by including this in your gradle f
 Add the dependency in your build file:
 
     dependencies {
-       compile 'co.uk.rushorm:rushandroid:1.3.0’
+       implementation 'co.uk.rushorm:rushandroid:1.3.0’
     }
 
 <hr>
