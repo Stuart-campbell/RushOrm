@@ -1,3 +1,8 @@
+# This project is no longer maintained 
+See Room as the recommended alternative https://developer.android.com/training/data-storage/room
+
+<hr>
+
 [![Build Status](https://travis-ci.org/Stuart-campbell/RushOrm.svg?branch=master)](https://travis-ci.org/Stuart-campbell/RushOrm)
 [![Coverage Status](https://coveralls.io/repos/github/Stuart-campbell/RushOrm/badge.svg?branch=feature%2Fadd_test_coverage)](https://coveralls.io/github/Stuart-campbell/RushOrm?branch=feature%2Fadd_test_coverage)
 [![Android Weekly](http://img.shields.io/badge/Android%20Weekly-%23139-lightgrey.svg?style=flat)](http://androidweekly.net/issues/issue-139)
